@@ -1,0 +1,15 @@
+{
+    "navigation": {
+        "invoices": "User Rates",
+        "dropdown" : {
+          "invoices": "Invoices"
+        },
+        "default-rate": "Default User Rate",
+        "rate": "Rate",
+        "edit-rate": "Edit Default Rate",
+        "rate-project": "Project"
+      },
+      "message": {
+        "no_data": "No data to display"
+      }
+}

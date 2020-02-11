@@ -1,0 +1,22 @@
+.email-reports{
+    &__calendar {
+        width: 330px;
+    }
+}
+.form-inputs {
+    display: flex;
+    padding: 0 0 0.5rem 0;
+    align-items: baseline;
+    width: 400px;
+    flex-grow: 3;
+    
+    .email-input, .error123 {
+        width: 340px;
+        display: block;
+
+    }
+}
+.email-input {
+    padding-right: 0.6rem;
+}
+

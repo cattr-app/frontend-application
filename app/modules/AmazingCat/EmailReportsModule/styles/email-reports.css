@@ -1,0 +1,14 @@
+.email-reports__calendar {
+  width: 330px;
+}
+.form-inputs {
+  display: flex;
+  align-items: center;
+  padding: 0 0 0.5rem 0;
+}
+.form-inputs .email-input {
+  width: 340px;
+}
+.email-input {
+  padding-right: 0.6rem;
+}

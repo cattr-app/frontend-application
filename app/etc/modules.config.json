@@ -1,0 +1,10 @@
+{
+  "AmazingCat_SampleModule": {
+    "type": "package",
+    "ref": "@amazingtime/sample-at-module",
+    "enabled": true
+  },
+  "AmazingCat_ProjectsModule": {
+    "enabled": true
+  }
+}

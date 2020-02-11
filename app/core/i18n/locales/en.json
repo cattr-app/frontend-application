@@ -1,0 +1,139 @@
+{
+  "navigation": {
+    "settings": "Settings",
+    "company_settings": "Company Settings",
+    "logout": "Logout",
+    "dropdown": {
+      "reports": "Reports"
+    }
+  },
+  "auth": {
+    "submit": "Login",
+    "forgot_password": "Forgot password?",
+    "message": {
+      "user_not_found": "We can't find the user with provided credentials",
+      "solve_captcha": "You must solve a CAPTCHA",
+      "auth_error": "Authorization error"
+    }
+  },
+  "reset": {
+    "forgot_password": "Forgot password?",
+    "reset_password": "Reset password",
+    "confirm_password": "Confirm password",
+    "step": "Шаг {n}",
+    "step_description": {
+      "step_1": "Enter email",
+      "step_2": "Check your email",
+      "step_3": "Enter new password",
+      "step_4": "Enjoy"
+    },
+    "tabs": {
+      "enter_email": {
+        "title": "Forgot password?",
+        "subtitle": "Enter your email and we will send a link to reset your password"
+      },
+      "check_email": {
+        "title": "Check your email",
+        "subtitle": "Check your email, and follow the link in the password reset email to complete the process"
+      },
+      "new_password": {
+        "title": "Enter new password",
+        "subtitle": "Password must be at least 6 characters"
+      },
+      "success": {
+        "title": "Success",
+        "subtitle": "Your password has been successfully changed"
+      }
+    },
+    "page_is_not_available": "This page is no longer available",
+    "go_away": "Go to login page"
+  },
+  "settings": {
+    "account": "Account",
+    "general": "General",
+    "language": "Language",
+    "company": "Company",
+    "company_timezone": "Company timezone",
+    "redmine_synchronization": "Redmine synchronization",
+    "gitlab_synchronization": "Gitlab synchronization"
+  },
+  "control": {
+    "save": "Save",
+    "create": "Create",
+    "view": "View",
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "yes": "Yes",
+    "no": "No",
+    "back": "Back",
+    "submit": "Submit",
+    "select_all": "Select All",
+    "user_selected": "No users selected | 1 user selected | {count} users selected",
+    "project_selected": "No projects selected | 1 project selected | {count} projects selected",
+    "day": "Day",
+    "week": "Week",
+    "month": "Month",
+    "range": "Range",
+    "active": "Active",
+    "inactive": "Inactive",
+    "search": "Search",
+    "add_time": "Add time",
+    "enable": "Enable",
+    "disable": "Disable",
+    "select": "Select",
+    "cancel": "Cancel"
+  },
+  "field": {
+    "password": "Password",
+    "name": "Name",
+    "full_name": "Full name",
+    "email": "E-mail",
+    "user": "User",
+    "active":  "Active",
+    "change_password": "Change password",
+    "screenshot": "Screenshot",
+    "screenshots": "Screenshots",
+    "screenshots_active": "Screenshots Active",
+    "manual_time": "Manual Time",
+    "screenshots_interval": "Screenshots Interval",
+    "computer_time_popup": "Computer Time Popup",
+    "timezone": "Timezone",
+    "default_role": "Default Role",
+    "project_roles": "Project Roles",
+    "task": "Task",
+    "project": "Project",
+    "priority": "Priority",
+    "created_at": "Created",
+    "updated_at": "Last edit",
+    "team": "Team",
+    "amount_of_tasks": "Amount of tasks",
+    "description": "Description",
+    "important": "Important",
+    "actions": "Actions",
+    "start_at": "Start at",
+    "end_at": "End at",
+    "role": "Role",
+    "user_language": "User Language",
+    "send_invite": "Send invite",
+    "selected": "Selected",
+    "total": "Total"
+  },
+  "filter": {
+    "full_name": "Filter by full name",
+    "email": "Filter by e-mail",
+    "task": "Filter by task name",
+    "project": "Filter by project name"
+  },
+  "message": {
+    "no_data": "No data to display",
+    "page_not_found": "Looks like the page you're looking for aren't exists :(",
+    "page_forbidden": "Access forbidden",
+    "field_is_required": "This field is required"
+  },
+  "time": {
+    "h": "h",
+    "m": "m",
+    "s": "s"
+  }
+}

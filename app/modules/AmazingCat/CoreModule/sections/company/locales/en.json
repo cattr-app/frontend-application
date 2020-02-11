@@ -1,0 +1,9 @@
+{
+  "navigation": {
+    "users": "Users"
+  },
+  "users": {
+    "grid-title": "Users",
+    "crud-title": "User"
+  }
+}

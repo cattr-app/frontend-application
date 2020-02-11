@@ -1,0 +1,15 @@
+{
+  "navigation": {
+    "tasks": "Tasks"
+  },
+  "tasks": {
+    "grid-title": "Tasks",
+    "crud-title": "Task"
+  },
+  "filter": {
+    "tasks": {
+      "name": "Filter By Task Name",
+      "project_name": "Filter By Project Name"
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "navigation": {
+    "email-reports": "Отправка отчетов на почту"
+  },
+  "email-reports": {
+    "title": "Конфигурация отправки отчётов на почту",
+    "create-title": "Новый отчёт"
+  },
+  "field": {
+    "pdf": "pdf",
+    "csv": "csv",
+    "xlsx": "xlsx",
+    "document_type": "Формат документа",
+    "create": "Создать отчет",
+    "frequency": {
+      "daily": "Каждый день",
+      "weekly": "Каждую неделю",
+      "monthly": "Каждый месяц",
+      "label": "Частота отправки"
+    },
+    "statistic_type": {
+      "label": "Тип статистики",
+      "invoices_statistic": "Выставления счета",
+      "project_report": "Проектный отчёт"
+    },
+    "projects": "Проекты",
+    "email": "Почта",
+    "report-name": "Наименование отчета",
+    "project_ids": "Проекты",
+    "value": "Дата получения",
+    "email-reports": {
+      "name": "Наименование отчета"
+    },
+    "events": {
+      "add": "Добавить почту"
+    }
+  }
+}

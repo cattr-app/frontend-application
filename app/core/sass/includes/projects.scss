@@ -1,0 +1,14 @@
+.projects-grid {
+  &__initials-row {
+      display: flex;
+      flex-wrap: wrap;
+
+    .avatar {
+      margin: $spacing-01;
+
+      &:first-child {
+        margin-left: 0;
+      }
+    }
+  }
+}

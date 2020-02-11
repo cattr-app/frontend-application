@@ -1,0 +1,14 @@
+{
+    "navigation": {
+        "invoices": "Пользовательская ставка",
+        "dropdown" : {
+          "invoices": "Счета"
+        },
+        "default-rate": "Ставка по умолчанию",
+        "rate": "Ставка",
+        "rate-project": "Проект"
+      },
+      "message": {
+        "no_data": "Нет данных для отображения"
+      }
+}

@@ -1,0 +1,38 @@
+{
+  "navigation": {
+    "email-reports": "Email Reports"
+  },
+  "email-reports": {
+    "title": "Email Reports Configuration",
+    "create-title": "New Email Reports"
+  },
+  "field": {
+    "pdf": "pdf",
+    "csv": "csv",
+    "xlsx": "xlsx",
+    "document_type": "Document type",
+    "create": "Create Report",
+    "frequency": {
+      "daily": "daily",
+      "weekly": "weekly",
+      "monthly": "monthly",
+      "label": "Frequency"
+    },
+    "statistic_type": {
+      "label": "Statistic Type",
+      "invoices_statistic": "Invoices Statistic",
+      "project_report": "Project Report Statistic"
+    },
+    "projects": "Projects",
+    "email": "Email",
+    "report-name": "Report Name",
+    "project_ids": "Projects",
+    "value": "Receiving Date",
+    "email-reports": {
+      "name": "Report Name"
+    },
+    "events": {
+      "add": "Add Email"
+    }
+  }
+}

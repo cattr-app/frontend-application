@@ -1,0 +1,11 @@
+{
+  "name": "@amazingtime/vue-cli-plugin-at-compiler",
+  "version": "1.0.0",
+  "author": {
+    "name": "AmazingCat LLC",
+    "email": "to@amazingcat.net"
+  },
+  "dependencies": {
+    "lodash": "^4.17.15"
+  }
+}
