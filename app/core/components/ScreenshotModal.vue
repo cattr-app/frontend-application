@@ -86,7 +86,7 @@
         },
         computed: {
             baseURL() {
-                return (env.API_URL || 'http://localhost:8000') + '/';
+                return (env.API_URL || `${window.location.origin}/api`)+ '/';
             },
         },
         methods: {

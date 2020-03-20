@@ -20,7 +20,7 @@
         },
         data() {
             return {
-                url: env.API_URL + '/' + this.src
+                url: (env.API_URL || `${window.location.origin}/api`) + '/' + this.src
             };
         },
         methods: {
@@ -32,7 +32,7 @@
 
                 if (this.src) {
                     axios.get(this.src, {
-                        baseURL: (env.API_URL || 'http://localhost:8000') + '/',
+                        baseURL: (env.API_URL || `${window.location.origin}/api`) + '/',
                         responseType: 'blob'
                     }).then(response => {
                         const blob = response.data;
@@ -57,7 +57,7 @@
                 if (this.isBlob) {
                     this.load();
                 } else {
-                    this.url = env.API_URL + '/' + this.src;
+                    this.url = (env.API_URL || `${window.location.origin}/api`) + '/' + this.src;
                 }
             }
         }
