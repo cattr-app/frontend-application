@@ -43,6 +43,10 @@
                 type: Object,
                 required: true,
             },
+            currentProjects: {
+                type: Object,
+                required: true,
+            },
             sort: {
                 type: String,
                 required: true,
@@ -95,7 +99,7 @@
 
                         lineWidth += infixWidth;
 
-                        if (this.breakWords && wordWidth > desiredWidth || this.ellipsis && this.isEditing) {
+                        if ((this.breakWords && wordWidth > desiredWidth) || (this.ellipsis && this.isEditing)) {
                             line.push(infix);
                             var letterWidth;
                             // var word = word.split('');
@@ -154,12 +158,13 @@
         },
         methods: {
             formatDuration: formatDurationString,
-            draw: debounce(function () {
+            draw: debounce(function() {
                 this.canvas.clear();
 
                 // User column header
                 const userLabel = new fabric.Textbox(this.$t('dashboard.user'), {
-                    left: 0, top: 8,
+                    left: 0,
+                    top: 8,
                     height: rowHeight,
                     textAlign: 'left',
                     fontFamily: 'Nunito, sans-serif',
@@ -175,8 +180,10 @@
 
                 if (this.sort === 'user') {
                     const sortIcon = new fabric.Triangle({
-                        left: userLabel.width + 4, top: 14,
-                        width: 8, height: 8,
+                        left: userLabel.width + 4,
+                        top: 14,
+                        width: 8,
+                        height: 8,
                         flipY: this.sortDir === 'desc',
                         fill: '#B1B1BE',
                         strokeWidth: 0,
@@ -190,7 +197,8 @@
 
                 // Worked column header
                 const workedLabel = new fabric.Textbox(this.$t('dashboard.worked'), {
-                    left: 194, top: 8,
+                    left: 194,
+                    top: 8,
                     height: rowHeight,
                     textAlign: 'left',
                     fontFamily: 'Nunito, sans-serif',
@@ -206,8 +214,10 @@
 
                 if (this.sort === 'worked') {
                     const sortIcon = new fabric.Triangle({
-                        left: workedLabel.width + 198, top: 14,
-                        width: 8, height: 8,
+                        left: workedLabel.width + 198,
+                        top: 14,
+                        width: 8,
+                        height: 8,
                         flipY: this.sortDir === 'desc',
                         fill: '#B1B1BE',
                         strokeWidth: 0,
@@ -225,100 +235,207 @@
                     if (user.avatar === 'gravatar') {
                         const emailMD5 = md5(user.email);
                         const url = `https://www.gravatar.com/avatar/${emailMD5}`;
-                        fabric.Image.fromURL(url, image => {
-                            image.scaleToWidth(avatarSize, true);
-                            this.canvas.add(image);
-                            this.canvas.requestRenderAll();
-                        }, {
-                            left: 0, top: top + 20,
-                            strokeWidth: 0,
-                            clipPath: new fabric.Rect({
-                                left: 0, top: top + 20,
-                                width: avatarSize, height: avatarSize,
-                                rx: 5, ry: 5,
-                                absolutePositioned: true,
-                            }),
-                            ...fabricObjectOptions,
-                        });
+                        fabric.Image.fromURL(
+                            url,
+                            image => {
+                                image.scaleToWidth(avatarSize, true);
+                                this.canvas.add(image);
+                                this.canvas.requestRenderAll();
+                            },
+                            {
+                                left: 0,
+                                top: top + 20,
+                                strokeWidth: 0,
+                                clipPath: new fabric.Rect({
+                                    left: 0,
+                                    top: top + 20,
+                                    width: avatarSize,
+                                    height: avatarSize,
+                                    rx: 5,
+                                    ry: 5,
+                                    absolutePositioned: true,
+                                }),
+                                ...fabricObjectOptions,
+                            },
+                        );
                     } else {
                         // Avatar background
-                        this.canvas.add(new fabric.Rect({
-                            left: 0, top: top + 20,
-                            width: avatarSize, height: avatarSize,
-                            rx: 5, ry: 5,
-                            fill: getBackgroundColor(user.full_name.length),
-                            strokeWidth: 0,
-                            ...fabricObjectOptions,
-                        }));
+                        this.canvas.add(
+                            new fabric.Rect({
+                                left: 0,
+                                top: top + 20,
+                                width: avatarSize,
+                                height: avatarSize,
+                                rx: 5,
+                                ry: 5,
+                                fill: getBackgroundColor(user.full_name.length),
+                                strokeWidth: 0,
+                                ...fabricObjectOptions,
+                            }),
+                        );
 
                         // Avatar label
-                        this.canvas.add(new fabric.Textbox(getInitials(user.full_name), {
-                            left: 0, top: top + 25,
-                            width: avatarSize, height: avatarSize,
-                            textAlign: 'center',
-                            fontFamily: 'Nunito, sans-serif',
-                            fontSize: 13,
-                            fontWeight: '500',
-                            fill: 'rgb(255, 255, 255)',
-                            ...fabricObjectOptions,
-                        }));
+                        this.canvas.add(
+                            new fabric.Textbox(getInitials(user.full_name), {
+                                left: 0,
+                                top: top + 25,
+                                width: avatarSize,
+                                height: avatarSize,
+                                textAlign: 'center',
+                                fontFamily: 'Nunito, sans-serif',
+                                fontSize: 13,
+                                fontWeight: '500',
+                                fill: 'rgb(255, 255, 255)',
+                                ...fabricObjectOptions,
+                            }),
+                        );
                     }
 
                     // Name label
-                    this.canvas.add(new fabric.Textbox(user.full_name, {
-                        left: avatarSize + 10, top: top + 18,
-                        width: 140, height: rowHeight,
-                        textAlign: 'left',
-                        fontFamily: 'Nunito, sans-serif',
-                        fontSize: 13,
-                        fontWeight: '500',
-                        fill: '#151941',
-                        ellipsis: true,
-                        ...fabricObjectOptions,
-                    }));
+                    this.canvas.add(
+                        new fabric.Textbox(user.full_name, {
+                            left: avatarSize + 10,
+                            top: top + 18,
+                            width: 140,
+                            height: rowHeight,
+                            textAlign: 'left',
+                            fontFamily: 'Nunito, sans-serif',
+                            fontSize: 13,
+                            fontWeight: '500',
+                            fill: '#151941',
+                            ellipsis: true,
+                            ...fabricObjectOptions,
+                        }),
+                    );
+
+                    const currentProject = this.currentProjects[user.id];
+                    if (currentProject) {
+                        // Current project label
+                        this.canvas.add(
+                            new fabric.Textbox(currentProject.name.toUpperCase(), {
+                                left: avatarSize + 10,
+                                top: top + 34,
+                                width: 150,
+                                height: rowHeight,
+                                textAlign: 'left',
+                                fontFamily: 'Nunito, sans-serif',
+                                fontSize: 8,
+                                fontWeight: '600',
+                                fill: '#2E2EF9',
+                                ellipsis: true,
+                                ...fabricObjectOptions,
+                            }),
+                        );
+                    }
 
                     const currentTask = this.currentTasks[user.id];
                     if (currentTask) {
                         // Avatar active icon
-                        this.canvas.add(new fabric.Circle({
-                            left: 19, top: top + 20 + 18,
-                            radius: 3.5,
-                            fill: '#2DC38D',
-                            stroke: '#ffffff',
-                            strokeWidth: 1,
-                            ...fabricObjectOptions,
-                        }));
+                        this.canvas.add(
+                            new fabric.Circle({
+                                left: 19,
+                                top: top + 20 + 18,
+                                radius: 3.5,
+                                fill: '#2DC38D',
+                                stroke: '#ffffff',
+                                strokeWidth: 1,
+                                ...fabricObjectOptions,
+                            }),
+                        );
 
-                        // Current task label
-                        this.canvas.add(new fabric.Textbox(currentTask.task_name.toUpperCase(), {
-                            left: avatarSize + 10, top: top + 38,
-                            width: sidebarWidth, height: rowHeight,
+                        // Task name overflow ellipsis
+                        const taskName = new fabric.Textbox(currentTask.task_name.toUpperCase(), {
+                            left: avatarSize + 10,
+                            top: top + 44,
+                            width: 150,
+                            height: rowHeight,
                             textAlign: 'left',
                             fontFamily: 'Nunito, sans-serif',
-                            fontSize: 9,
+                            fontSize: 8,
                             fontWeight: '600',
                             fill: '#2E2EF9',
+                            ellipsis: true,
                             ...fabricObjectOptions,
-                        }));
+                        });
+
+                        // Full task name for popup
+                        const taskNameHint = new fabric.Textbox(currentTask.task_name.toUpperCase(), {
+                            originX: 'left',
+                            originY: 'bottom',
+                            left: avatarSize + 12,
+                            top: top + 43,
+                            height: rowHeight,
+                            width: 150,
+                            textAlign: 'left',
+                            fontFamily: 'Nunito, sans-serif',
+                            fontSize: 8,
+                            fontWeight: '600',
+                            fill: '#59566E',
+                            ...fabricObjectOptions,
+                        });
+
+                        // Rectangle for popup
+                        const taskNameHintRect = new fabric.Rect({
+                            originX: 'left',
+                            originY: 'bottom',
+                            left: avatarSize + 10,
+                            top: top + 45,
+                            width: taskNameHint.width + 5,
+                            height: taskNameHint.height + 5,
+                            fill: '#FAFAFA',
+                            strokeWidth: 1,
+                            stroke: '#E0DFED',
+                            rx: 1,
+                            ry: 1,
+                        });
+
+                        const taskHintGroup = new fabric.Group([taskNameHintRect, taskNameHint], {
+                            selectable: false,
+                            visible: false,
+                            ...fabricObjectOptions,
+                        });
+
+                        taskName.on('mouseover', e => {
+                            taskHintGroup.set({
+                                visible: true,
+                            });
+
+                            this.canvas.requestRenderAll();
+                        });
+
+                        taskName.on('mouseout', e => {
+                            taskHintGroup.set({
+                                visible: false,
+                            });
+
+                            this.canvas.requestRenderAll();
+                        });
+
+                        this.canvas.add(taskName);
+                        this.canvas.add(taskHintGroup);
                     }
 
                     // Time worked label
                     const worked = this.worked[user.id] ? this.worked[user.id] : 0;
-                    this.canvas.add(new fabric.Textbox(this.formatDuration(worked), {
-                        left: 194, top: top + 16,
-                        width: sidebarWidth, height: rowHeight,
-                        textAlign: 'left',
-                        fontFamily: 'Nunito, sans-serif',
-                        fontSize: 15,
-                        fontWeight: '600',
-                        fill: '#59566E',
-                        ...fabricObjectOptions,
-                    }));
+                    this.canvas.add(
+                        new fabric.Textbox(this.formatDuration(worked), {
+                            left: 194,
+                            top: top + 16,
+                            width: sidebarWidth,
+                            height: rowHeight,
+                            textAlign: 'left',
+                            fontFamily: 'Nunito, sans-serif',
+                            fontSize: 15,
+                            fontWeight: '600',
+                            fill: '#59566E',
+                            ...fabricObjectOptions,
+                        }),
+                    );
                 });
 
                 this.canvas.requestRenderAll();
             }, 100),
-            onResize: debounce(function () {
+            onResize: debounce(function() {
                 const height = this.users.length * rowHeight + titleHeight + subtitleHeight;
                 this.canvas.setWidth(sidebarWidth);
                 this.canvas.setHeight(height);
@@ -333,6 +450,9 @@
                 this.draw();
             },
             currentTasks() {
+                this.draw();
+            },
+            currentProjects() {
                 this.draw();
             },
         },

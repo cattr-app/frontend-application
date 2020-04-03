@@ -2,7 +2,12 @@
 node_modules
 /dist
 /app/etc/env.js
+/app/etc/modules.config.json
 /app/generated
+output/*
+!output/500.html
+!output/fallback-fonts
+!output/resources
 
 # local env files
 .env.local

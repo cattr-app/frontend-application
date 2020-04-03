@@ -6,7 +6,7 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
     modules,
-    strict: true
+    strict: true,
 });
 
 for (const moduleName of Object.keys(modules)) {

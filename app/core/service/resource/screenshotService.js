@@ -2,7 +2,6 @@ import ResourceService from './resouceService';
 import axios from 'axios';
 
 export default class ScreenshotService extends ResourceService {
-
     /**
      * @param id
      * @returns string

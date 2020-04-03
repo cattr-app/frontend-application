@@ -1,10 +1,14 @@
 <template>
-    <div class="canvas" ref="canvasWrapper">
+    <div ref="canvasWrapper" class="canvas">
         <canvas ref="canvas"></canvas>
 
-        <div class="popup"
+        <div
             v-show="hoverPopup.show && !clickPopup.show"
-            :style="{ left: `${hoverPopup.x - 30}px`, bottom: `${height - hoverPopup.y + 10}px` }"
+            class="popup"
+            :style="{
+                left: `${hoverPopup.x - 30}px`,
+                bottom: `${height - hoverPopup.y + 10}px`,
+            }"
         >
             <div v-if="hoverPopup.event">
                 {{ getProjectName(hoverPopup.event.project_id) }}
@@ -18,12 +22,17 @@
             <a class="corner" :style="{ left: `${hoverPopup.borderX}px` }"></a>
         </div>
 
-        <div class="popup"
+        <div
             v-show="clickPopup.show"
-            :style="{ left: `${clickPopup.x - 30}px`, bottom: `${height - clickPopup.y + 10}px` }"
+            class="popup"
+            :style="{
+                left: `${clickPopup.x - 30}px`,
+                bottom: `${height - clickPopup.y + 10}px`,
+            }"
         >
             <div v-if="clickPopup.event && getScreenshotByInterval(clickPopup.intervalID)">
                 <Screenshot
+                    :lazyImage="false"
                     :screenshot="getScreenshotByInterval(clickPopup.intervalID)"
                     :project="getProject(clickPopup.event.project_id)"
                     :task="getTask(clickPopup.event.task_id)"
@@ -47,16 +56,17 @@
             <a class="corner" :style="{ left: `${clickPopup.borderX}px` }"></a>
         </div>
 
-        <ScreenshotModal :project="modal.project"
-                         :screenshot="modal.screenshot"
-                         :show="modal.show"
-                         :showNavigation="true"
-                         :task="modal.task"
-                         :user="modal.user"
-                         @close="onHide"
-                         @remove="onRemove"
-                         @showNext="showNext"
-                         @showPrevious="showPrevious"
+        <ScreenshotModal
+            :project="modal.project"
+            :screenshot="modal.screenshot"
+            :show="modal.show"
+            :showNavigation="true"
+            :task="modal.task"
+            :user="modal.user"
+            @close="onHide"
+            @remove="onRemove"
+            @showNext="showNext"
+            @showPrevious="showPrevious"
         />
     </div>
 </template>
@@ -70,8 +80,7 @@
     import Screenshot from '@/components/Screenshot';
     import ScreenshotModal from '@/components/ScreenshotModal';
     import { formatDurationString } from '@/utils/time';
-    import ScreenshotService from "@/service/resource/screenshotService";
-    import { cloneDeep, merge } from 'lodash';
+    import ScreenshotService from '@/service/resource/screenshotService';
 
     const fabricObjectOptions = {
         editable: false,
@@ -90,14 +99,15 @@
     const rowHeight = 65;
     const columns = 24;
 
-    const maxLeftOffset = 800;
+    const popupWidth = 270;
+    const canvasPadding = 24;
     const defaultCornerOffset = 15;
 
     export default {
         name: 'TeamDayGraph',
         components: {
             Screenshot,
-            ScreenshotModal
+            ScreenshotModal,
         },
         props: {
             users: {
@@ -131,27 +141,25 @@
                     borderX: 0,
                 },
                 screenshotsService: new ScreenshotService(),
-                availableIntervals: {},
                 modal: {
                     show: false,
-                    interval: null,
+                    intervalID: null,
                     project: null,
                     task: null,
                     user: null,
                     screenshot: null,
-                    intervalID: null,
                 },
             };
         },
         computed: {
-            ...mapGetters('timeline', [
-                'tasks',
-                'projects',
-                'screenshots',
-                'intervals'
-            ]),
+            ...mapGetters('timeline', ['tasks', 'screenshots', 'intervals']),
             height() {
                 return this.users.length * rowHeight + titleHeight + subtitleHeight;
+            },
+            projects() {
+                return Object.keys(this.tasks)
+                    .map(taskID => this.tasks[taskID])
+                    .reduce((projects, task) => ({ ...projects, [task.project_id]: task.project }), {});
             },
         },
         mounted() {
@@ -165,15 +173,17 @@
             this.onResize();
             window.addEventListener('resize', this.onResize);
             window.addEventListener('mousedown', this.onClick);
+            window.addEventListener('keydown', this.onKeyDown);
         },
         beforeDestroy() {
             window.removeEventListener('resize', this.onResize);
             window.removeEventListener('mousedown', this.onClick);
+            window.removeEventListener('keydown', this.onKeyDown);
         },
         methods: {
             formatDuration: formatDurationString,
-            showPopup(){
-                this.modal.interval = this.clickPopup.intervalID;
+            showPopup() {
+                this.modal.intervalID = this.clickPopup.intervalID;
                 this.modal.project = this.getProject(this.clickPopup.event.project_id);
                 this.modal.user = this.getUser(this.clickPopup.event.user_id);
                 this.modal.task = this.getTask(this.clickPopup.event.task_id);
@@ -181,33 +191,61 @@
 
                 this.modal.show = true;
             },
-            onHide () {
+            onHide() {
                 this.modal.show = false;
             },
-            showPrevious () {
-                const intervals = this.intervals[this.modal.user.id].intervals;
-
-                const currentIndex = intervals.findIndex(x => x.id === this.modal.interval.id);
-
-                if (currentIndex !== 0) {
-                    this.modal.interval = intervals[currentIndex - 1];
-                    this.modal.project = this.getProject(this.modal.interval.project_id);
-                    this.modal.user = this.getUser(this.modal.interval.user_id);
-                    this.modal.task = this.getTask(this.modal.interval.task_id);
-                    this.modal.screenshot = this.getScreenshotByInterval(this.modal.interval.id);
+            onKeyDown(e) {
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    this.showPrevious();
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    this.showNext();
                 }
             },
-            showNext () {
-                const intervals = this.intervals[this.modal.user.id].intervals;
+            getUserIntervals(userID) {
+                return this.intervals[userID].intervals;
+            },
+            getUngroupedUserIntervals(userID) {
+                return this.getUserIntervals(userID).reduce((total, current) => {
+                    const intervals = current.ids.map(id => ({
+                        ...current,
+                        id,
+                    }));
 
-                const currentIndex = intervals.findIndex(x => x.id === this.modal.interval.id);
+                    return total.concat(intervals);
+                }, []);
+            },
+            showPrevious() {
+                const intervals = this.getUngroupedUserIntervals(this.modal.user.id);
 
-                if (currentIndex + 1 !== intervals.length) {
-                    this.modal.interval = intervals[currentIndex + 1];
-                    this.modal.project = this.getProject(this.modal.interval.project_id);
-                    this.modal.user = this.getUser(this.modal.interval.user_id);
-                    this.modal.task = this.getTask(this.modal.interval.task_id);
-                    this.modal.screenshot = this.getScreenshotByInterval(this.modal.interval.id);
+                const currentIndex = intervals.findIndex(x => x.id === this.modal.intervalID);
+
+                if (currentIndex > 0) {
+                    const interval = intervals[currentIndex - 1];
+                    if (interval) {
+                        this.modal.intervalID = interval.id;
+                        this.modal.project = this.getProject(interval.project_id);
+                        this.modal.user = this.getUser(interval.user_id);
+                        this.modal.task = this.getTask(interval.task_id);
+                        this.modal.screenshot = this.getScreenshotByInterval(this.modal.intervalID);
+                    }
+                }
+            },
+            showNext() {
+                const intervals = this.getUngroupedUserIntervals(this.modal.user.id);
+
+                const currentIndex = intervals.findIndex(x => x.id === this.modal.intervalID);
+
+                if (currentIndex < intervals.length - 1) {
+                    const interval = intervals[currentIndex + 1];
+                    if (interval) {
+                        this.modal.intervalID = interval.id;
+                        this.modal.project = this.getProject(interval.project_id);
+                        this.modal.user = this.getUser(interval.user_id);
+                        this.modal.task = this.getTask(interval.task_id);
+                        this.modal.screenshot = this.getScreenshotByInterval(this.modal.intervalID);
+                    }
                 }
             },
             getProjectName(projectID) {
@@ -246,7 +284,7 @@
             getScreenshotByInterval(intervalID) {
                 return this.screenshots.find(screenshot => screenshot.time_interval_id === intervalID);
             },
-            draw: debounce(function () {
+            draw: debounce(function() {
                 this.canvas.clear();
 
                 const width = this.canvas.getWidth();
@@ -254,58 +292,74 @@
                 const columnWidth = width / columns;
 
                 // Background
-                this.canvas.add(new fabric.Rect({
-                        left: 0, top: titleHeight + subtitleHeight,
-                        width: width - 1, height: height - 1,
-                        rx: 20, ry: 20,
+                this.canvas.add(
+                    new fabric.Rect({
+                        left: 0,
+                        top: titleHeight + subtitleHeight,
+                        width: width - 1,
+                        height: height - 1,
+                        rx: 20,
+                        ry: 20,
                         fill: '#FAFAFA',
                         stroke: '#DFE5ED',
                         strokeWidth: 1,
                         ...fabricObjectOptions,
-                    })
-                    .on('mousedown', () => this.$emit('outsideClick'))
+                    }).on('mousedown', () => this.$emit('outsideClick')),
                 );
 
                 for (let column = 0; column < columns; ++column) {
-                    const date = moment().startOf('day').add(column, 'hours');
+                    const date = moment()
+                        .startOf('day')
+                        .add(column, 'hours');
                     const left = columnWidth * column;
 
                     // Column headers - hours
-                    this.canvas.add(new fabric.Textbox(date.format('h'), {
-                        left, top: 0,
-                        width: columnWidth, height: titleHeight,
-                        textAlign: 'center',
-                        fontFamily: 'Nunito, sans-serif',
-                        fontSize: 15,
-                        fill: '#151941',
-                        ...fabricObjectOptions,
-                    }));
+                    this.canvas.add(
+                        new fabric.Textbox(date.format('h'), {
+                            left,
+                            top: 0,
+                            width: columnWidth,
+                            height: titleHeight,
+                            textAlign: 'center',
+                            fontFamily: 'Nunito, sans-serif',
+                            fontSize: 15,
+                            fill: '#151941',
+                            ...fabricObjectOptions,
+                        }),
+                    );
 
                     // Column headers - am/pm
-                    this.canvas.add(new fabric.Textbox(date.format('A'), {
-                        left, top: titleHeight,
-                        width: columnWidth, height: subtitleHeight,
-                        textAlign: 'center',
-                        fontFamily: 'Nunito, sans-serif',
-                        fontSize: 10,
-                        fontWeight: '600',
-                        fill: '#B1B1BE',
-                        ...fabricObjectOptions,
-                    }));
+                    this.canvas.add(
+                        new fabric.Textbox(date.format('A'), {
+                            left,
+                            top: titleHeight,
+                            width: columnWidth,
+                            height: subtitleHeight,
+                            textAlign: 'center',
+                            fontFamily: 'Nunito, sans-serif',
+                            fontSize: 10,
+                            fontWeight: '600',
+                            fill: '#B1B1BE',
+                            ...fabricObjectOptions,
+                        }),
+                    );
 
                     // Vertical grid lines
                     if (column > 0) {
-                        this.canvas.add(new fabric.Line([
-                            0, 0,
-                            0, height,
-                        ], {
-                            left, top: titleHeight + subtitleHeight,
-                            stroke: '#DFE5ED',
-                            strokeWidth: 1,
-                            ...fabricObjectOptions,
-                        }));
+                        this.canvas.add(
+                            new fabric.Line([0, 0, 0, height], {
+                                left,
+                                top: titleHeight + subtitleHeight,
+                                stroke: '#DFE5ED',
+                                strokeWidth: 1,
+                                ...fabricObjectOptions,
+                            }),
+                        );
                     }
                 }
+
+                const { width: canvasWidth } = this.$refs.canvasWrapper.getBoundingClientRect();
+                const maxLeftOffset = canvasWidth - popupWidth + 2 * canvasPadding;
 
                 this.users.forEach((user, row) => {
                     const top = row * rowHeight + titleHeight + subtitleHeight;
@@ -314,19 +368,20 @@
                     const userEvents = this.events[user.id];
                     if (userEvents) {
                         userEvents.forEach(event => {
-                            this.availableIntervals[user.id] = merge(event.ids, this.availableIntervals[user.id]);
-
                             const startOfDay = moment.tz(event.start_at, this.timezone).startOf('day');
-                            const secondsFromMidnight = moment(event.start_at).diff(startOfDay, 'seconds');
-                            const duration = moment(event.end_at).diff(event.start_at, 'seconds');
+                            const secondsFromMidnight = moment.utc(event.start_at).diff(startOfDay, 'seconds');
+                            const duration = moment.utc(event.end_at).diff(event.start_at, 'seconds');
 
-                            const left = Math.floor(secondsFromMidnight * columnWidth / 3600);
-                            const width = Math.ceil(duration * columnWidth / 3600);
+                            const left = Math.floor((secondsFromMidnight * columnWidth) / 3600);
+                            const width = Math.ceil((duration * columnWidth) / 3600);
 
                             const rect = new fabric.Rect({
-                                left, top: top + rowHeight / 4,
-                                width, height: rowHeight / 2,
-                                rx: 2, ry: 2,
+                                left,
+                                top: top + rowHeight / 4,
+                                width,
+                                height: rowHeight / 2,
+                                rx: 2,
+                                ry: 2,
                                 fill: event.is_manual ? '#c4b52d' : '#2DC48D',
                                 stroke: 'transparent',
                                 strokeWidth: 0,
@@ -336,15 +391,15 @@
                             });
 
                             rect.on('mouseover', e => {
-                                if( e.target.left > maxLeftOffset ) {
+                                if (e.target.left > maxLeftOffset) {
                                     this.hoverPopup = {
                                         show: true,
                                         x: maxLeftOffset,
                                         y: e.target.top,
                                         event,
-                                        borderX: defaultCornerOffset + e.target.left - maxLeftOffset
+                                        borderX: defaultCornerOffset + e.target.left - maxLeftOffset,
                                     };
-                                }else{
+                                } else {
                                     this.hoverPopup = {
                                         show: true,
                                         x: e.target.left,
@@ -365,25 +420,30 @@
                             rect.on('mousedown', e => {
                                 const { ids } = event;
                                 const { pointer, target } = e;
-                                const n = Math.floor((pointer.x - target.left) * ids.length / (target.width + 1));
-                                const x = target.left + target.width * n / ids.length;
+                                const n = Math.floor(((pointer.x - target.left) * ids.length) / (target.width + 1));
+                                const x = target.left + (target.width * n) / ids.length;
                                 const y = target.top;
                                 const intervalID = ids[n];
 
                                 this.$emit('selectedIntervals', event);
 
-                                if( x > maxLeftOffset ) {
+                                if (x > maxLeftOffset) {
                                     this.clickPopup = {
                                         show: true,
                                         x: maxLeftOffset,
-                                        y, event, intervalID,
-                                        borderX: defaultCornerOffset + x - maxLeftOffset
+                                        y,
+                                        event,
+                                        intervalID,
+                                        borderX: defaultCornerOffset + x - maxLeftOffset,
                                     };
-                                }else{
+                                } else {
                                     this.clickPopup = {
                                         show: true,
-                                        x, y, event, intervalID,
-                                        borderX: defaultCornerOffset
+                                        x,
+                                        y,
+                                        event,
+                                        intervalID,
+                                        borderX: defaultCornerOffset,
                                     };
                                 }
 
@@ -396,28 +456,28 @@
 
                     // Horizontal grid lines
                     if (row > 0) {
-                        this.canvas.add(new fabric.Line([
-                            0, 0,
-                            width, 0,
-                        ], {
-                            left: 0, top,
-                            stroke: '#DFE5ED',
-                            strokeWidth: 1,
-                            ...fabricObjectOptions,
-                        }));
+                        this.canvas.add(
+                            new fabric.Line([0, 0, width, 0], {
+                                left: 0,
+                                top,
+                                stroke: '#DFE5ED',
+                                strokeWidth: 1,
+                                ...fabricObjectOptions,
+                            }),
+                        );
                     }
                 });
 
                 this.canvas.requestRenderAll();
             }, 100),
-            onResize: debounce(function () {
+            onResize: debounce(function() {
                 const { width } = this.$refs.canvasWrapper.getBoundingClientRect();
                 this.canvas.setWidth(width);
                 this.canvas.setHeight(this.height);
                 this.draw();
-            }, 100),
+            }, 200),
             onClick(e) {
-                if (e.button !== 0 || e.target && e.target.closest('.popup')) {
+                if (e.button !== 0 || (e.target && e.target.closest('.popup'))) {
                     return;
                 }
 
@@ -429,29 +489,19 @@
                 try {
                     await this.screenshotsService.deleteItem(this.modal.screenshot.id);
 
-                    const interval = this.modal.screenshot.time_interval;
-                    const totalIntervals = cloneDeep(this.intervals);
-                    const userInterval = cloneDeep(this.intervals[interval.user_id]);
-
-                    userInterval.duration -= moment(interval.end_at).diff(interval.start_at, 'seconds');
-                    userInterval.intervals = userInterval.intervals.filter(int => int.id !== interval.id);
-
-                    totalIntervals[interval.user_id] = userInterval;
-                    this.$store.dispatch('timeline/setIntervals', totalIntervals);
-
                     this.$Notify({
                         type: 'success',
                         title: 'Deleted Successfully',
-                        message: 'Screenshot was deleted successfully'
+                        message: 'Screenshot was deleted successfully',
                     });
                 } catch (e) {
                     this.$Notify({
                         type: 'error',
                         title: 'Deletion Error',
-                        message: 'This screenshot can not be deleted OR something unusual happened during the request'
+                        message: 'This screenshot can not be deleted OR something unusual happened during the request',
                     });
                 }
-            }
+            },
         },
         watch: {
             users() {
@@ -492,7 +542,7 @@
 
             text-align: center;
 
-            z-index: 1;
+            z-index: 3;
 
             & .corner {
                 content: ' ';

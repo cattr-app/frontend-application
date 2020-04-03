@@ -1,28 +1,32 @@
 <template>
-    <div @click="$emit('click', $event)" class="screenshot">
+    <div class="screenshot" @click="$emit('click', $event)">
         <AppImage
-                :is-blob="false"
-                :src="screenshot.thumbnail_path || screenshot.path"
-                @click="onShow"
-                class="screenshot-image"
+            :is-blob="false"
+            :src="getThumbnailPath(screenshot)"
+            class="screenshot-image"
+            :lazy="lazyImage"
+            @click="onShow"
         />
 
-        <div class="screenshot-text" v-if="showText">
-            <span class="screenshot-task" v-if="task && showTask">{{ task.task_name }}</span>
+        <div v-if="showText" class="screenshot-text">
+            <span v-if="task && showTask" class="screenshot-task">
+                {{ task.task_name }}
+            </span>
             <span class="screenshot-time">{{ formatTime(screenshot.created_at) }}</span>
         </div>
 
-        <ScreenshotModal :project="project"
-                         :screenshot="screenshot"
-                         :show="showModal"
-                         :showNavigation="showNavigation"
-                         :task="task"
-                         :user="user"
-                         @close="onHide"
-                         @remove="onRemove"
-                         @showNext="$emit('showNext')"
-                         @showPrevious="$emit('showPrevious')"
-                         v-if="!disableModal"
+        <ScreenshotModal
+            v-if="!disableModal"
+            :project="project"
+            :screenshot="screenshot"
+            :show="showModal"
+            :showNavigation="showNavigation"
+            :task="task"
+            :user="user"
+            @close="onHide"
+            @remove="onRemove"
+            @showNext="$emit('showNext')"
+            @showPrevious="$emit('showPrevious')"
         />
     </div>
 </template>
@@ -31,6 +35,12 @@
     import moment from 'moment';
     import AppImage from './AppImage';
     import ScreenshotModal from './ScreenshotModal';
+
+    export function thumbnailPathProvider(screenshot) {
+        return screenshot.path;
+    }
+
+    export const config = { thumbnailPathProvider };
 
     export default {
         name: 'Screenshot',
@@ -67,17 +77,21 @@
                 type: Boolean,
                 default: false,
             },
+            lazyImage: {
+                type: Boolean,
+                default: true,
+            },
         },
-        data () {
+        data() {
             return {
                 showModal: false,
             };
         },
         methods: {
-            formatTime (value) {
+            formatTime(value) {
                 return moment(value).format('HH:mm');
             },
-            onShow () {
+            onShow() {
                 if (this.disableModal) {
                     return;
                 }
@@ -85,55 +99,51 @@
                 this.showModal = true;
                 this.$emit('showModalChange', true);
             },
-            onHide () {
+            onHide() {
                 this.showModal = false;
                 this.$emit('showModalChange', false);
             },
-            onRemove () {
+            onRemove() {
                 this.onHide();
                 this.$emit('remove', this.screenshot);
+            },
+            getThumbnailPath(screenshot) {
+                return config.thumbnailPathProvider(screenshot);
             },
         },
     };
 </script>
 
 <style lang="scss" scoped>
-    .screenshot
-    {
-        display:   flex;
+    .screenshot {
+        display: flex;
         flex-flow: column;
 
-        &-image
-        {
+        &-image {
             border-radius: 5px;
-            cursor:        pointer;
-            display:       inline-block;
-            flex:          1;
-            height:        auto;
-            width:         100%;
-            object-fit:    cover;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-        &-text
-        {
-            align-items:     baseline;
-            color:           #59566E;
-            display:         flex;
-            flex-flow:       row nowrap;
-            font-size:       11px;
-            font-weight:     600;
+        &-text {
+            align-items: baseline;
+            color: #59566e;
+            display: flex;
+            flex-flow: row nowrap;
+            font-size: 11px;
+            font-weight: 600;
             justify-content: space-between;
         }
 
-        &-task
-        {
-            overflow:      hidden;
+        &-task {
+            overflow: hidden;
             text-overflow: ellipsis;
-            white-space:   nowrap;
+            white-space: nowrap;
         }
 
-        &-time
-        {
+        &-time {
             margin-left: 0.5em;
         }
     }

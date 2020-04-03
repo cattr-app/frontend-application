@@ -1,16 +1,18 @@
 <template>
-    <div class="crud">
+    <div class="crud" :class="crudClass">
         <div class="crud__header">
             <h1 class="page-title crud__title">{{ $t(title) }}</h1>
             <h4 class="crud__total">{{ $t('field.total') }} {{ totalItems }}</h4>
         </div>
 
         <div class="row crud__filters">
-            <at-input v-for="(filter, key) of filters" :key="key" v-model="filterModel[filter.referenceKey]"
-                      type="text"
-                      @input="filterData(filter.referenceKey, filterModel[filter.referenceKey])"
-                      :placeholder="$t(filter.filterName)"
-                      class="col-6 crud__filter"
+            <at-input
+                v-if="filters.length"
+                v-model="filterModel"
+                type="text"
+                :placeholder="filterPlaceholder"
+                class="col-6 crud__filter"
+                @input="filterData"
             >
                 <template slot="prepend">
                     <i class="icon icon-search"></i>
@@ -20,13 +22,24 @@
             <div class="col crud__control-items">
                 <template v-for="(control, key) of pageControls">
                     <template v-if="checkWithCtx(control.renderCondition)">
+                        <at-checkbox
+                            v-if="control.frontedType == 'checkbox'"
+                            :key="control.key"
+                            v-model="values[control.key]"
+                            class="crud__control-items__item"
+                            @on-change="handleWithCtx(control.onChange)"
+                        >
+                            {{ $t(control.label) }}
+                        </at-checkbox>
+
                         <at-button
-                                :key="key"
-                                size="large"
-                                :type="control.type"
-                                :icon="control.icon"
-                                @click="handleWithCtx(control.onClick)"
-                        >{{ $t(control.label) }}
+                            v-else
+                            :key="key"
+                            size="large"
+                            :type="control.type"
+                            :icon="control.icon"
+                            @click="handleWithCtx(control.onClick)"
+                            >{{ $t(control.label) }}
                         </at-button>
                     </template>
                 </template>
@@ -34,21 +47,57 @@
         </div>
 
         <div class="at-container">
-                <div class="crud__table">
-                    <at-table size="large"
-                              :columns="columns"
-                              :data="displayableData">
-                    </at-table>
+            <div v-if="filterFields && filterFields.length" class="crud__column-filters">
+                <template v-for="filter of filterFields">
+                    <at-select
+                        v-if="filter.fieldOptions && filter.fieldOptions.type === 'select'"
+                        :key="filter.key"
+                        v-model="filterFieldsModel[filter.key]"
+                        type="text"
+                        :placeholder="$t(filter.placeholder)"
+                        class="crud__column-filter"
+                        :style="{ width: columnWidth[filter.key] + 'px' }"
+                        @input="filterFieldsData"
+                    >
+                        <at-option
+                            v-for="(option, optionKey) of filter.fieldOptions.options"
+                            :key="optionKey"
+                            :value="option.value"
+                        >
+                            {{ option.label }}
+                        </at-option>
+                    </at-select>
 
-                    <preloader v-if="isDataLoading"></preloader>
-                </div>
+                    <at-input
+                        v-else
+                        :key="filter.key"
+                        v-model="filterFieldsModel[filter.key]"
+                        type="text"
+                        :placeholder="$t(filter.placeholder)"
+                        class="crud__column-filter"
+                        :style="{ width: columnWidth[filter.key] + 'px' }"
+                        @input="filterFieldsData"
+                    >
+                        <template slot="prepend">
+                            <i class="icon icon-search"></i>
+                        </template>
+                    </at-input>
+                </template>
+            </div>
+
+            <div ref="tableWrapper" class="crud__table">
+                <at-table ref="table" size="large" :columns="columns" :data="displayableData" />
+                <preloader v-if="isDataLoading" />
+            </div>
         </div>
 
-        <at-pagination :total="totalItems"
-                       :current="page"
-                       @page-change="loadPage"
-                       class="crud__pagination">
-        </at-pagination>
+        <at-pagination
+            :total="totalItems"
+            :current="page"
+            :page-size="itemsPerPage"
+            class="crud__pagination"
+            @page-change="loadPage"
+        />
     </div>
 </template>
 
@@ -56,6 +105,7 @@
     import Preloader from '@/components/Preloader';
     import axios from 'axios';
 
+    const defaultItemsPerPage = 10;
     const CancelToken = axios.CancelToken;
     let cancel;
 
@@ -63,11 +113,11 @@
         name: 'GridView',
 
         components: {
-            Preloader
+            Preloader,
         },
 
         data() {
-            const { gridData } = this.$route.meta;
+            const { gridData, sortable } = this.$route.meta;
 
             const columns = gridData.columns.map(col => {
                 col.title = this.$t(col.title);
@@ -81,30 +131,39 @@
                         return h(
                             'div',
                             {
-                                class: 'actions-column'
+                                class: 'actions-column',
                             },
-                            gridData.actions.map((item) => {
-                                if (typeof item.renderCondition !== 'undefined' ? item.renderCondition(this) : true) {
-                                    return h('AtButton', {
-                                        props: {
-                                            type: item.actionType || 'primary', // AT-ui button display type
-                                            icon: item.icon || undefined // Prepend icon to button
+                            gridData.actions.map(item => {
+                                if (
+                                    typeof item.renderCondition !== 'undefined'
+                                        ? item.renderCondition(this, params.item)
+                                        : true
+                                ) {
+                                    return h(
+                                        'AtButton',
+                                        {
+                                            props: {
+                                                type: item.actionType || 'primary', // AT-ui button display type
+                                                icon: item.icon || undefined, // Prepend icon to button
+                                            },
+                                            on: {
+                                                click: () => {
+                                                    item.onClick(this.$router, params, this);
+                                                },
+                                            },
+                                            class: 'action-button',
                                         },
-                                        on: {
-                                            click: () => {
-                                                item.onClick(this.$router, params, this);
-                                            }
-                                        },
-                                        class: 'action-button'
-                                    }, this.$t(item.title));
+                                        this.$t(item.title),
+                                    );
                                 }
-                            })
+                            }),
                         );
-                    }
+                    },
                 });
             }
 
-            const itemsPerPage = 10;
+            const orderBy = sortable ? { ...columns[0], direction: 'asc' } : null;
+
             const withParam = gridData.with;
             const withCount = gridData.withCount;
 
@@ -112,11 +171,17 @@
                 title: gridData.title || '',
                 columns,
                 filters: gridData.filters || [],
+                filterFields: gridData.filterFields || [],
                 tableData: [],
                 initialData: [],
 
-                filterModel: {},
+                filterModel: '',
                 filterTimeout: null,
+                filterFieldsTimeout: null,
+                orderBy,
+
+                filterFieldsModel: {},
+                columnWidth: {},
 
                 service: gridData.service,
 
@@ -124,27 +189,54 @@
 
                 page: +(this.$route.query.page || 1),
                 totalItems: 0,
-
+                values: [],
                 queryParams: {
                     with: withParam,
                     withCount,
                     paginate: true,
-                    perPage: itemsPerPage,
+                    perPage: this.$route.meta.itemsPerPage || defaultItemsPerPage,
                     page: this.$route.query.page,
                 },
 
-                isDataLoading: false
+                isDataLoading: false,
             };
         },
 
         methods: {
-            filterData(field, searchString) {
+            filterData() {
                 clearTimeout(this.filterTimeout);
 
                 this.filterTimeout = setTimeout(() => {
-                    // This is the way api Apply Query for Where Like condition ;  '%' - is important
                     // TODO Refactor when TypeScript will be here
-                    this.queryParams[field] = ['like', '%' + searchString + '%'];
+                    this.queryParams['search'] = {
+                        query: this.filterModel,
+                        fields: this.filters.map(filter => filter.referenceKey),
+                    };
+
+                    const firstPage = 1;
+                    this.loadPage(firstPage);
+                }, 500);
+            },
+
+            filterFieldsData() {
+                clearTimeout(this.filterFieldsTimeout);
+
+                this.filterFieldsTimeout = setTimeout(() => {
+                    Object.keys(this.filterFieldsModel).forEach(field => {
+                        if (
+                            typeof this.filterFieldsModel[field] !== undefined &&
+                            this.filterFieldsModel[field].toString().length
+                        ) {
+                            const filter = this.filterFields.find(filter => filter.key === field);
+                            if (filter && filter.fieldOptions && filter.fieldOptions.type === 'text') {
+                                this.queryParams[field] = ['like', `%${this.filterFieldsModel[field]}%`];
+                            } else {
+                                this.queryParams[field] = this.filterFieldsModel[field];
+                            }
+                        } else {
+                            delete this.queryParams[field];
+                        }
+                    });
 
                     const firstPage = 1;
                     this.loadPage(firstPage);
@@ -175,27 +267,146 @@
                 const config = {
                     cancelToken: new CancelToken(function executor(c) {
                         cancel = c;
-                    })
+                    }),
                 };
 
-                let { data, total, current_page } = (await this.service.getWithFilters(this.queryParams, config)
+                const { queryParams, sortable, orderBy } = this;
+                if (sortable && orderBy) {
+                    queryParams['orderBy'] = [orderBy.key, orderBy.direction];
+                }
+
+                let { data, total, current_page } = await this.service
+                    .getWithFilters(queryParams, config)
                     .then(({ data }) => {
                         this.isDataLoading = false;
                         return data;
-                    }));
+                    });
 
                 this.totalItems = total;
                 this.page = current_page;
 
                 this.tableData = data;
                 this.initialData = data;
+            },
+
+            handleResize() {
+                const { table } = this.$refs;
+                if (!table) {
+                    return;
+                }
+
+                table.handleResize();
+
+                this.$nextTick(() => {
+                    table.columnsData.forEach((column, index) => {
+                        const width = table.setCellWidth(column, index);
+                        this.$set(this.columnWidth, column.key, width);
+                    });
+                });
+            },
+
+            handleTableClick(e) {
+                const { sortable, orderBy } = this;
+                if (!sortable) {
+                    return;
+                }
+
+                if (
+                    !e.target.classList.contains('at-table__cell') ||
+                    !e.target.classList.contains('at-table__column')
+                ) {
+                    return;
+                }
+
+                let column = null;
+                for (let _column of this.columns) {
+                    if (_column.title === e.target.textContent.trim()) {
+                        column = _column;
+                        break;
+                    }
+                }
+
+                if (!column || !column.key) {
+                    return;
+                }
+
+                if (orderBy && orderBy.key === column.key) {
+                    const direction = orderBy.direction === 'asc' ? 'desc' : 'asc';
+                    this.orderBy = { ...orderBy, direction };
+                } else {
+                    this.orderBy = { ...column, direction: 'asc' };
+                }
+
+                this.fetchData();
+            },
+        },
+
+        updated() {
+            const { sortable, orderBy } = this;
+            if (!sortable || !orderBy) {
+                return;
+            }
+
+            const { tableWrapper } = this.$refs;
+            const chevrons = tableWrapper.querySelectorAll('.at-table__cell.at-table__column > .chevron');
+            chevrons.forEach(chevron => chevron.remove());
+
+            let column = null;
+            const columns = tableWrapper.querySelectorAll('.at-table__cell.at-table__column');
+            for (let _column of columns) {
+                if (_column.textContent.trim() === orderBy.title) {
+                    column = _column;
+                    break;
+                }
+            }
+
+            if (!column) {
+                return;
+            }
+
+            if (orderBy.direction === 'asc') {
+                column.insertAdjacentHTML('beforeend', '<i class="icon icon-chevron-up chevron"></i>');
+            } else {
+                column.insertAdjacentHTML('beforeend', '<i class="icon icon-chevron-down chevron"></i>');
             }
         },
 
         computed: {
             displayableData() {
                 return this.tableData;
-            }
+            },
+
+            filterPlaceholder() {
+                const filters = [...this.filters];
+                const last = filters.pop();
+                if (filters.length) {
+                    const fields = filters.map(filter => this.$t(filter.filterName)).join(', ');
+                    return this.$t('filter.enter-multiple', [fields, this.$t(last.filterName)]);
+                } else {
+                    return this.$t('filter.enter-single', [this.$t(last.filterName)]);
+                }
+            },
+
+            itemsPerPage() {
+                return this.$route.meta.itemsPerPage || defaultItemsPerPage;
+            },
+
+            crudClass() {
+                const styles = {};
+                if (typeof this.$route.meta.style !== 'undefined') {
+                    styles[`crud_style_${this.$route.meta.style}`] = true;
+                }
+
+                if (this.sortable) {
+                    styles['crud_sortable'] = true;
+                }
+
+                return styles;
+            },
+
+            sortable() {
+                return !!this.$route.meta.sortable;
+            },
         },
 
         async beforeRouteUpdate(from, to, next) {
@@ -207,7 +418,18 @@
             if (!this.initialData.length) {
                 await this.fetchData();
             }
-        }
+
+            window.addEventListener('resize', this.handleResize);
+            this.handleResize();
+
+            this.$refs.tableWrapper.addEventListener('click', this.handleTableClick);
+        },
+
+        beforeDestory() {
+            window.removeEventListener('resize', this.handleResize);
+
+            this.$refs.tableWrapper.removeEventListener('click', this.handleTableClick);
+        },
     };
 </script>
 
@@ -226,7 +448,12 @@
         }
 
         &__control-items {
-            text-align: right;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            &__item {
+                padding-right: 1rem;
+            }
         }
 
         &__pagination {
@@ -253,24 +480,47 @@
             }
         }
 
+        &__column-filters {
+            display: flex;
+            flex-flow: row nowrap;
+
+            z-index: 1;
+        }
+
+        &__column-filter {
+            padding: 0.5rem;
+
+            &::v-deep {
+                .at-input-group__prepend {
+                    border: 1px solid $gray-5;
+                    border-right: 0;
+                }
+
+                .at-input__original,
+                .at-select__selection {
+                    border: 1px solid $gray-5;
+                }
+            }
+        }
+
         &__table {
             position: relative;
 
             &::v-deep tr {
                 th {
                     background: #fff;
-                    color: #C4C4CF;
+                    color: #c4c4cf;
                 }
             }
 
             &::v-deep .at-table {
                 &__content {
-                 border: 0;
+                    border: 0;
                 }
 
                 &__tbody {
                     tr:last-child .at-table__cell {
-                    border-bottom: 0;
+                        border-bottom: 0;
                     }
                 }
 
@@ -295,6 +545,19 @@
                 .action-button {
                     margin-right: 1em;
                 }
+            }
+        }
+
+        &_style_compact {
+            &::v-deep .at-table__cell {
+                padding-top: 0.5rem;
+                padding-bottom: 0.5rem;
+            }
+        }
+
+        &_sortable {
+            &::v-deep .at-table__cell.at-table__column {
+                cursor: pointer !important;
             }
         }
     }

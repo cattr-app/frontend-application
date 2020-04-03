@@ -1,10 +1,7 @@
 <template>
     <div>
-        <at-select v-model="model" v-if="options" filterable :placeholder="$t('control.select')">
-            <at-option
-                    v-for="option of options" :key="option.value"
-                    :value="option.value"
-                    :label="option.label">
+        <at-select v-if="options" ref="select" v-model="model" :placeholder="$t('control.select')" filterable>
+            <at-option v-for="option of options" :key="option.value" :label="option.label" :value="option.value">
             </at-option>
         </at-select>
         <at-input v-else disabled></at-input>
@@ -13,23 +10,29 @@
 
 <script>
     export default {
-        name: "ResourceSelect",
+        name: 'ResourceSelect',
         props: {
             value: {
                 type: [String, Number, Array],
-                default: ''
+                default: '',
             },
             service: {
-                type: Object
-            }
+                type: Object,
+            },
         },
         async mounted() {
             this.options = await this.service.getOptionList();
+            await this.$nextTick();
+            if ('select' in this.$refs) {
+                this.$refs.select.$children.forEach(option => {
+                    option.hidden = false;
+                });
+            }
         },
         data() {
             return {
                 options: null,
-            }
+            };
         },
         computed: {
             model: {
@@ -37,13 +40,9 @@
                     return this.value;
                 },
                 set(value) {
-                    this.$emit('input', value)
-                }
-            }
-        }
-    }
+                    this.$emit('input', value);
+                },
+            },
+        },
+    };
 </script>
-
-<style lang="scss" scoped>
-
-</style>

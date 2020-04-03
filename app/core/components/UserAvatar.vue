@@ -1,11 +1,12 @@
 <template>
     <div class="avatar">
-        <vue-avatar class="avatar__photo"
-                :username="username"
-                :size="size"
-                :customStyle="styles"
-                :backgroundColor="backgroundColor"
-                :src="src"
+        <vue-avatar
+            class="avatar__photo"
+            :username="username"
+            :size="size"
+            :customStyle="styles"
+            :backgroundColor="backgroundColor"
+            :src="src"
         ></vue-avatar>
         <div v-show="isOnline" class="avatar__online-status"></div>
     </div>
@@ -16,7 +17,7 @@
     import Avatar from 'vue-avatar';
 
     export default {
-        name: "UserAvatar",
+        name: 'UserAvatar',
         props: {
             size: {
                 type: Number,
@@ -31,11 +32,11 @@
                 required: true,
             },
             isOnline: {
-                type: Boolean
+                type: Boolean,
             },
         },
         components: {
-            'vue-avatar' : Avatar
+            'vue-avatar': Avatar,
         },
         computed: {
             username() {
@@ -70,7 +71,7 @@
                 };
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>
@@ -81,7 +82,7 @@
             height: 7px;
             width: 7px;
             position: absolute;
-            background: #6ECEB2;
+            background: #6eceb2;
             border-radius: 100%;
             border: 1px solid white;
             right: 0;

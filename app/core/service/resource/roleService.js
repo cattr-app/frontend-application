@@ -1,9 +1,8 @@
 import ResourceService from './resouceService';
 import axios from 'axios';
-import {serialize} from "../../utils/url";
+import { serialize } from '../../utils/url';
 
 export default class RoleService extends ResourceService {
-
     constructor(params = {}) {
         super();
         this.params = params;

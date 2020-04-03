@@ -1,70 +1,96 @@
 const state = {
     sections: [],
+    additionalFields: [],
 };
 
 const getters = {
-    sections: s => s.sections,
+    sections: s => {
+        return s.sections.map(section => {
+            const additionalFields = s.additionalFields
+                .filter(({ scope, path }) => `${scope}.${path}` === section.pathName)
+                .map(({ field }) => field);
+            if (additionalFields.length > 0) {
+                return {
+                    ...section,
+                    fields: [...section.fields, ...additionalFields],
+                };
+            }
+
+            return section;
+        });
+    },
 };
 
 const mutations = {
-
     setSection(s, section) {
         s.sections.push(section);
     },
 
-    update(s, data) {
-        s.sections[s.sections.findIndex(p => p.pathName === data.name)].data = data.data;
-    }
+    clearSections(s) {
+        s.sections = [];
+    },
 
+    addField(s, { scope, path, field }) {
+        s.additionalFields.push({ scope, path, field });
+    },
 };
 
 const actions = {
-
     /**
      * Push new section to sections array
      *
-     * @param commit
+     * @param store
      * @param section
      * @returns {Promise}
      */
-    setSettingSection: async ({commit}, section) => {
-        const access = await section.accessCheck();
-        if (!access) {
-            return;
+    async setSettingSection(store, section) {
+        // We need this if when navigating from Settings to Company because store already have values and will not fire action
+        if (Object.keys(this.getters['user/companyData']).length) {
+            await addSectionToStore(store, section);
         }
-        return new Promise((resolve) => {
-            section.meta.service.getItem().then(async response => {
-                section.data = response.data;
-                section = {
-                    label: section.meta.label,
-                    fields: section.meta.fields,
-                    pathName: section.name,
-                    service: section.meta.service,
-                    data: section.data,
-                    access: access,
-                    scope: section.scope,
-                };
-                commit('setSection', section);
 
-                resolve(response);
-            });
-        })
+        this.watch(
+            () => this.getters['user/companyData'],
+            async () => await addSectionToStore(store, section),
+        );
     },
 
     /**
-     * Update section after user changed / filled any fields
+     * Clear all sections to fill them again with new data
      *
      * @param commit
-     * @param data
      */
-    updateSection: ({commit}, data) => {
-        commit('update', data)
-    }
+    clearSections: ({ commit }) => {
+        commit('clearSections');
+    },
+
+    addField({ commit }, { scope, path, field }) {
+        commit('addField', { scope, path, field });
+    },
 };
 
 export default {
     state,
     getters,
     mutations,
-    actions
+    actions,
+};
+
+const addSectionToStore = async (store, section) => {
+    const access = await section.accessCheck();
+    if (!access || store.state.sections.findIndex(s => s.pathName === section.name) >= 0) {
+        return;
+    }
+    section.meta.service.getItem().then(({ data }) => {
+        section = {
+            label: section.meta.label,
+            fields: section.meta.fields,
+            pathName: section.name,
+            service: section.meta.service,
+            access: access,
+            scope: section.scope,
+            data,
+        };
+        store.commit('setSection', section);
+    });
 };

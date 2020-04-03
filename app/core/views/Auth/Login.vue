@@ -1,7 +1,7 @@
 <template>
     <div class="login row at-row no-gutter">
         <div class="col-8">
-            <validation-observer class="box" v-slot="{ invalid }" tag="div" @submit.prevent="submit" ref="observer">
+            <validation-observer ref="observer" v-slot="{ invalid }" class="box" tag="div" @submit.prevent="submit">
                 <div class="top">
                     <div class="static-message">
                         <div class="logo"></div>
@@ -9,32 +9,35 @@
                     <h1 class="login__title">Cattr</h1>
                 </div>
                 <div>
-                    <at-alert v-if="error" type="error" class="login__error" closable :message="error" @on-close="error = null" />
+                    <at-alert
+                        v-if="error"
+                        type="error"
+                        class="login__error"
+                        closable
+                        :message="error"
+                        @on-close="error = null"
+                    />
 
-                    <validation-provider rules="required|email" mode="passive" v-slot="{ errors }" name="E-mail">
-                        <div class="input-group">
-                            <small>E-Mail</small>
-                            <at-input name="login" v-model="user.email" :status="errors.length > 0 ? 'error' : ''"
-                                      placeholder="E-Mail" icon="mail" type="text" required
-                                      @keydown.native.enter.prevent="submit"></at-input>
-                            <small>{{ errors[0] }}</small>
-                        </div>
-                        <!-- /.input-group -->
-                    </validation-provider>
-                    <validation-provider rules="required" mode="passive" v-slot="{ errors }" :name="$t('field.password')">
-                        <div class="input-group">
-                            <small>{{ $t('field.password') }}</small>
-                            <at-input name="password" v-model="user.password" :status="errors.length > 0 ? 'error' : ''"
-                                      :placeholder="$t('field.password')" type="password" icon="lock"
-                                      required @keydown.native.enter.prevent="submit"></at-input>
-                            <small>{{ errors[0] }}</small>
-                        </div>
-                        <!-- /.input-group -->
-                    </validation-provider>
+                    <component :is="config.authInput" @change="change" @submit="submit" />
+
+                    <vue-recaptcha
+                        v-if="recaptchaKey"
+                        ref="recaptcha"
+                        :loadRecaptchaScript="true"
+                        :sitekey="recaptchaKey"
+                        class="recaptcha"
+                        @verify="onCaptchaVerify"
+                        @expired="onCaptchaExpired"
+                    ></vue-recaptcha>
                 </div>
-                <vue-recaptcha :loadRecaptchaScript="true" :sitekey="recaptchaKey" ref="recaptcha"
-                               v-if="recaptchaKey" @verify="onCaptchaVerify" @expired="onCaptchaExpired" class="recaptcha"></vue-recaptcha>
-                <at-button class="login__btn" native-type="submit" type="primary" @click="submit">{{ $t('auth.submit') }}</at-button>
+                <at-button
+                    class="login__btn"
+                    native-type="submit"
+                    type="primary"
+                    :loading="isLoading"
+                    @click="submit"
+                    >{{ $t('auth.submit') }}</at-button
+                >
                 <router-link class="link" to="/auth/password/reset">{{ $t('auth.forgot_password') }}</router-link>
             </validation-observer>
         </div>
@@ -43,16 +46,20 @@
 </template>
 
 <script>
-    import axios from 'axios';
-    import { ValidationObserver, ValidationProvider } from 'vee-validate';
+    import { ValidationObserver } from 'vee-validate';
     import VueRecaptcha from 'vue-recaptcha';
+    import AuthInput from './AuthInput';
+    import has from 'lodash/has';
+
+    export const config = { authInput: AuthInput };
 
     export default {
         name: 'Login',
+
         components: {
-            ValidationProvider,
             ValidationObserver,
-            VueRecaptcha
+            VueRecaptcha,
+            AuthInput,
         },
 
         data() {
@@ -60,11 +67,18 @@
                 user: {
                     email: null,
                     password: null,
-                    recaptcha: null
+                    recaptcha: null,
                 },
                 recaptchaKey: null,
                 error: null,
+                isLoading: false,
             };
+        },
+
+        computed: {
+            config() {
+                return config;
+            },
         },
 
         mounted() {
@@ -78,8 +92,12 @@
                 this.user.recaptcha = response;
             },
 
-            onCaptchaExpired(){
+            onCaptchaExpired() {
                 this.$refs.recaptcha.reset();
+            },
+
+            change(user) {
+                this.user = { ...this.user, ...user };
             },
 
             async submit() {
@@ -89,6 +107,7 @@
                 }
 
                 this.$Loading.start();
+                this.isLoading = true;
                 const apiService = this.$store.getters['user/apiService'];
 
                 try {
@@ -98,6 +117,7 @@
 
                     await apiService.attemptLogin(this.user);
                     await apiService.getAllowedRules();
+                    await apiService.getProjectRules();
                     await apiService.getCompanyData();
 
                     this.error = null;
@@ -105,42 +125,46 @@
                 } catch (e) {
                     this.$Loading.error();
 
-                    if(e.response.status === 429 && this.recaptchaKey === null){
-                        this.recaptchaKey = e.response.data.info.site_key;
+                    if (has(e, 'response.status')) {
+                        if (e.response.status === 429 && this.recaptchaKey === null) {
+                            this.recaptchaKey = e.response.data.info.site_key;
+                        }
+
+                        let message;
+
+                        if (e.response.status === 401) {
+                            message = this.$t('auth.message.user_not_found');
+                        } else if (e.response.status === 429) {
+                            message = this.$t('auth.message.solve_captcha');
+                        } else if (e.response.status === 503) {
+                            message = this.$t('auth.message.data_reset');
+                        } else {
+                            message = this.$t('auth.message.auth_error');
+                        }
+
+                        this.error = message;
                     }
-
-                    let message;
-
-                    if( e.response.status === 401 ) {
-                        message = this.$t('auth.message.user_not_found');
-                    } else if(e.response.status === 429) {
-                        message = this.$t('auth.message.resolve_captcha');
-                    } else {
-                        message = this.$t('auth.message.auth_error');
-                    }
-
-                    this.error = message;
+                } finally {
+                    this.isLoading = false;
                 }
-            }
-        }
+            },
+        },
     };
 </script>
 
-
-
 <style lang="scss" scoped>
     .login {
-        width: 100%;
+        flex-wrap: nowrap;
         height: 100vh;
+        margin: 0;
         max-height: 100vh;
         position: relative;
-        margin: 0;
-        flex-wrap: nowrap;
+        width: 100%;
 
         &__title {
-            text-align: center;
-            font-size: 1.8rem;
             color: $black-900;
+            font-size: 1.8rem;
+            text-align: center;
         }
 
         &__btn {
@@ -148,16 +172,16 @@
         }
 
         &__error {
-            overflow: initial;
             margin-bottom: 1rem;
+            overflow: initial;
         }
 
         .box {
             display: flex;
             flex-direction: column;
+            height: 100%;
             justify-content: center;
             padding: 0 $spacing-08;
-            height: 100%;
 
             .top {
                 display: flex;
@@ -165,23 +189,23 @@
                 margin-bottom: $layout-01;
 
                 .static-message {
+                    align-items: center;
                     display: flex;
                     flex-flow: column nowrap;
-                    align-items: center;
 
                     .logo {
-                        display: flex;
-                        justify-content: center;
                         align-items: center;
-                        width: 60px;
-                        height: 60px;
-                        text-transform: uppercase;
-                        font-weight: bold;
-                        font-size: 1.8rem;
-                        border-radius: 10px;
                         background: url('../../assets/logo.svg');
                         background-size: cover;
+                        border-radius: 10px;
                         color: #ffffff;
+                        display: flex;
+                        font-size: 1.8rem;
+                        font-weight: bold;
+                        height: 60px;
+                        justify-content: center;
+                        text-transform: uppercase;
+                        width: 60px;
                     }
                 }
             }
@@ -192,18 +216,19 @@
         }
 
         .link {
-            font-weight: 600;
             color: $blue-1;
+            font-weight: 600;
             text-align: center;
         }
 
-        .input-group {
+        ::v-deep .input-group {
             margin-bottom: 0.75rem;
         }
 
         .hero {
-            background: url('../../assets/login.svg');
-            background-size: cover;
+            background: url('../../assets/login.svg') #6159e6;
+            background-repeat: no-repeat;
+            background-size: 100%;
         }
     }
 </style>

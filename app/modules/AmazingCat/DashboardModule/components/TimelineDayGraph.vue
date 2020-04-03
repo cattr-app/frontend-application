@@ -1,10 +1,14 @@
 <template>
-    <div class="canvas" ref="canvasWrapper">
+    <div ref="canvasWrapper" class="canvas">
         <canvas ref="canvas"></canvas>
 
-        <div :style="{ left: `${hoverPopup.x - 30}px`, bottom: `${height - hoverPopup.y + 10}px` }"
-             class="popup"
-             v-show="hoverPopup.show && !clickPopup.show"
+        <div
+            v-show="hoverPopup.show && !clickPopup.show"
+            :style="{
+                left: `${hoverPopup.x - 30}px`,
+                bottom: `${height - hoverPopup.y + 10}px`,
+            }"
+            class="popup"
         >
             <div v-if="hoverPopup.event">
                 {{ getProjectName(hoverPopup.event.project_id) }}
@@ -18,22 +22,26 @@
             <a class="corner" :style="{ left: `${hoverPopup.borderX}px` }"></a>
         </div>
 
-        <div :style="{ left: `${clickPopup.x - 30}px`, bottom: `${height - clickPopup.y + 10}px` }"
-             class="popup"
-             :data-offset="`${clickPopup.borderX}px`"
-             v-show="clickPopup.show"
+        <div
+            v-show="clickPopup.show"
+            :style="{
+                left: `${clickPopup.x - 30}px`,
+                bottom: `${height - clickPopup.y + 10}px`,
+            }"
+            class="popup"
+            :data-offset="`${clickPopup.borderX}px`"
         >
-            <div v-if="clickPopup.event && getScreenshotByInterval(clickPopup.intervalID)">
-                <Screenshot
-                        :disableModal="true"
-                        :project="getProject(clickPopup.event.project_id)"
-                        :screenshot="getScreenshotByInterval(clickPopup.intervalID)"
-                        :showText="false"
-                        @click="showPopup(getScreenshotByInterval(clickPopup.intervalID))"
-                        :task="getTask(clickPopup.event.task_id)"
-                        :user="user"
-                />
-            </div>
+            <Screenshot
+                v-if="clickPopup.event && getScreenshotByInterval(clickPopup.intervalID)"
+                :lazyImage="false"
+                :disableModal="true"
+                :project="getProject(clickPopup.event.project_id)"
+                :screenshot="getScreenshotByInterval(clickPopup.intervalID)"
+                :showText="false"
+                :task="getTask(clickPopup.event.task_id)"
+                :user="user"
+                @click="showPopup(getScreenshotByInterval(clickPopup.intervalID))"
+            />
 
             <div v-if="clickPopup.event">
                 <router-link :to="`/projects/view/${clickPopup.event.project_id}`">
@@ -48,16 +56,17 @@
             <a class="corner" :style="{ left: `${clickPopup.borderX}px` }"></a>
         </div>
 
-        <ScreenshotModal :project="modal.project"
-                         :screenshot="modal.screenshot"
-                         :show="modal.show"
-                         :showNavigation="true"
-                         :task="modal.task"
-                         :user="user"
-                         @close="onHide"
-                         @remove="onRemove"
-                         @showNext="showNext"
-                         @showPrevious="showPrevious"
+        <ScreenshotModal
+            :project="modal.project"
+            :screenshot="modal.screenshot"
+            :show="modal.show"
+            :showNavigation="true"
+            :task="modal.task"
+            :user="user"
+            @close="onHide"
+            @remove="onRemove"
+            @showNext="showNext"
+            @showPrevious="showPrevious"
         />
     </div>
 </template>
@@ -71,7 +80,6 @@
     import ScreenshotModal from '@/components/ScreenshotModal';
     import ScreenshotService from '@/service/resource/screenshotService';
     import { mapGetters } from 'vuex';
-    import { cloneDeep } from 'lodash';
 
     const fabricObjectOptions = {
         editable: false,
@@ -89,7 +97,8 @@
     const timelineHeight = 75;
     const columns = 24;
 
-    const maxLeftOffset = 850;
+    const popupWidth = 270;
+    const canvasPadding = 24;
     const defaultCornerOffset = 15;
 
     export default {
@@ -107,26 +116,28 @@
                 type: Array,
                 required: true,
             },
+            timezone: {
+                type: String,
+                required: true,
+            },
         },
         components: {
             Screenshot,
-            ScreenshotModal
+            ScreenshotModal,
         },
         computed: {
-            ...mapGetters('timeline', [
-                'tasks',
-                'projects',
-                'screenshots',
-                'intervals'
-            ]),
-            ...mapGetters('user', [
-                'user',
-            ]),
-            height () {
+            ...mapGetters('timeline', ['tasks', 'screenshots', 'intervals']),
+            ...mapGetters('user', ['user']),
+            height() {
                 return timelineHeight + titleHeight + subtitleHeight;
             },
+            projects() {
+                return Object.keys(this.tasks)
+                    .map(taskID => this.tasks[taskID])
+                    .reduce((projects, task) => ({ ...projects, [task.project_id]: task.project }), {});
+            },
         },
-        data () {
+        data() {
             return {
                 hoverPopup: {
                     show: false,
@@ -152,7 +163,7 @@
                 },
             };
         },
-        mounted () {
+        mounted() {
             this.canvas = new fabric.Canvas(this.$refs.canvas, {
                 backgroundColor: '#fff',
                 renderOnAddRemove: false,
@@ -163,42 +174,53 @@
             this.onResize();
             window.addEventListener('resize', this.onResize);
             window.addEventListener('mousedown', this.onClick);
+            window.addEventListener('keydown', this.onKeyDown);
         },
-        beforeDestroy () {
+        beforeDestroy() {
             window.removeEventListener('resize', this.onResize);
             window.removeEventListener('mousedown', this.onClick);
+            window.removeEventListener('keydown', this.onKeyDown);
         },
         methods: {
             formatDuration: formatDurationString,
-            showPopup (screenshot) {
+            showPopup(screenshot) {
                 if (typeof screenshot !== 'object') {
                     return;
                 }
 
-                this.modal.project = this.getProject(screenshot);
-                this.modal.task = this.getTask(screenshot);
+                this.modal.task = this.getTask(screenshot.time_interval?.task_id);
+                this.modal.project = this.modal.task?.project;
                 this.modal.screenshot = screenshot;
 
                 this.modal.show = true;
             },
-            onHide () {
+            onHide() {
                 this.modal.show = false;
             },
-            showPrevious () {
+            onKeyDown(e) {
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    this.showPrevious();
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    this.showNext();
+                }
+            },
+            showPrevious() {
                 const currentIndex = this.screenshots.findIndex(x => x.id === this.modal.screenshot.id);
 
                 if (currentIndex !== 0) {
                     this.modal.screenshot = this.screenshots[currentIndex - 1];
                 }
             },
-            showNext () {
+            showNext() {
                 const currentIndex = this.screenshots.findIndex(x => x.id === this.modal.screenshot.id);
 
                 if (currentIndex + 1 !== this.screenshots.length) {
                     this.modal.screenshot = this.screenshots[currentIndex + 1];
                 }
             },
-            getProjectName (projectID) {
+            getProjectName(projectID) {
                 const project = this.getProject(projectID);
                 if (!project) {
                     return '';
@@ -206,7 +228,7 @@
 
                 return project.name;
             },
-            getTaskName (taskID) {
+            getTaskName(taskID) {
                 const task = this.getTask(taskID);
                 if (!task) {
                     return '';
@@ -214,96 +236,115 @@
 
                 return task.task_name;
             },
-            getProject (projectID) {
+            getProject(projectID) {
                 if (!this.projects[projectID]) {
                     return null;
                 }
 
                 return this.projects[projectID];
             },
-            getTask (taskID) {
+            getTask(taskID) {
                 if (!this.tasks[taskID]) {
                     return null;
                 }
 
                 return this.tasks[taskID];
             },
-            getScreenshotByInterval (intervalID) {
+            getScreenshotByInterval(intervalID) {
                 return this.screenshots.find(screenshot => screenshot.time_interval_id === intervalID);
             },
-            draw: debounce(function () {
+            draw: debounce(function() {
                 this.canvas.clear();
 
                 const width = this.canvas.getWidth();
                 const columnWidth = width / columns;
 
                 // Background
-                this.canvas.add(new fabric.Rect({
-                        left: 0, top: titleHeight + subtitleHeight,
-                        width: width - 1, height: timelineHeight - 1,
-                        rx: 20, ry: 20,
+                this.canvas.add(
+                    new fabric.Rect({
+                        left: 0,
+                        top: titleHeight + subtitleHeight,
+                        width: width - 1,
+                        height: timelineHeight - 1,
+                        rx: 20,
+                        ry: 20,
                         fill: '#FAFAFA',
                         stroke: '#DFE5ED',
                         strokeWidth: 1,
                         ...fabricObjectOptions,
-                    })
-                    .on('mousedown', () => this.$emit('outsideClick'))
+                    }).on('mousedown', () => this.$emit('outsideClick')),
                 );
 
+                const { width: canvasWidth } = this.$refs.canvasWrapper.getBoundingClientRect();
+                const maxLeftOffset = canvasWidth - popupWidth + 2 * canvasPadding;
+
                 for (let i = 0; i < columns; ++i) {
-                    const date = moment().startOf('day').add(i, 'hours');
+                    const date = moment()
+                        .startOf('day')
+                        .add(i, 'hours');
                     const left = columnWidth * i;
 
                     // Column header - hour
-                    this.canvas.add(new fabric.Textbox(date.format('h'), {
-                        left, top: 0,
-                        width: columnWidth, height: titleHeight,
-                        textAlign: 'center',
-                        fontFamily: 'Nunito, sans-serif',
-                        fontSize: 15,
-                        fill: '#151941',
-                        ...fabricObjectOptions,
-                    }));
+                    this.canvas.add(
+                        new fabric.Textbox(date.format('h'), {
+                            left,
+                            top: 0,
+                            width: columnWidth,
+                            height: titleHeight,
+                            textAlign: 'center',
+                            fontFamily: 'Nunito, sans-serif',
+                            fontSize: 15,
+                            fill: '#151941',
+                            ...fabricObjectOptions,
+                        }),
+                    );
 
                     // Column header - am/pm
-                    this.canvas.add(new fabric.Textbox(date.format('A'), {
-                        left, top: titleHeight,
-                        width: columnWidth, height: subtitleHeight,
-                        textAlign: 'center',
-                        fontFamily: 'Nunito, sans-serif',
-                        fontSize: 10,
-                        fontWeight: '600',
-                        fill: '#B1B1BE',
-                        ...fabricObjectOptions,
-                    }));
+                    this.canvas.add(
+                        new fabric.Textbox(date.format('A'), {
+                            left,
+                            top: titleHeight,
+                            width: columnWidth,
+                            height: subtitleHeight,
+                            textAlign: 'center',
+                            fontFamily: 'Nunito, sans-serif',
+                            fontSize: 10,
+                            fontWeight: '600',
+                            fill: '#B1B1BE',
+                            ...fabricObjectOptions,
+                        }),
+                    );
 
                     // Vertical grid line
                     if (i > 0) {
-                        this.canvas.add(new fabric.Line([
-                            0, 0,
-                            0, timelineHeight,
-                        ], {
-                            left, top: titleHeight + subtitleHeight,
-                            stroke: '#DFE5ED',
-                            strokeWidth: 1,
-                            ...fabricObjectOptions,
-                        }));
+                        this.canvas.add(
+                            new fabric.Line([0, 0, 0, timelineHeight], {
+                                left,
+                                top: titleHeight + subtitleHeight,
+                                stroke: '#DFE5ED',
+                                strokeWidth: 1,
+                                ...fabricObjectOptions,
+                            }),
+                        );
                     }
                 }
 
                 // Intervals
                 this.events.forEach(event => {
-                    const startOfDay = moment(event.start_at).startOf('day');
-                    const secondsFromMidnight = moment(event.start_at).diff(startOfDay, 'seconds');
-                    const duration = moment(event.end_at).diff(event.start_at, 'seconds');
+                    const startOfDay = moment.tz(event.start_at, this.timezone).startOf('day');
+                    const secondsFromMidnight = moment.utc(event.start_at).diff(startOfDay, 'seconds');
+                    const duration = moment.utc(event.end_at).diff(event.start_at, 'seconds');
 
-                    const left = Math.floor(secondsFromMidnight * columnWidth / 3600);
-                    const width = Math.ceil(duration * columnWidth / 3600);
+                    const left = Math.floor((secondsFromMidnight * columnWidth) / 3600);
+                    const width = Math.ceil((duration * columnWidth) / 3600);
 
                     const rect = new fabric.Rect({
-                        left, top: titleHeight + subtitleHeight + 22,
-                        width, height: 30,
-                        rx: 3, ry: 3,
+                        left,
+                        top: titleHeight + subtitleHeight + 22,
+                        width,
+                        height: 30,
+                        rx: 3,
+                        ry: 3,
                         fill: event.is_manual ? '#c4b52d' : '#2DC48D',
                         stroke: 'transparent',
                         strokeWidth: 0,
@@ -313,15 +354,15 @@
                     });
 
                     rect.on('mouseover', e => {
-                        if( e.target.left > maxLeftOffset ) {
+                        if (e.target.left > maxLeftOffset) {
                             this.hoverPopup = {
                                 show: true,
                                 x: maxLeftOffset,
                                 y: e.target.top,
                                 event,
-                                borderX: defaultCornerOffset + e.target.left - maxLeftOffset
+                                borderX: defaultCornerOffset + e.target.left - maxLeftOffset,
                             };
-                        }else{
+                        } else {
                             this.hoverPopup = {
                                 show: true,
                                 x: e.target.left,
@@ -342,25 +383,30 @@
                     rect.on('mousedown', e => {
                         const { ids } = event;
                         const { pointer, target } = e;
-                        const n = Math.floor((pointer.x - target.left) * ids.length / (target.width + 1));
-                        const x = target.left + target.width * n / ids.length;
+                        const n = Math.floor(((pointer.x - target.left) * ids.length) / (target.width + 1));
+                        const x = target.left + (target.width * n) / ids.length;
                         const y = target.top;
                         const intervalID = ids[n];
 
                         this.$emit('selectedIntervals', event);
 
-                        if( x > maxLeftOffset ) {
+                        if (x > maxLeftOffset) {
                             this.clickPopup = {
                                 show: true,
                                 x: maxLeftOffset,
-                                y, event, intervalID,
-                                borderX: defaultCornerOffset + x - maxLeftOffset
+                                y,
+                                event,
+                                intervalID,
+                                borderX: defaultCornerOffset + x - maxLeftOffset,
                             };
-                        }else{
+                        } else {
                             this.clickPopup = {
                                 show: true,
-                                x, y, event, intervalID,
-                                borderX: defaultCornerOffset
+                                x,
+                                y,
+                                event,
+                                intervalID,
+                                borderX: defaultCornerOffset,
                             };
                         }
 
@@ -372,25 +418,24 @@
 
                 this.canvas.requestRenderAll();
             }),
-            onClick (e) {
-                if (e.button !== 0 || e.target && e.target.closest('.popup')) {
-                    return;
-                }
-
-                if (e.target
-                    && !e.target.parentElement.classList.contains(this.canvas.wrapperEl.classList)
-                    && !e.target.closest('.time-interval-edit-panel')
-                    && !e.target.closest('.screenshots')
-                    && !e.target.closest('.at-modal')
+            onClick(e) {
+                if (
+                    e.target &&
+                    !e.target.parentElement.classList.contains(this.canvas.wrapperEl.classList) &&
+                    !e.target.closest('.time-interval-edit-panel') &&
+                    !e.target.closest('.screenshot') &&
+                    !e.target.closest('.modal') &&
+                    !e.target.closest('.at-modal') &&
+                    !e.target.closest('.popup')
                 ) {
                     this.$emit('outsideClick');
-                }
 
-                if (this.clickPopup.show) {
-                    this.clickPopup.show = false;
+                    if (this.clickPopup.show) {
+                        this.clickPopup.show = false;
+                    }
                 }
             },
-            onResize: debounce(function () {
+            onResize: debounce(function() {
                 const { width } = this.$refs.canvasWrapper.getBoundingClientRect();
                 this.canvas.setWidth(width);
 
@@ -403,20 +448,10 @@
                 try {
                     await this.screenshotsService.deleteItem(this.modal.screenshot.id);
 
-                    const interval = this.modal.screenshot.time_interval;
-                    const totalIntervals = cloneDeep(this.intervals);
-                    const userInterval = cloneDeep(this.intervals[interval.user_id]);
-
-                    userInterval.duration -= moment(interval.end_at).diff(interval.start_at, 'seconds');
-                    userInterval.intervals = userInterval.intervals.filter(int => int.id !== interval.id);
-
-                    totalIntervals[interval.user_id] = userInterval;
-                    this.$store.dispatch('timeline/setIntervals', totalIntervals);
-
                     this.$Notify({
                         type: 'success',
                         title: 'Deleted Successfully',
-                        message: 'Screenshot was deleted successfully'
+                        message: 'Screenshot was deleted successfully',
                     });
 
                     this.modal.show = false;
@@ -424,13 +459,13 @@
                     this.$Notify({
                         type: 'error',
                         title: 'Deletion Error',
-                        message: 'This screenshot can not be deleted OR something unusual happened during the request'
+                        message: 'This screenshot can not be deleted OR something unusual happened during the request',
                     });
                 }
-            }
+            },
         },
         watch: {
-            events () {
+            events() {
                 this.draw();
             },
         },
@@ -438,51 +473,48 @@
 </script>
 
 <style lang="scss" scoped>
-
     .canvas {
         position: relative;
 
-        &::v-deep canvas
-        {
+        &::v-deep canvas {
             box-sizing: content-box;
         }
 
-        .popup
-        {
-            background:    #ffffff;
-            border:        0;
+        .popup {
+            background: #ffffff;
+            border: 0;
 
             border-radius: 20px;
 
-            box-shadow:    0px 7px 64px rgba(0, 0, 0, 0.07);
-            display:       block;
+            box-shadow: 0px 7px 64px rgba(0, 0, 0, 0.07);
+            display: block;
 
-            padding:       10px;
+            padding: 10px;
 
-            position:      absolute;
+            position: absolute;
 
-            text-align:    center;
+            text-align: center;
 
-            width:         270px;
+            width: 270px;
 
-            z-index:       1;
+            z-index: 1;
 
             & .corner {
-                border-left:  15px solid transparent;
+                border-left: 15px solid transparent;
 
                 border-right: 15px solid transparent;
-                border-top:   10px solid #ffffff;
+                border-top: 10px solid #ffffff;
 
-                bottom:       -10px;
-                content:      ' ';
-                display:      block;
+                bottom: -10px;
+                content: ' ';
+                display: block;
 
-                height:       0;
+                height: 0;
 
-                position:     absolute;
-                width:        0;
+                position: absolute;
+                width: 0;
 
-                z-index:      1;
+                z-index: 1;
             }
         }
     }

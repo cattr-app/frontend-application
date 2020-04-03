@@ -1,5 +1,6 @@
 <template>
     <div id="app">
+        <component :is="config.beforeLayout" />
         <component :is="layout">
             <router-view :key="$route.path"></router-view>
         </component>
@@ -9,17 +10,18 @@
 <script>
     import axios, { Cancel } from 'axios';
     import router from './router';
+    import has from 'lodash/has';
+    import * as Sentry from '@sentry/browser';
+    import { getLangCookie, setLangCookie } from './i18n';
 
-    const cancelExcept = [
-        'auth.login',
-        'settings',
-        'company',
-    ];
+    export const config = { beforeLayout: null };
+
+    const cancelExcept = ['auth.login', 'settings', 'company', 'dashboard'];
 
     let CancelTokenSource = axios.CancelToken.source();
     router.beforeEach((to, from, next) => {
         if (from.name !== null && cancelExcept.indexOf(from.name) === -1) {
-            CancelTokenSource.cancel();
+            CancelTokenSource.cancel('Page switch');
             CancelTokenSource = axios.CancelToken.source();
         }
 
@@ -32,7 +34,7 @@
         data() {
             return {
                 refCount: 0,
-                isLoading: false
+                isLoading: false,
             };
         },
 
@@ -44,7 +46,14 @@
                     this.$loading.show();
                     await userApi.checkApiAuth();
                     await userApi.getAllowedRules();
+                    await userApi.getProjectRules();
                     await userApi.getCompanyData();
+                    Sentry.setUser({
+                        email: this.$store.state.user.user.data.email,
+                        full_name: this.$store.state.user.user.data.full_name,
+                        id: this.$store.state.user.user.data.id,
+                        role: this.$store.state.user.user.data.role.name,
+                    });
                     this.$Loading.finish();
                 } catch (e) {
                     // Whoops
@@ -55,33 +64,54 @@
         },
 
         created() {
-            axios.interceptors.request.use((config) => {
-                if (typeof config.cancelToken === 'undefined') {
-                    config.cancelToken = CancelTokenSource.token;
-                }
-                this.setLoading(true);
-                return Promise.resolve(config);
-            }, (error) => {
-                this.$Loading.error();
-                return Promise.reject(error);
-            });
+            axios.interceptors.request.use(
+                config => {
+                    if (typeof config.cancelToken === 'undefined') {
+                        config.cancelToken = CancelTokenSource.token;
+                    }
+                    this.setLoading(true);
+                    return Promise.resolve(config);
+                },
+                error => {
+                    this.$Loading.error();
+                    return Promise.reject(error);
+                },
+            );
 
-            axios.interceptors.response.use((response) => {
-                this.setLoading(false);
-                return Promise.resolve(response);
-            }, (error) => {
-                this.setLoading(false);
-                if (!axios.isCancel(error) && error.response.status !== 401) {
-                    this.$Notify({
-                        title: 'Error',
-                        message: 'There was an error while processing the request #' + this.refCount + '. ' +
-                            'Error message: ' + error.response.data.message + '. See console log for more information',
-                        type: 'error',
-                        duration: 5000
-                    });
-                }
-                return Promise.reject(error);
-            });
+            axios.interceptors.response.use(
+                response => {
+                    this.setLoading(false);
+                    return Promise.resolve(response);
+                },
+                error => {
+                    this.setLoading(false);
+
+                    if (
+                        !axios.isCancel(error) &&
+                        (!has(error, 'response.status') || error.response.status !== 401) &&
+                        (!has(error, 'response.status') || error.response.status !== 503)
+                    ) {
+                        this.$Notify({
+                            title: 'Error',
+                            message: has(error, 'response.data.message')
+                                ? error.response.data.message
+                                : 'Internal server error',
+                            type: 'error',
+                            duration: 5000,
+                        });
+                    } else if (error.response.status === 503) {
+                        this.$store.dispatch('forceUserExit', 'Data reset');
+                    }
+                    return Promise.reject(error);
+                },
+            );
+        },
+
+        mounted() {
+            if (sessionStorage.getItem('logout')) {
+                this.$store.dispatch('user/setLoggedInStatus', null);
+                sessionStorage.removeItem('logout');
+            }
         },
 
         methods: {
@@ -94,14 +124,15 @@
             },
             setUserLocale() {
                 const user = this.$store.getters['user/user'];
+                const cookieLang = getLangCookie();
                 // Set user locale after auth
                 if (user.user_language) {
                     this.$i18n.locale = user.user_language;
-                    localStorage.setItem('language', user.user_language);
-                } else if (localStorage.getItem('language')) {
-                    this.$i18n.locale = localStorage.getItem('language');
+                    setLangCookie(user.user_language);
+                } else if (cookieLang) {
+                    this.$i18n.locale = cookieLang;
                 }
-            }
+            },
         },
 
         computed: {
@@ -113,7 +144,10 @@
             },
             layout() {
                 return this.$route.meta.layout || 'default-layout';
-            }
+            },
+            config() {
+                return config;
+            },
         },
 
         watch: {
@@ -131,17 +165,16 @@
 
             isLoggedIn(status) {
                 if (status) {
-                    this.$router.push({ name: 'dashboard.timeline' });
+                    this.$router.push({ name: 'dashboard' });
                 } else {
                     const reason = this.$store.getters['user/lastLogoutReason'];
-                    const message = reason === null ?
-                        'You has been logged out' :
-                        `You has been logged out. Reason: ${reason}`;
+                    const message =
+                        reason === null ? 'You has been logged out' : `You has been logged out. Reason: ${reason}`;
 
                     this.$Notify({
                         title: 'Warning',
                         message,
-                        type: 'warning'
+                        type: 'warning',
                     });
                     this.$router.push({ name: 'auth.login' });
                 }
@@ -157,17 +190,17 @@
                         this.$Loading.finish();
                     });
                 }
-            }
-        }
+            },
+        },
     };
 </script>
 
 <style lang="scss">
-    @import "sass/app";
+    @import 'sass/app';
 
     .at-loading-bar {
         &__inner {
-            transition: width .5s linear;
+            transition: width 0.5s linear;
         }
     }
 </style>

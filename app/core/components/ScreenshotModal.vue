@@ -1,27 +1,28 @@
 <template>
-    <at-modal class="modal" v-if="show" :width="900" :value="true" @on-cancel="onClose" @on-confirm="onClose">
+    <at-modal v-if="show" class="modal" :width="900" :value="true" @on-cancel="onClose" @on-confirm="onClose">
         <template v-slot:header>
             <span class="modal-title">{{ $t('field.screenshot') }}</span>
         </template>
 
-        <a :href="baseURL + screenshot.path" target="_blank">
-            <AppImage v-if="screenshot" class="modal-screenshot" :is-blob="false" :src="screenshot.path" />
+        <a target="_blank">
+            <AppImage
+                v-if="screenshot && screenshot.id"
+                class="modal-screenshot"
+                :is-blob="false"
+                :src="getScreenshotPath(screenshot)"
+            />
         </a>
 
         <div v-if="showNavigation" class="modal-left">
-            <at-button type="primary" icon="icon-arrow-left" @click.prevent="$emit('showPrevious')"></at-button>
+            <at-button type="primary" icon="icon-arrow-left" @click="$emit('showPrevious')"></at-button>
         </div>
 
         <div v-if="showNavigation" class="modal-right">
-            <at-button type="primary" icon="icon-arrow-right" @click.prevent="$emit('showNext')"></at-button>
+            <at-button type="primary" icon="icon-arrow-right" @click="$emit('showNext')"></at-button>
         </div>
 
         <template v-slot:footer>
-            <at-button class="modal-remove"
-                type="text"
-                icon="icon-trash-2"
-                @click="onRemove"
-            ></at-button>
+            <at-button class="modal-remove" type="text" icon="icon-trash-2" @click="onRemove"></at-button>
 
             <div v-if="project" class="modal-field">
                 <span class="modal-label">{{ $t('field.project') }}:</span>
@@ -45,7 +46,7 @@
             </div>
 
             <div v-if="screenshot" class="modal-field">
-                <span class="modal-label">{{ $t('field.created_at')}}:</span>
+                <span class="modal-label">{{ $t('field.created_at') }}:</span>
                 <span class="modal-value">{{ formatDate(screenshot.created_at) }}</span>
             </div>
         </template>
@@ -56,6 +57,12 @@
     import moment from 'moment';
     import AppImage from './AppImage';
     import env from '_app/etc/env';
+
+    export function screenshotPathProvider(screenshot) {
+        return screenshot.path;
+    }
+
+    export const config = { screenshotPathProvider };
 
     export default {
         name: 'ScreenshotModal',
@@ -86,12 +93,14 @@
         },
         computed: {
             baseURL() {
-                return (env.API_URL || `${window.location.origin}/api`)+ '/';
+                return (env.API_URL || `${window.location.origin}/api`) + '/';
             },
         },
         methods: {
             formatDate(value) {
-                return moment(value).locale(this.$i18n.locale).format('MMMM D, YYYY — HH:mm:ss');
+                return moment(value)
+                    .locale(this.$i18n.locale)
+                    .format('MMMM D, YYYY — HH:mm:ss');
             },
             onClose() {
                 this.$emit('close');
@@ -99,32 +108,34 @@
             onRemove() {
                 this.$emit('remove', this.screenshot.id);
             },
+            getScreenshotPath(screenshot) {
+                return config.screenshotPathProvider(screenshot);
+            },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>
     .modal {
-        position: relative;
-
         &::v-deep {
             .at-modal__mask {
                 background: rgba(#151941, 0.7);
-                //backdrop-filter: blur(10px);
             }
 
             .at-modal__wrapper {
                 display: flex;
                 align-items: center;
                 justify-content: center;
+
+                overflow-y: scroll;
+                padding-top: 1rem;
+                padding-bottom: 1rem;
             }
 
             .at-modal {
                 border-radius: 15px;
                 top: unset;
-
-                display: flex;
-                flex-flow: column nowrap;
+                height: fit-content;
             }
 
             .at-modal__header {
@@ -142,7 +153,7 @@
             }
 
             .at-modal__close {
-                color: #B1B1BE;
+                color: #b1b1be;
             }
         }
 
@@ -175,6 +186,7 @@
 
             width: 100%;
             height: auto;
+            min-height: 300px;
             max-height: 70vh;
 
             object-fit: contain;
@@ -189,7 +201,7 @@
             bottom: 12px;
             right: 16px;
 
-            color: #FF5569;
+            color: #ff5569;
         }
 
         &-field {
@@ -206,8 +218,9 @@
             margin-right: 0.5em;
         }
 
-        &-value, &-value a {
-            color: #2E2EF9;
+        &-value,
+        &-value a {
+            color: #2e2ef9;
         }
     }
 </style>

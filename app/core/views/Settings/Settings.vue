@@ -2,19 +2,15 @@
     <div :class="classes">
         <h1 class="page-title">{{ $t('navigation.settings') }}</h1>
         <div class="at-container">
-            <at-menu class="settings__menu" router mode="horizontal" v-if="sections">
+            <at-menu v-if="sections" class="settings__menu" router mode="horizontal">
                 <template v-for="(section, key) in sections">
-                    <at-menu-item
-                            :key="key"
-                            :to="{name: section.pathName}"
-                            v-if="section.access"
-                    >
+                    <at-menu-item v-if="section.access" :key="key" :to="{ name: section.pathName }">
                         {{ $t(section.label) }}
                     </at-menu-item>
                 </template>
             </at-menu>
             <div class="settings__content">
-                <router-view></router-view>
+                <router-view @onUpdate="reinitSections"></router-view>
             </div>
         </div>
     </div>
@@ -23,22 +19,37 @@
 <script>
     export default {
         name: 'Settings',
-
         computed: {
             classes() {
                 const route = this.$route.name.split('.').pop();
                 return ['settings', `settings--${route}`];
             },
-
             sections() {
                 return this.$store.getters['settings/sections']
-                    .filter(section => section.scope === 'settings');
-            }
+                    .filter(section => section.scope === 'settings')
+                    .sort((a, b) => {
+                        if (b.label < a.label) {
+                            return 1;
+                        } else if (b.label > a.label) {
+                            return -1;
+                        }
+                        return 0;
+                    });
+            },
+        },
+        methods: {
+            async reinitSections() {
+                await this.$store.dispatch('user/setCompanyData', {});
+                const userApi = await this.$store.getters['user/apiService'];
+                await this.$store.dispatch('settings/clearSections').then(async () => {
+                    await userApi.getCompanyData();
+                });
+            },
         },
 
         mounted() {
             if (this.$route.name === 'settings') {
-                this.$router.push({name: 'settings.account'});
+                this.$router.push({ name: 'settings.account' });
             }
         },
     };

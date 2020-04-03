@@ -1,36 +1,35 @@
 <script>
-import { mapGetters } from 'vuex';
+    import { mapGetters } from 'vuex';
     export default {
         name: 'RenderableField',
-        //functional: true,
         props: {
             render: {
                 required: true,
-                type: Function
+                type: Function,
             },
             value: {
-                default: undefined
+                default: Object,
             },
             field: {
                 required: true,
-                type: Object
+                type: Object,
             },
             values: {
-                type: Object
+                type: Object,
             },
             setValue: {
-                type: Function
+                type: Function,
             },
         },
         data() {
             return {
-                currentValue: this.value
+                currentValue: this.value,
             };
         },
         watch: {
             value(val) {
                 this.currentValue = val;
-            }
+            },
         },
         computed: {
             ...mapGetters('user', ['companyData']),
@@ -45,12 +44,12 @@ import { mapGetters } from 'vuex';
             },
             blurHandler(evt) {
                 this.$emit('blur', evt);
-            }
+            },
         },
         render(h) {
             return this.render(h, {
                 inputHandler: this.inputHandler,
-                currentValue: this.currentValue === undefined ? {} : this.currentValue,
+                currentValue: this.currentValue,
                 focusHandler: this.focusHandler,
                 blurHandler: this.blurHandler,
                 field: this.field,
@@ -58,6 +57,6 @@ import { mapGetters } from 'vuex';
                 setValue: this.setValue,
                 companyData: this.companyData,
             });
-        }
+        },
     };
 </script>

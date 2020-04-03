@@ -2,7 +2,6 @@ import ResourceService from './resouceService';
 import axios from 'axios';
 
 export default class TimeIntervalService extends ResourceService {
-
     /**
      * @returns {string}
      * @param id
@@ -31,7 +30,7 @@ export default class TimeIntervalService extends ResourceService {
      * @param data
      */
     save(data) {
-        return axios.post('time-intervals/manual-create', data);
+        return axios.post('time-intervals/create', data);
     }
 
     /**
@@ -53,14 +52,16 @@ export default class TimeIntervalService extends ResourceService {
     /**
      * @returns {Promise<AxiosResponse<T>>}
      * @param userIds
+     * @param projectIds
      * @param startAt
      * @param endAt
      * @param config
      */
-    getDashboardIntervals(userIds, startAt, endAt, config = {}) {
+    getDashboardIntervals(userIds, projectIds, startAt, endAt, config = {}) {
         const url = 'time-intervals/dashboard';
         const data = {
             user_ids: userIds,
+            project_ids: projectIds,
             start_at: startAt,
             end_at: endAt,
         };

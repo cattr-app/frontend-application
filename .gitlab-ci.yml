@@ -1,0 +1,70 @@
+demo_deploy:
+  image: alpine
+  stage: deploy
+  only:
+    - demo
+  before_script:
+    - 'which ssh-agent || ( apk add --update openssh )'
+    - eval $(ssh-agent -s)
+    - echo "$DEMO_KEY" | base64 -d | ssh-add -
+    - mkdir ~/.ssh
+    - ssh-keyscan -H $DEMO_HOST >> ~/.ssh/known_hosts
+  script:
+    - ssh $DEMO_USER@$DEMO_HOST 'cd cattr/demo && docker-compose build --no-cache --force-rm demo'
+    - ssh $DEMO_USER@$DEMO_HOST 'cd cattr/demo && docker-compose down -v && docker-compose up -d demo'
+
+live_deploy:
+  image: alpine
+  stage: deploy
+  variables:
+    NODE_VERSION: 12.16.1
+  only:
+    - release
+  before_script:
+    - 'which ssh-agent || ( apk add --update openssh )'
+    - eval $(ssh-agent -s)
+    - echo "$CI_KEY" | base64 -d | ssh-add -
+    - mkdir ~/.ssh
+    - ssh-keyscan -H $CI_HOST >> ~/.ssh/known_hosts
+    - apk add curl bash
+    - curl -sL https://sentry.io/get-cli/ | bash
+    - VERSION=$(cat package.json | grep version | grep -o ":.*" | grep -o "\".*\"" | sed 's/"//g')
+    - sentry-cli releases new "${VERSION}@${CI_COMMIT_SHORT_SHA}"
+  script:
+    - VERSION=$(cat package.json | grep version | grep -o ":.*" | grep -o "\".*\"" | sed 's/"//g')
+    - sentry-cli releases set-commits "${VERSION}@${CI_COMMIT_SHORT_SHA}" --auto
+    - start=$(date +%s)
+    - ssh $CI_USER@$CI_HOST 'cd cattr/core-vue-application && git pull'
+    - echo "export NODE_VERSION=$NODE_VERSION && cd cattr/core-vue-application && ~/.nvm/nvm-exec npm install && ~/.nvm/nvm-exec npx vue-cli-service modules:compile" | ssh -T $CI_USER@$CI_HOST
+    - echo "export VUE_APP_SENTRY_DSN='$VUE_APP_SENTRY_DSN' && export SENTRY_ORG='$SENTRY_ORG' && export SENTRY_AUTH_TOKEN='$SENTRY_AUTH_TOKEN' && export SENTRY_PROJECT='$SENTRY_PROJECT' && export SENTRY_URL='$SENTRY_URL' && export NODE_VERSION=$NODE_VERSION && cd cattr/core-vue-application && ~/.nvm/nvm-exec npm run build && cp -rf dist/* output" | ssh -T $CI_USER@$CI_HOST
+    - now=$(date +%s)
+    - sentry-cli releases deploys "${VERSION}@${CI_COMMIT_SHORT_SHA}" new -e "$CI_COMMIT_REF_NAME" -t $((now-start))
+    - sentry-cli releases finalize "${VERSION}@${CI_COMMIT_SHORT_SHA}"
+
+staging_deploy:
+  image: alpine
+  stage: deploy
+  only:
+    - staging
+  variables:
+    NODE_VERSION: 12.16.1
+  before_script:
+    - 'which ssh-agent || ( apk add --update openssh )'
+    - eval $(ssh-agent -s)
+    - echo "$STAGING_KEY" | base64 -d | ssh-add -
+    - mkdir ~/.ssh
+    - ssh-keyscan -H $STAGING_HOST >> ~/.ssh/known_hosts
+    - apk add curl bash
+    - curl -sL https://sentry.io/get-cli/ | bash
+    - VERSION=$(cat package.json | grep version | grep -o ":.*" | grep -o "\".*\"" | sed 's/"//g')
+    - sentry-cli releases new "${VERSION}@${CI_COMMIT_SHORT_SHA}"
+  script:
+    - VERSION=$(cat package.json | grep version | grep -o ":.*" | grep -o "\".*\"" | sed 's/"//g')
+    - sentry-cli releases set-commits "${VERSION}@${CI_COMMIT_SHORT_SHA}" --auto
+    - start=$(date +%s)
+    - ssh $STAGING_USER@$STAGING_HOST 'cd frontend && git pull && cp -f app/etc/env.staging.js app/etc/env.js && cp -f app/etc/modules.staging.json app/etc/modules.config.json'
+    - echo "export NODE_VERSION=$NODE_VERSION && cd frontend && rm -f output/index.html &&  ~/.nvm/nvm-exec npm install && ~/.nvm/nvm-exec npx vue-cli-service modules:compile" | ssh -T $STAGING_USER@$STAGING_HOST
+    - echo "export VUE_APP_SENTRY_DSN='$VUE_APP_SENTRY_DSN' && export SENTRY_ORG='$SENTRY_ORG' && export SENTRY_AUTH_TOKEN='$SENTRY_AUTH_TOKEN' SENTRY_PROJECT='$SENTRY_PROJECT' && export SENTRY_URL='$SENTRY_URL' && export NODE_VERSION=$NODE_VERSION && cd frontend && ~/.nvm/nvm-exec npm run build && cp -rf dist/* output" | ssh -T $STAGING_USER@$STAGING_HOST
+    - now=$(date +%s)
+    - sentry-cli releases deploys "${VERSION}@${CI_COMMIT_SHORT_SHA}" new -e "$CI_COMMIT_REF_NAME" -t $((now-start))
+    - sentry-cli releases finalize "${VERSION}@${CI_COMMIT_SHORT_SHA}"

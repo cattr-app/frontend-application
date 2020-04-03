@@ -1,5 +1,5 @@
 <template>
-    <div class="loader">
+    <div class="loader" :class="{ 'loader--transparent': isTransparent }">
         <div class="lds-ellipsis">
             <div></div>
             <div></div>
@@ -8,6 +8,18 @@
         </div>
     </div>
 </template>
+
+<script>
+    export default {
+        name: 'Preloader',
+        props: {
+            isTransparent: {
+                type: Boolean,
+                default: false,
+            },
+        },
+    };
+</script>
 
 <style lang="scss" scoped>
     .loader {
@@ -25,6 +37,10 @@
         right: 0;
         left: 0;
         bottom: 0;
+
+        &--transparent {
+            background: rgba(255, 255, 255, 0.8);
+        }
 
         .lds-ellipsis {
             display: inline-block;

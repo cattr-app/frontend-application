@@ -2,18 +2,15 @@
     <div :class="classes">
         <h1 class="page-title">{{ $t('navigation.company_settings') }}</h1>
         <div class="at-container">
-                <at-menu class="settings__menu" router mode="horizontal" v-if="sections">
-                    <template v-for="(section, key) in sections">
-                        <at-menu-item
-                                :key="key"
-                                :to="{name: section.pathName}"
-                                v-if="section.access"
+            <at-menu v-if="sections" class="settings__menu" router mode="horizontal">
+                <template v-for="(section, key) in sections">
+                    <at-menu-item v-if="section.access" :key="key" :to="{ name: section.pathName }"
                         >{{ $t(section.label) }}
-                        </at-menu-item>
-                    </template>
-                </at-menu>
+                    </at-menu-item>
+                </template>
+            </at-menu>
             <div class="settings__content">
-                <router-view></router-view>
+                <router-view @onUpdate="reinitSections"></router-view>
             </div>
         </div>
     </div>
@@ -29,12 +26,29 @@
             },
             sections() {
                 return this.$store.getters['settings/sections']
-                    .filter(section => section.scope === 'company');
+                    .filter(section => section.scope === 'company')
+                    .sort((a, b) => {
+                        if (b.label < a.label) {
+                            return 1;
+                        } else if (b.label > a.label) {
+                            return -1;
+                        }
+                        return 0;
+                    });
+            },
+        },
+        methods: {
+            async reinitSections() {
+                await this.$store.dispatch('user/setCompanyData', {});
+                const userApi = await this.$store.getters['user/apiService'];
+                await this.$store.dispatch('settings/clearSections').then(async () => {
+                    await userApi.getCompanyData();
+                });
             },
         },
         mounted() {
             if (this.$route.name === 'company') {
-                this.$router.push({name: 'company.general'});
+                this.$router.push({ name: 'company.general' });
             }
         },
     };

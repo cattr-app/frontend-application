@@ -2,146 +2,173 @@
     <div>
         <template v-if="this.section && values">
             <component
+                :is="component"
                 v-for="(component, index) of this.section.topComponents"
                 :key="index"
-                :is="component"
                 :parent="this"
             ></component>
             <validation-observer ref="form">
                 <div class="data-entries">
-                    <template v-for="(field, key) of this.section.fields">
-                        <template
-                            v-if="typeof field.displayable !== 'undefined' ? field.displayable : true"
-                        >
-                            <div :key="key" class="data-entry">
-                                <div class="row">
-                                    <div class="col-6 label">{{ $t(field.label) }}</div>
-                                    <div class="col">
-                                        <validation-provider
-                                            v-if="typeof field.render !== 'undefined'"
-                                            v-slot="{ errors }"
-                                        >
-                                            <renderable-field
-                                                v-model="values[field.key]"
-                                                :render="field.render"
-                                                :field="field"
-                                                :values="values"
-                                                class="with-margin"
-                                            ></renderable-field>
-                                        </validation-provider>
-
-                                        <validation-provider
-                                            v-else-if="field.fieldOptions.type === 'input' || field.fieldOptions.type === 'text'"
-                                            v-slot="{ errors }"
-                                            :name="$t(field.label)"
-                                            :vid="field.key"
-                                        >
-                                            <at-input
-                                                v-model="values[field.key]"
-                                                :readonly="field.fieldOptions.fckAutocomplete || false"
-                                                @focus="removeReadonly"
-                                                :placeholder="field.fieldOptions.placeholder || ''"
-                                                :type="field.fieldOptions.frontendType || ''"
-                                                :status="errors.length > 0  ? 'error' : ''"
-                                            ></at-input>
-                                            <small>{{ errors[0] }}</small>
-                                        </validation-provider>
-
-                                        <validation-provider
-                                            v-else-if="field.fieldOptions.type === 'number'"
-                                            v-slot="{ errors }"
-                                            :name="$t(field.label)"
-                                            :vid="field.key"
-                                        >
-                                            <at-input-number
-                                                :min="field.minValue"
-                                                :max="field.maxValue"
-                                                v-model="values[field.key]"
-                                            ></at-input-number>
-                                            <small>{{ errors[0] }}</small>
-                                        </validation-provider>
-
-                                        <validation-provider
-                                            v-else-if="field.fieldOptions.type === 'select'"
-                                            v-slot="{ errors }"
-                                            :name="$t(field.label)"
-                                            :vid="field.key"
-                                        >
-                                            <at-select
-                                                v-model="values[field.key]"
-                                                class="with-margin"
+                    <template v-for="(fields, groupKey) of this.groups">
+                        <template v-for="(field, key) of fields">
+                            <template v-if="typeof field.displayable === 'function' ? field.displayable($store) : true">
+                                <div :key="key" class="data-entry">
+                                    <div class="row">
+                                        <div class="col-6 label">
+                                            <at-tooltip
+                                                v-if="field.tooltipValue"
+                                                :content="$t(field.tooltipValue)"
+                                                placement="top-right"
                                             >
-                                                <at-option
-                                                    v-for="(option, optionKey) of getSelectOptions(field, values)"
-                                                    :key="optionKey"
-                                                    :value="option.value"
-                                                >{{ option.label }}</at-option>
-                                            </at-select>
-                                            <small>{{ errors[0] }}</small>
-                                        </validation-provider>
+                                                <p class="label label-tooltip">
+                                                    {{ $t(field.label) }}
+                                                    <span v-if="field.required">*</span>
+                                                </p>
+                                            </at-tooltip>
+                                            <p v-else class="label">
+                                                {{ $t(field.label) }}
+                                                <span v-if="field.required">*</span>
+                                            </p>
+                                        </div>
+                                        <div class="col">
+                                            <validation-provider v-if="typeof field.render === 'function'">
+                                                <renderable-field
+                                                    v-model="values[field.key]"
+                                                    :render="field.render"
+                                                    :field="field"
+                                                    :values="values"
+                                                    class="with-margin"
+                                                ></renderable-field>
+                                            </validation-provider>
 
-                                        <validation-provider
-                                            v-else-if="field.fieldOptions.type === 'textarea'"
-                                            v-slot="{ errors }"
-                                            :name="$t(field.label)"
-                                            :vid="field.key"
-                                        >
-                                            <at-textarea
-                                                autosize
-                                                v-model="values[field.key]"
-                                                class="with-margin"
-                                                :class="{'at-textarea--error': errors.length > 0}"
-                                            ></at-textarea>
-                                            <small>{{ errors[0] }}</small>
-                                        </validation-provider>
+                                            <validation-provider
+                                                v-else-if="
+                                                    field.fieldOptions.type === 'input' ||
+                                                        field.fieldOptions.type === 'text'
+                                                "
+                                                v-slot="{ errors }"
+                                                :name="$t(field.label)"
+                                                :vid="field.key"
+                                            >
+                                                <at-input
+                                                    v-model="values[field.key]"
+                                                    :readonly="field.fieldOptions.disableAutocomplete || false"
+                                                    :placeholder="field.fieldOptions.placeholder || ''"
+                                                    :type="field.fieldOptions.frontendType || ''"
+                                                    :status="errors.length > 0 ? 'error' : ''"
+                                                    @focus="removeReadonly"
+                                                ></at-input>
+                                                <small>{{ errors[0] }}</small>
+                                            </validation-provider>
 
-                                        <validation-provider
-                                            v-else-if="field.fieldOptions.type === 'listbox'"
-                                            v-slot="{ errors }"
-                                            :name="$t(field.label)"
-                                            :vid="field.key"
-                                        >
-                                            <ListBox
-                                                :keyField="field.fieldOptions.keyField"
-                                                :labelField="field.fieldOptions.labelField"
-                                                :valueField="field.fieldOptions.valueField"
-                                                v-model="values[field.key]"
-                                            />
-                                            <small>{{ errors[0] }}</small>
-                                        </validation-provider>
+                                            <validation-provider
+                                                v-else-if="field.fieldOptions.type === 'number'"
+                                                v-slot="{ errors }"
+                                                :name="$t(field.label)"
+                                                :vid="field.key"
+                                            >
+                                                <at-input-number
+                                                    v-model="values[field.key]"
+                                                    :min="field.minValue"
+                                                    :max="field.maxValue"
+                                                    size="large"
+                                                    @blur="handleInputNumber($event, field.key)"
+                                                ></at-input-number>
+                                                <small>{{ errors[0] }}</small>
+                                            </validation-provider>
+
+                                            <validation-provider
+                                                v-else-if="field.fieldOptions.type === 'select'"
+                                                v-slot="{ errors }"
+                                                :name="$t(field.label)"
+                                                :vid="field.key"
+                                            >
+                                                <at-select v-model="values[field.key]" class="with-margin">
+                                                    <at-option
+                                                        v-for="(option, optionKey) of getSelectOptions(field, values)"
+                                                        :key="optionKey"
+                                                        :value="option.value"
+                                                        >{{ $t(option.label) }}
+                                                    </at-option>
+                                                </at-select>
+                                                <small>{{ errors[0] }}</small>
+                                            </validation-provider>
+
+                                            <validation-provider
+                                                v-else-if="field.fieldOptions.type === 'textarea'"
+                                                v-slot="{ errors }"
+                                                :name="$t(field.label)"
+                                                :vid="field.key"
+                                            >
+                                                <at-textarea
+                                                    v-model="values[field.key]"
+                                                    autosize
+                                                    class="with-margin"
+                                                    :class="{
+                                                        'at-textarea--error': errors.length > 0,
+                                                    }"
+                                                ></at-textarea>
+                                                <small>{{ errors[0] }}</small>
+                                            </validation-provider>
+
+                                            <validation-provider
+                                                v-else-if="field.fieldOptions.type === 'listbox'"
+                                                v-slot="{ errors }"
+                                                :name="$t(field.label)"
+                                                :vid="field.key"
+                                            >
+                                                <ListBox
+                                                    v-model="values[field.key]"
+                                                    :keyField="field.fieldOptions.keyField"
+                                                    :labelField="field.fieldOptions.labelField"
+                                                    :valueField="field.fieldOptions.valueField"
+                                                />
+                                                <small>{{ errors[0] }}</small>
+                                            </validation-provider>
+
+                                            <validation-provider
+                                                v-else-if="field.fieldOptions.type === 'checkbox'"
+                                                v-slot="{ errors }"
+                                                :vid="field.key"
+                                            >
+                                                <at-checkbox v-model="values[field.key]" label="" />
+                                                <small>{{ errors[0] }}</small>
+                                            </validation-provider>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </template>
                         </template>
+
+                        <hr :key="groupKey" class="group-divider" />
                     </template>
                 </div>
                 <component
+                    :is="component"
                     v-for="(component, index) of this.section.bottomComponents"
                     :key="index"
-                    :is="component"
                     :parent="this"
                 ></component>
-                <at-button type="primary" @click="submit">{{ $t('control.save') }}</at-button>
+                <at-button type="primary" @click="submit">{{ $t('control.save') }} </at-button>
             </validation-observer>
         </template>
     </div>
 </template>
 
 <script>
-    import { cloneDeep } from "lodash";
-    import ListBox from "@/components/ListBox";
-    import RenderableField from "@/components/RenderableField";
-    import Store from "../../store";
-    import { ValidationObserver, ValidationProvider } from "vee-validate";
+    import cloneDeep from 'lodash/cloneDeep';
+    import ListBox from '@/components/ListBox';
+    import RenderableField from '@/components/RenderableField';
+    import { ValidationObserver, ValidationProvider } from 'vee-validate';
 
     export default {
-        name: "DynamicSettings",
+        name: 'DynamicSettings',
 
         components: {
             RenderableField,
             ListBox,
             ValidationObserver,
-            ValidationProvider
+            ValidationProvider,
         },
 
         data() {
@@ -158,27 +185,60 @@
         watch: {
             sections() {
                 this.fetchSectionData();
-            }
+            },
         },
 
         computed: {
             sections() {
                 return this.$store.getters['settings/sections'];
-            }
+            },
+
+            groups() {
+                if (!this.section) {
+                    return {};
+                }
+
+                const { fields } = this.section;
+                if (!fields) {
+                    return {};
+                }
+
+                return Object.keys(fields)
+                    .map(key => ({ key, field: fields[key] }))
+                    .reduce((groups, { key, field }) => {
+                        const groupKey = field.group || 'default';
+                        if (!groups[groupKey]) {
+                            groups[groupKey] = {};
+                        }
+
+                        groups[groupKey][key] = field;
+                        return groups;
+                    }, {});
+            },
         },
 
         methods: {
+            handleInputNumber(ev, key) {
+                let number = ev.target.valueAsNumber;
+                if (ev.target.max && number > ev.target.max) {
+                    number = Number(ev.target.max);
+                    ev.target.valueAsNumber = number;
+                    ev.target.value = String(number);
+                }
+                if (ev.target.min && number < ev.target.min) {
+                    number = Number(ev.target.min);
+                    ev.target.valueAsNumber = number;
+                    ev.target.value = String(number);
+                }
+
+                this.values[key] = number;
+            },
             fetchSectionData() {
                 const name = this.$route.name;
-                this.section = this.$store.getters['settings/sections'].filter(s => s.pathName === name)[0];
+                this.section = this.$store.getters['settings/sections'].find(s => s.pathName === name);
 
                 if (this.section) {
-                    const data = this.section.data;
-                    if (data) {
-                        Object.keys(data).forEach(key => {
-                            this.$set(this.values, key, cloneDeep(data[key]));
-                        });
-                    }
+                    this.values = { ...this.values, ...this.section.data };
                 }
             },
 
@@ -198,27 +258,22 @@
                 return options;
             },
 
-            submit() {
-                this.$store.dispatch('settings/updateSection', {
-                    data: this.values,
-                    name: this.section.pathName
-                });
-                this.section.service
+            async submit() {
+                await this.section.service
                     .save(this.values)
-                    .then(data => {
+                    .then(() => {
                         this.$Notify({
                             type: 'success',
                             title: 'Information Saved',
-                            message: 'Information successfully saved'
+                            message: 'Information successfully saved',
                         });
-                        this.$router.go(0);
                     })
                     .catch(({ response }) => {
-                        console.log(response.data.info, this.$refs.form);
                         this.$refs.form.setErrors(response.data.info);
                     });
-            }
-        }
+                this.$emit('onUpdate');
+            },
+        },
     };
 </script>
 
@@ -232,6 +287,20 @@
 
         .label {
             font-weight: bold;
+        }
+
+        .label-tooltip {
+            border-bottom: 1.5px dashed;
+            cursor: pointer;
+        }
+    }
+
+    .group-divider {
+        border: 0;
+        border-top: 1px solid #eeeef5;
+
+        &:last-child {
+            display: none;
         }
     }
 </style>

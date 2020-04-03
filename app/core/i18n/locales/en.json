@@ -13,14 +13,15 @@
     "message": {
       "user_not_found": "We can't find the user with provided credentials",
       "solve_captcha": "You must solve a CAPTCHA",
-      "auth_error": "Authorization error"
+      "auth_error": "Authorization error",
+      "data_reset": "Data are flushing, please wait a minute and try again"
     }
   },
   "reset": {
     "forgot_password": "Forgot password?",
     "reset_password": "Reset password",
     "confirm_password": "Confirm password",
-    "step": "Шаг {n}",
+    "step": "Step {n}",
     "step_description": {
       "step_1": "Enter email",
       "step_2": "Check your email",
@@ -48,14 +49,19 @@
     "page_is_not_available": "This page is no longer available",
     "go_away": "Go to login page"
   },
+  "register": {
+    "title": "Register",
+    "subtitle": "Please fill out the fields to confirm your registration",
+    "register_btn": "Create account",
+    "success_title": "Account was created successfully",
+    "success_subtitle": "Go to the login page to log into your account"
+  },
   "settings": {
     "account": "Account",
     "general": "General",
     "language": "Language",
     "company": "Company",
-    "company_timezone": "Company timezone",
-    "redmine_synchronization": "Redmine synchronization",
-    "gitlab_synchronization": "Gitlab synchronization"
+    "company_timezone": "Company timezone"
   },
   "control": {
     "save": "Save",
@@ -69,12 +75,15 @@
     "back": "Back",
     "submit": "Submit",
     "select_all": "Select All",
+    "clear_all": "Clear All",
     "user_selected": "No users selected | 1 user selected | {count} users selected",
     "project_selected": "No projects selected | 1 project selected | {count} projects selected",
     "day": "Day",
     "week": "Week",
     "month": "Month",
     "range": "Range",
+    "today": "Today",
+    "ok": "Ok",
     "active": "Active",
     "inactive": "Inactive",
     "search": "Search",
@@ -82,12 +91,15 @@
     "enable": "Enable",
     "disable": "Disable",
     "select": "Select",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "reset": "Reset",
+    "show_active": "Show active tasks"
   },
   "field": {
     "password": "Password",
     "name": "Name",
-    "full_name": "Full name",
+    "full_name": "Name",
+    "status": "Status",
     "email": "E-mail",
     "user": "User",
     "active":  "Active",
@@ -97,7 +109,7 @@
     "screenshots_active": "Screenshots Active",
     "manual_time": "Manual Time",
     "screenshots_interval": "Screenshots Interval",
-    "computer_time_popup": "Computer Time Popup",
+    "computer_time_popup": "Inactivity Time Popup",
     "timezone": "Timezone",
     "default_role": "Default Role",
     "project_roles": "Project Roles",
@@ -117,9 +129,39 @@
     "user_language": "User Language",
     "send_invite": "Send invite",
     "selected": "Selected",
-    "total": "Total"
+    "total": "Total",
+    "total_spent": "Total Spent Time",
+    "workers": "Workers",
+    "statuses": {
+      "any": "Any",
+      "active": "Active",
+      "disabled": "Disabled"
+    },
+    "roles": {
+      "any": "Any",
+      "manager": "Manager",
+      "user": "User",
+      "auditor": "Auditor"
+    },
+    "type": "Type",
+    "types": {
+      "all": "All",
+      "employee": "Employee",
+      "client": "Client"
+    },
+    "work_time": "Working Hours",
+    "notice": "Notice"
   },
   "filter": {
+    "enter-single": "Enter {0}",
+    "enter-multiple": "Enter {0} or {1}",
+    "fields": {
+      "task_name": "task name",
+      "project_name": "project name",
+      "full_name": "full name",
+      "name": "name",
+      "email": "e-mail"
+    },
     "full_name": "Filter by full name",
     "email": "Filter by e-mail",
     "task": "Filter by task name",
@@ -127,7 +169,7 @@
   },
   "message": {
     "no_data": "No data to display",
-    "page_not_found": "Looks like the page you're looking for aren't exists :(",
+    "page_not_found": "Looks like the page you're looking for doesn't exist :(",
     "page_forbidden": "Access forbidden",
     "field_is_required": "This field is required"
   },
@@ -135,5 +177,28 @@
     "h": "h",
     "m": "m",
     "s": "s"
+  },
+  "tooltip": {
+    "task_important": "Related screenshots should not be deleted automatically",
+    "user_change_password": "Makes the password change after the first login mandatory",
+    "user_manual_time": "Allow users to manually add time",
+    "user_send_invite": "Email user the account's credentials",
+    "user_computer_time_popup": "User's inactivity time in minutes before 'inactivity detected' modal pops up",
+    "user_interval_screenshot": "Screenshot creation time in minutes",
+    "color_intervals": "Lets you select colors for workday time intervals from 0 to 100%",
+    "work_time": "Minimum working hours/day"
+  },
+  "invite": {
+    "label": "Invite users",
+    "content": "Please add the emails you'd like to send the invitations to your company's Cattr instance. Emails are separated by comma.",
+    "message": {
+      "error": "Please input your emails",
+      "success": "Success",
+      "valid": "These emails not valid:"
+    },
+    "users_exist": "Users with this emails is already exists",
+    "these_emails": "These emails:",
+    "already_exists": "is already exists",
+    "already_sent": "to these addresses is already sent"
   }
 }

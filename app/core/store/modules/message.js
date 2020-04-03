@@ -27,7 +27,7 @@ const mutations = {
 
     setServiceObject(state, serviceObject) {
         state.api = serviceObject;
-    }
+    },
 };
 
 const actions = {
@@ -36,8 +36,8 @@ const actions = {
     },
 
     setMessage({ commit }, messageData) {
-        commit('setMessage', messageData)
-    }
+        commit('setMessage', messageData);
+    },
 };
 
 export default { state, getters, mutations, actions };

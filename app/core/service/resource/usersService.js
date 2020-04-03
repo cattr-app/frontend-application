@@ -3,13 +3,18 @@ import axios from 'axios';
 import { serialize } from '../../utils/url';
 
 export default class UsersService extends ResourceService {
-
     /**
      * @param config
      * @returns {Promise<AxiosResponse<T>>}
      */
     getAll(config = {}) {
-        return axios.get('users/list', config);
+        return axios.get('users/list', config).catch(error => {
+            if (!('message' in error) || error.message !== 'Page switch') {
+                console.error(error);
+            } else {
+                return { data: [] };
+            }
+        });
     }
 
     /**
@@ -17,7 +22,7 @@ export default class UsersService extends ResourceService {
      * @returns string
      */
     getItemRequestUri(id) {
-        return `users/show?${serialize({ id, with: ['role'] })}`;
+        return `users/show?${serialize({ id, with: ['role', 'projectsRelation.role'] })}`;
     }
 
     /**

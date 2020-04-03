@@ -1,10 +1,9 @@
 import ResourceService from './resouceService';
 import axios from 'axios';
-import _ from 'lodash';
-import {serialize} from "../../utils/url";
+import difference from 'lodash/difference';
+import { serialize } from '../../utils/url';
 
 export default class ProjectService extends ResourceService {
-
     constructor(params = {}) {
         super();
         this.params = params;
@@ -30,7 +29,13 @@ export default class ProjectService extends ResourceService {
      * @returns {Promise<AxiosResponse<T>>}
      */
     getAll() {
-        return axios.get('projects/list?' + serialize(this.params));
+        return axios.get('projects/list?' + serialize(this.params)).catch(error => {
+            if (!('message' in error) || error.message !== 'Page switch') {
+                console.error(error);
+            } else {
+                return { data: [] };
+            }
+        });
     }
 
     /**
@@ -96,20 +101,14 @@ export default class ProjectService extends ResourceService {
     }
 
     removeUsersFromProject(projectId, users) {
-        return axios.post('project-users/bulk-remove', {
-
-        })
+        return axios.post('project-users/bulk-remove', {});
     }
 
-    addUsersToProject(projectId, users) {
-
-    }
+    addUsersToProject(projectId, users) {}
 
     saveUsersRelations(newData, originalData) {
-        const addedUsers = _.difference(newData, originalData);
-        const removedUsers = _.difference(originalData, newData);
-
-
+        const addedUsers = difference(newData, originalData);
+        const removedUsers = difference(originalData, newData);
     }
 
     /**

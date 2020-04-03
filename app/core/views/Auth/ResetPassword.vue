@@ -3,77 +3,137 @@
         <div class="container">
             <div class="at-container crud__content">
                 <at-steps :current="currentStep" class="steps col-lg-offset-4">
-                    <at-step :title="$t('reset.step', {n: 1})" :description="$t('reset.step_description.step_1')"></at-step>
-                    <at-step :title="$t('reset.step', {n: 2})" :description="$t('reset.step_description.step_2')"></at-step>
-                    <at-step :title="$t('reset.step', {n: 3})" :description="$t('reset.step_description.step_3')"></at-step>
-                    <at-step :title="$t('reset.step', {n: 4})" :description="$t('reset.step_description.step_4')"></at-step>
+                    <at-step
+                        :title="$t('reset.step', { n: 1 })"
+                        :description="$t('reset.step_description.step_1')"
+                    ></at-step>
+                    <at-step
+                        :title="$t('reset.step', { n: 2 })"
+                        :description="$t('reset.step_description.step_2')"
+                    ></at-step>
+                    <at-step
+                        :title="$t('reset.step', { n: 3 })"
+                        :description="$t('reset.step_description.step_3')"
+                    ></at-step>
+                    <at-step
+                        :title="$t('reset.step', { n: 4 })"
+                        :description="$t('reset.step_description.step_4')"
+                    ></at-step>
                 </at-steps>
 
                 <div class="row">
                     <div v-if="currentStep == 0" class="col-6 col-offset-9">
                         <validation-observer v-slot="{ invalid }">
                             <div class="header-text">
-                                <h2 class="header-text__title">{{ $t('reset.tabs.enter_email.title') }}</h2>
-                                <p class="header-text__subtitle">{{ $t('reset.tabs.enter_email.subtitle') }}</p>
+                                <h2 class="header-text__title">
+                                    {{ $t('reset.tabs.enter_email.title') }}
+                                </h2>
+                                <p class="header-text__subtitle">
+                                    {{ $t('reset.tabs.enter_email.subtitle') }}
+                                </p>
                             </div>
-                            <validation-provider rules="required|email" v-slot="{ errors }">
+                            <validation-provider v-slot="{ errors }" rules="required|email">
                                 <small>E-Mail</small>
-                                <at-input name="login" v-model="email"
-                                          :status="errors.length > 0 ? 'error' : ''"
-                                          placeholder="E-Mail" icon="mail" type="text" :disabled="disabledForm">
+                                <at-input
+                                    v-model="email"
+                                    name="login"
+                                    :status="errors.length > 0 ? 'error' : ''"
+                                    placeholder="E-Mail"
+                                    icon="mail"
+                                    type="text"
+                                    :disabled="disabledForm"
+                                >
                                 </at-input>
                             </validation-provider>
-                            <at-button class="btn" native-type="submit" type="primary" :disabled="invalid || disabledForm"
-                                       @click="resetPassword">{{ $t('reset.reset_password') }}</at-button>
+                            <at-button
+                                class="btn"
+                                native-type="submit"
+                                type="primary"
+                                :disabled="invalid || disabledForm"
+                                @click="resetPassword"
+                                >{{ $t('reset.reset_password') }}</at-button
+                            >
                         </validation-observer>
                     </div>
 
                     <div v-if="currentStep == 1" class="col-6 col-offset-9">
                         <div class="header-text">
                             <i class="icon icon-mail"></i>
-                            <h2 class="header-text__title">{{ $t('reset.tabs.check_email.title') }}</h2>
-                            <p class="header-text__subtitle">{{ $t('reset.tabs.check_email.subtitle') }}</p>
+                            <h2 class="header-text__title">
+                                {{ $t('reset.tabs.check_email.title') }}
+                            </h2>
+                            <p class="header-text__subtitle">
+                                {{ $t('reset.tabs.check_email.subtitle') }}
+                            </p>
                         </div>
                     </div>
 
                     <div v-if="currentStep == 2" class="col-6 col-offset-9">
                         <validation-observer v-if="isValidToken" ref="form" v-slot="{ invalid }">
                             <div class="header-text">
-                                <h2 class="header-text__title">{{ $t('reset.tabs.new_password.title') }}</h2>
-                                <p class="header-text__subtitle">{{ $t('reset.tabs.new_password.subtitle') }}</p>
+                                <h2 class="header-text__title">
+                                    {{ $t('reset.tabs.new_password.title') }}
+                                </h2>
+                                <p class="header-text__subtitle">
+                                    {{ $t('reset.tabs.new_password.subtitle') }}
+                                </p>
                             </div>
-                            <validation-provider rules="required|min:6" :name="$t('field.password')" v-slot="{ errors }" vid="password">
+                            <validation-provider
+                                v-slot="{ errors }"
+                                rules="required|min:6"
+                                :name="$t('field.password')"
+                                vid="password"
+                            >
                                 <small>{{ $t('field.password') }}</small>
-                                <at-input :name="$t('field.password')" v-model="password"
-                                          :status="errors.length > 0 ? 'error' : ''"
-                                          :placeholder="$t('field.password')" icon="lock" type="password" :disabled="disabledForm">
+                                <at-input
+                                    v-model="password"
+                                    :name="$t('field.password')"
+                                    :status="errors.length > 0 ? 'error' : ''"
+                                    :placeholder="$t('field.password')"
+                                    icon="lock"
+                                    type="password"
+                                    :disabled="disabledForm"
+                                >
                                 </at-input>
                                 <p class="error-message">
                                     <small>{{ errors[0] }}</small>
                                 </p>
                             </validation-provider>
                             <validation-provider
-                                    rules="required|min:6|confirmed:password"
-                                    :name="$t('reset.confirm_password')"
-                                    vid="passwordConfirmation"
-                                    v-slot="{ errors }"
+                                v-slot="{ errors }"
+                                rules="required|min:6|confirmed:password"
+                                :name="$t('reset.confirm_password')"
+                                vid="passwordConfirmation"
                             >
                                 <small>{{ $t('reset.confirm_password') }}</small>
-                                <at-input name="passwordConfirmation" v-model="passwordConfirmation"
-                                          :status="errors.length > 0 ? 'error' : ''"
-                                          :placeholder="$t('reset.confirm_password')" icon="lock" type="password"
-                                          :disabled="disabledForm">
+                                <at-input
+                                    v-model="passwordConfirmation"
+                                    name="passwordConfirmation"
+                                    :status="errors.length > 0 ? 'error' : ''"
+                                    :placeholder="$t('reset.confirm_password')"
+                                    icon="lock"
+                                    type="password"
+                                    :disabled="disabledForm"
+                                >
                                 </at-input>
                                 <p class="error-message">
                                     <small>{{ errors[0] }}</small>
                                 </p>
                             </validation-provider>
-                            <at-button class="btn" native-type="submit" type="primary" :disabled="invalid || disabledForm"
-                                       @click="submitNewPassword">{{ $t('control.submit') }}</at-button>
+                            <at-button
+                                class="btn"
+                                native-type="submit"
+                                type="primary"
+                                :disabled="invalid || disabledForm"
+                                @click="submitNewPassword"
+                                >{{ $t('control.submit') }}</at-button
+                            >
                         </validation-observer>
                         <div v-else>
                             <div class="header-text">
-                                <h2 class="header-text__title">{{ $t('reset.page_is_not_available') }}</h2>
+                                <h2 class="header-text__title">
+                                    {{ $t('reset.page_is_not_available') }}
+                                </h2>
                                 <router-link to="/auth/login">{{ $t('reset.go_away') }}</router-link>
                             </div>
                         </div>
@@ -82,7 +142,9 @@
                     <div v-if="currentStep == 3" class="col-6 col-offset-9">
                         <div class="header-text">
                             <i class="icon icon-check"></i>
-                            <h2 class="header-text__title">{{ $t('reset.tabs.success.title') }}</h2>
+                            <h2 class="header-text__title">
+                                {{ $t('reset.tabs.success.title') }}
+                            </h2>
                             <p class="header-text__subtitle"></p>
                             <router-link to="/auth/login">{{ $t('reset.go_away') }}</router-link>
                         </div>
@@ -95,19 +157,19 @@
 </template>
 
 <script>
-    import {ValidationObserver, ValidationProvider} from 'vee-validate';
+    import { ValidationObserver, ValidationProvider } from 'vee-validate';
     import axios from 'axios';
 
     export default {
-        name: "ResetPassword",
+        name: 'ResetPassword',
         components: {
             ValidationProvider,
-            ValidationObserver
+            ValidationObserver,
         },
         created() {
             if (this.$route.query.token && this.$route.query.email) {
                 this.currentStep = 2;
-                //this.validateToken();
+                this.validateToken();
             }
         },
         data() {
@@ -118,70 +180,81 @@
                 currentStep: 0,
                 disabledForm: false,
                 isValidToken: true,
-            }
+            };
         },
         methods: {
             resetPassword() {
                 this.disabledForm = true;
 
                 const data = {
-                    'email': this.email
+                    email: this.email,
                 };
 
-                axios.post('auth/password/reset/request', data).then(({data}) => {
-                    if (data.success) {
-                        this.currentStep = 1;
-                    }
-                }).catch(({response}) => {
-                    this.$Notify({
-                        title: 'Error',
-                        message: response.data.message || 'Something went wrong',
-                        type: 'error',
+                axios
+                    .post('auth/password/reset/request', data)
+                    .then(({ data }) => {
+                        if (data.success) {
+                            this.currentStep = 1;
+                        }
+                    })
+                    .catch(({ response }) => {
+                        this.$Notify({
+                            title: 'Error',
+                            message: response.data.message || 'Something went wrong',
+                            type: 'error',
+                        });
+                    })
+                    .finally(() => {
+                        this.disabledForm = false;
                     });
-                }).finally(() => {
-                    this.disabledForm = false;
-                });
             },
             validateToken() {
                 const data = {
-                    'email': this.$route.query.email,
-                    'token': this.$route.query.token,
+                    email: this.$route.query.email,
+                    token: this.$route.query.token,
                 };
 
-                axios.post('auth/password/reset/validate', data).then(({data}) => {
-                    if (data.success) {
-                        this.isValidToken = true;
-                    }
-                }).catch(() => {
-                    this.isValidToken = false;
-                })
+                axios
+                    .post('auth/password/reset/validate', data)
+                    .then(({ data }) => {
+                        if (data.success) {
+                            this.isValidToken = true;
+                        }
+                    })
+                    .catch(() => {
+                        this.isValidToken = false;
+                    });
             },
             submitNewPassword() {
                 this.disabledForm = true;
 
                 const data = {
-                    'email': this.$route.query.email,
-                    'token': this.$route.query.token,
-                    'password': this.password,
-                    'password_confirmation': this.passwordConfirmation,
+                    email: this.$route.query.email,
+                    token: this.$route.query.token,
+                    password: this.password,
+                    password_confirmation: this.passwordConfirmation,
                 };
 
-                axios.post('auth/password/reset/process', data).then(({data}) => {
-                    if (data.success) {
-                        this.currentStep = 3;
-                    }
-                }).catch(({response}) => {
-                    this.$Notify({
-                        title: 'Error',
-                        message: response.data.message || 'Something went wrong',
-                        type: 'error',
+                axios
+                    .post('auth/password/reset/process', data)
+                    .then(({ data }) => {
+                        if (data.success) {
+                            this.currentStep = 3;
+                        }
+                    })
+                    .catch(({ response }) => {
+                        this.$Notify({
+                            title: 'Error',
+                            message: response.data.message || 'Something went wrong',
+                            type: 'error',
+                        });
+                    })
+                    .finally(() => {
+                        this.disabledForm = false;
                     });
-                }).finally(() => {
-                    this.disabledForm = false;
-                });
-            }
-        }
-    }
+            },
+        },
+    };
 </script>
 
 <style lang="scss" scoped>

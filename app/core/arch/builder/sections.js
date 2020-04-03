@@ -9,7 +9,6 @@ import Store from '../../store';
  * @param accessCheck - function to check if user has access to work with section content
  */
 export default class SettingsSection {
-
     path = '';
     name = '';
     meta = {};
@@ -26,7 +25,8 @@ export default class SettingsSection {
         this.path = this.pathDelimiter + scope + this.pathDelimiter + path;
         this.name = scope + this.nameDelimiter + name;
         this.meta = meta;
-        this.component = component || (() => import( /* webpackChunkName: "settings" */ '@/views/Settings/DynamicSettings.vue'));
+        this.component =
+            component || (() => import(/* webpackChunkName: "settings" */ '@/views/Settings/DynamicSettings.vue'));
         this.children = children;
         this.accessCheck = accessCheck;
         this.scope = scope;
@@ -39,7 +39,7 @@ export default class SettingsSection {
             children: this.children,
             accessCheck: this.accessCheck,
             scope: this.scope,
-        }
+        };
     }
 
     /**

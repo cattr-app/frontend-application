@@ -1,24 +1,24 @@
 <template>
-    <at-menu class="navigation container-fluid" router mode="horizontal">
-        <router-link to="/timeline" class="brand"></router-link>
-        <div class="navigation__container">
+    <at-menu class="navbar container-fluid" router mode="horizontal">
+        <router-link to="/dashboard" class="navbar__logo"></router-link>
+        <div v-if="loggedIn">
             <template v-for="(item, key) in navItems">
                 <at-menu-item :key="key" :to="item.to">
                     {{ $t(item.label) }}
                 </at-menu-item>
-            </template>   
+            </template>
             <template v-for="(item, key) in navDropdowns">
                 <at-submenu :key="key" :title="$t(key)">
                     <template slot="title">{{ $t(key) }}</template>
-                        <template  v-for="(val, itemKey) in item">
-                            <at-menu-item :to="val.to" :key="itemKey">
-                                {{ $t(val.label) }}
-                            </at-menu-item>
-                        </template>
+                    <template v-for="(val, itemKey) in item">
+                        <at-menu-item :key="itemKey" :to="val.to">
+                            {{ $t(val.label) }}
+                        </at-menu-item>
+                    </template>
                 </at-submenu>
             </template>
         </div>
-        <at-dropdown placement="bottom-right" @on-dropdown-command="userDropdownHandle">
+        <at-dropdown v-if="loggedIn" placement="bottom-right" @on-dropdown-command="userDropdownHandle">
             <i class="icon icon-chevron-down at-menu__submenu-icon"></i>
             <user-avatar :user="user" :border-radius="10"></user-avatar>
             <at-dropdown-menu slot="menu">
@@ -36,109 +36,103 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import UserAvatar from './UserAvatar';
-import { getModuleList } from '../moduleLoader';
+    import { mapGetters } from 'vuex';
+    import UserAvatar from './UserAvatar';
+    import { getModuleList } from '../moduleLoader';
 
-export default {
-    components: {
-        UserAvatar
-    },
-    data() {
-        return {
-            modules: Object.values(getModuleList()).map(i => i.moduleInstance),
-        };
-    },
-    methods: {
-        userDropdownHandle(route) {
-            this.$router.push({ name: route });
+    export default {
+        components: {
+            UserAvatar,
         },
-        async logout() {
-            await this.$store.getters['user/apiService'].logout();
-        }
-    },
-    computed: {
-        navItems() {
-            const navItems = [];
-            this.modules.forEach(m => {
-                const entries = m.getNavbarEntries();
-                entries.forEach(e => {
-                    if (e.displayCondition(this.$store)) {
-                        navItems.push(e.getData())
-                    }
+        data() {
+            return {
+                modules: Object.values(getModuleList()).map(i => i.moduleInstance),
+            };
+        },
+        methods: {
+            userDropdownHandle(route) {
+                this.$router.push({ name: route });
+            },
+            async logout() {
+                await this.$store.getters['user/apiService'].logout();
+            },
+        },
+        computed: {
+            navItems() {
+                const navItems = [];
+                this.modules.forEach(m => {
+                    const entries = m.getNavbarEntries();
+                    entries.forEach(e => {
+                        if (e.displayCondition(this.$store)) {
+                            navItems.push(e.getData());
+                        }
+                    });
                 });
-            });  
-            
-            return navItems;
-        },
-        navDropdowns() {
-            const entriesDr = {};
-            this.modules.forEach(m => {
-                const entriesDropdown = m.getNavbarEntriesDropdown();
-                Object.keys(entriesDropdown).forEach(key => {
-                    const isAllowItem = entriesDropdown[key][0].displayCondition(this.$store);     
-                    if (!entriesDr.hasOwnProperty(entriesDropdown[key][0].section) && isAllowItem) {
-                        entriesDr[entriesDropdown[key][0].section] = [];
-                    }
-                    if (isAllowItem) {
-                        entriesDr[entriesDropdown[key][0].section].push(entriesDropdown[key][0]);
-                    }
+
+                return navItems;
+            },
+            navDropdowns() {
+                const entriesDr = {};
+                this.modules.forEach(m => {
+                    const entriesDropdown = m.getNavbarEntriesDropdown();
+                    Object.keys(entriesDropdown).forEach(key => {
+                        const isAllowItem = entriesDropdown[key][0].displayCondition(this.$store);
+                        if (!entriesDr.hasOwnProperty(entriesDropdown[key][0].section) && isAllowItem) {
+                            entriesDr[entriesDropdown[key][0].section] = [];
+                        }
+                        if (isAllowItem) {
+                            entriesDr[entriesDropdown[key][0].section].push(entriesDropdown[key][0]);
+                        }
+                    });
                 });
-            });
-            
-            return entriesDr;
-        },
-        ...mapGetters('user', ['user']),
-        userDropdownItems() {
-            const items = [
-                {
-                    to: {
-                        name: 'settings'
+
+                return entriesDr;
+            },
+            ...mapGetters('user', ['user']),
+            userDropdownItems() {
+                const items = [
+                    {
+                        to: {
+                            name: 'settings',
+                        },
+                        title: `<i class="icon icon-settings"></i> ${this.$t('navigation.settings')}`,
                     },
-                    title: `<i class="icon icon-settings"></i> ${this.$t('navigation.settings')}`
+                ];
+
+                if (this.user && this.user.is_admin) {
+                    items.push({
+                        to: {
+                            name: 'company',
+                        },
+                        title: `<i class="icon icon-settings"></i> ${this.$t('navigation.company_settings')}`,
+                    });
                 }
-            ];
 
-            if (this.user && this.user.is_admin) {
-                items.push({
-                    to: {
-                        name: 'company'
-                    },
-                    title: `<i class="icon icon-settings"></i> ${this.$t('navigation.company_settings')}`
-                });
-            }
-
-            return items;
+                return items;
+            },
+            rules() {
+                return this.$store.getters['user/allowedRules'];
+            },
+            loggedIn() {
+                return this.$store.getters['user/loggedIn'];
+            },
         },
-        rules() {
-            return this.$store.getters['user/allowedRules'];
-        }
-    }
-};
+    };
 </script>
 
 <style lang="scss" scoped>
-    .navigation {
+    .navbar {
         display: flex;
         height: auto;
-        padding: .75em 24px;
+        padding: 0.75em 24px;
         justify-content: space-between;
         box-shadow: 0px 0px 10px rgba(63, 51, 86, 0.1);
         border-bottom: 0;
 
-        .brand {
-            align-self: center;
+        &__logo {
             background: url('../assets/logo.svg');
-            border-radius: 5px;
             height: 45px;
             width: 45px;
-            display: flex;
-            flex-flow: column nowrap;
-            justify-content: center;
-            align-items: center;
-            font-size: 18px;
-            font-weight: bold;
-            color: #FFFFFF;
             background-size: cover;
         }
 
@@ -146,9 +140,13 @@ export default {
             .at-menu {
                 &__item-link {
                     &::after {
-                        bottom: -.75em;
+                        bottom: -0.75em;
                     }
                 }
+            }
+
+            .at-menu__submenu-title {
+                padding-right: 0 !important;
             }
 
             .at-dropdown {

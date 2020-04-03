@@ -10,7 +10,7 @@
 
 <script>
     export default {
-        name: 'PageForbidden'
+        name: 'PageForbidden',
     };
 </script>
 

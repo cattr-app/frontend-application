@@ -2,7 +2,7 @@
 
 const fs = require('fs'),
     path = require('path'),
-    _ = require('lodash');
+    isObject = require('lodash/isObject');
 
 /**
  *
@@ -22,14 +22,15 @@ module.exports = (api, options) => {
         }
         const moduleList = require(p);
 
-        const fdArray = [
-            'export default ['
-        ];
+        const fdArray = ['export default ['];
         Object.keys(moduleList).forEach(moduleName => {
-            if (_.isObject(moduleList[moduleName])) {
+            if (isObject(moduleList[moduleName])) {
                 const moduleConfig = moduleList[moduleName];
 
-                if (moduleConfig.type === 'package' && (moduleConfig.hasOwnProperty('enabled') ? moduleConfig.enabled : true)) {
+                if (
+                    moduleConfig.type === 'package' &&
+                    (moduleConfig.hasOwnProperty('enabled') ? moduleConfig.enabled : true)
+                ) {
                     fdArray.push(`    () => require('${moduleConfig.ref}'),`);
                     console.log(`${moduleName} => added package as static require dependency`);
                 }

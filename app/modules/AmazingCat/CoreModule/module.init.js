@@ -1,3 +1,7 @@
+import env from '_app/etc/env';
+import * as screenshot from '@/components/Screenshot';
+import * as screenshotModal from '@/components/ScreenshotModal';
+
 /**
  * ModuleConfig - used as module configuration section to manipulate module loading settings
  * @type {{routerPrefix: string, loadOrder: number, enabled: boolean}}
@@ -5,9 +9,8 @@
 export const ModuleConfig = {
     enabled: true,
     routerPrefix: 'settings',
-    loadOrder: 10
+    loadOrder: 10,
 };
-
 
 /**
  * Module init function.
@@ -20,8 +23,18 @@ export const ModuleConfig = {
  * @returns {context}
  */
 export function init(context, router) {
+    context.addRoute({
+        path: '/company/users/view/:id',
+        name: 'company.users.view',
+        component: () => import(/* webpackChunkName: "dashboard" */ './components/Users.vue'),
+        meta: {
+            auth: true,
+        },
+    });
+
     const requireSection = require.context('.', true, /^(?!.*(service|module)).*\.js$/);
-    const sections = requireSection.keys()
+    const sections = requireSection
+        .keys()
         .map(fn => requireSection(fn).default)
         .map(section => {
             if (typeof section === 'function') {
@@ -37,6 +50,12 @@ export function init(context, router) {
             context.addSettingsSection(section);
         }
     });
+
+    if (env.GET_SCREENSHOTS_BY_ID) {
+        // Modify screenshot paths
+        screenshot.config.thumbnailPathProvider = screenshot => `uploads/screenshots/thumbs/${screenshot.id}`;
+        screenshotModal.config.screenshotPathProvider = screenshot => `uploads/screenshots/${screenshot.id}`;
+    }
 
     return context;
 }

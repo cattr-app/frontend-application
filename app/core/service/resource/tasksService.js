@@ -1,9 +1,8 @@
 import ResourceService from '@/service/resource/resouceService';
 import axios from 'axios';
-import {serialize} from "../../utils/url";
+import { serialize } from '../../utils/url';
 
 export default class TasksService extends ResourceService {
-
     /**
      * @returns {Promise<AxiosResponse<T>>}
      */
@@ -17,7 +16,7 @@ export default class TasksService extends ResourceService {
      * @param filters
      */
     getItem(id, filters = {}) {
-        return axios.get(this.getItemRequestUri(id) + '&'+ serialize(filters));
+        return axios.get(this.getItemRequestUri(id) + '&' + serialize(filters));
     }
 
     /**
@@ -25,7 +24,7 @@ export default class TasksService extends ResourceService {
      * @param id
      */
     getItemRequestUri(id) {
-        return `tasks/show?${serialize({id})}`;
+        return `tasks/show?${serialize({ id })}`;
     }
 
     /**

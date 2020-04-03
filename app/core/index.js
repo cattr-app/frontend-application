@@ -10,18 +10,30 @@ import store from './store';
 import AtComponents from 'at-ui';
 import Dialog from 'vue-dialog-loading';
 import DatePicker from 'vue2-datepicker';
+import moment from 'vue-moment';
+import VueAuthImage from 'vue-auth-image';
+import * as Sentry from '@sentry/browser';
+import * as Integrations from '@sentry/integrations';
 import i18n from './i18n';
 import './vee-validate';
+import VueLazyload from 'vue-lazyload';
 
-import axios from 'axios';
-import moment from 'vue-moment';
+if (process.env.NODE_ENV !== 'development' && process.env.VUE_APP_SENTRY_DSN) {
+    Sentry.init({
+        release: process.env.VUE_APP_VERSION,
+        environment: process.env.NODE_ENV,
+        dsn: process.env.VUE_APP_SENTRY_DSN,
+        integrations: [
+            new Integrations.Vue({
+                Vue,
+                attachProps: true,
+            }),
+        ],
+    });
+}
 
-// Layouts
-import DefaultLayout from './layouts/DefaultLayout';
-import AuthLayout from './layouts/AuthLayout';
-
-Vue.component('default-layout', DefaultLayout);
-Vue.component('auth-layout', AuthLayout);
+//Global components
+import installGlobalComponents from './global-extension';
 
 Vue.config.productionTip = false;
 
@@ -29,8 +41,12 @@ Vue.use(AtComponents);
 Vue.use(moment);
 Vue.use(Dialog);
 Vue.use(DatePicker);
+Vue.use(VueAuthImage);
+Vue.use(VueLazyload, {
+    lazyComponent: true,
+});
 
-Vue.prototype.$http = axios;
+installGlobalComponents(Vue);
 
 if (process.env.NODE_ENV === 'development') {
     window.system = {};
@@ -42,8 +58,7 @@ const app = new Vue({
     router,
     store,
     i18n,
-    render: h => h(App)
+    render: h => h(App),
 }).$mount('#app');
 
 export default app;
-

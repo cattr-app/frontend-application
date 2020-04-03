@@ -1,44 +1,57 @@
 <template>
-    <div class="datetimeinput" @click="togglePopup" ref="datetimeinput">
+    <div ref="datetimeinput" class="datetimeinput" @click="togglePopup">
         <div class="at-input">
-            <at-input
-                class="input"
-                :readonly="true"
-                :value="inputValue"
-            />
+            <at-input class="input" :readonly="true" :value="inputValue" />
 
             <transition name="slide-up">
-                <div v-show="showPopup"
+                <div
+                    v-show="showPopup"
                     class="datepicker-wrapper at-select__dropdown at-select__dropdown--bottom"
-                    @click.stop>
-                    <date-picker
-                        class="datepicker"
-                        :append-to-body="false"
-                        :clearable="false"
-                        :editable="false"
-                        :inline="true"
-                        :lang="datePickerLang"
-                        type="day"
-                        :value="datePickerValue"
-                        :disabled-date="disabledDate"
-                        @change="onDateChange"
-                    />
+                    @click.stop
+                >
+                    <div class="datepicker__main">
+                        <date-picker
+                            class="datepicker"
+                            :append-to-body="false"
+                            :clearable="false"
+                            :editable="false"
+                            :inline="true"
+                            :lang="datePickerLang"
+                            type="day"
+                            :value="datePickerValue"
+                            :disabled-date="disabledDate"
+                            @change="onDateChange"
+                        />
 
-                    <ul class="hour-select">
-                        <li v-for="h in hours" :key="h" class="item"
-                            :class="{ 'selected': hour === h }"
-                            @click="setHour(h)">
-                            {{h.toString().padStart(2, '0')}}
-                        </li>
-                    </ul>
+                        <ul class="hour-select">
+                            <li
+                                v-for="h in hours"
+                                :key="h"
+                                class="item"
+                                :class="{ selected: hour === h }"
+                                @click="setHour(h)"
+                            >
+                                {{ h.toString().padStart(2, '0') }}
+                            </li>
+                        </ul>
 
-                    <ul class="minute-select">
-                        <li v-for="m in minutes" :key="m" class="item"
-                            :class="{ 'selected': minute === m }"
-                            @click="setMinute(m)">
-                            {{m.toString().padStart(2, '0')}}
-                        </li>
-                    </ul>
+                        <ul class="minute-select">
+                            <li
+                                v-for="m in minutes"
+                                :key="m"
+                                class="item"
+                                :class="{ selected: minute === m }"
+                                @click="setMinute(m)"
+                            >
+                                {{ m.toString().padStart(2, '0') }}
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="datepicker__footer">
+                        <at-button size="small" @click="onDateChange(new Date())">{{ $t('control.today') }}</at-button>
+                        <at-button size="small" @click="showPopup = false">{{ $t('control.ok') }}</at-button>
+                    </div>
                 </div>
             </transition>
         </div>
@@ -51,7 +64,7 @@
     const DATETIME_FORMAT = 'YYYY-MM-DD HH:mm';
 
     export default {
-        name: "DatetimeInput",
+        name: 'DatetimeInput',
         props: {
             inputHandler: {
                 type: Function,
@@ -65,7 +78,7 @@
         data() {
             return {
                 showPopup: false,
-            }
+            };
         },
         computed: {
             datePickerLang() {
@@ -106,7 +119,9 @@
         mounted() {
             window.addEventListener('click', this.hidePopup);
 
-            const dateTimeStr = moment().startOf('day').toISOString();
+            const dateTimeStr = moment()
+                .startOf('day')
+                .toISOString();
             this.inputHandler(dateTimeStr);
             this.$emit('change', dateTimeStr);
         },
@@ -123,7 +138,9 @@
                 }
             },
             onDateChange(value) {
-                const dateTime = moment(value).hour(this.hour).minute(this.minute);
+                const dateTime = moment(value)
+                    .hour(this.hour)
+                    .minute(this.minute);
                 const dateTimeStr = dateTime.toISOString();
 
                 this.inputHandler(dateTimeStr);
@@ -152,15 +169,15 @@
 
 <style lang="scss" scoped>
     .input {
-        background: #FFFFFF;
+        background: #ffffff;
         width: 330px;
         height: 40px;
-        border: 1px solid #C5D9E8;
+        border: 1px solid #c5d9e8;
         border-radius: 5px;
         cursor: pointer;
 
         &:hover {
-            border: 1px solid #79A1EB;
+            border: 1px solid #79a1eb;
         }
 
         &::v-deep {
@@ -181,14 +198,24 @@
 
     .datepicker-wrapper {
         position: absolute;
+        width: 400px;
+        max-height: unset;
+    }
 
+    .datepicker__main {
         display: flex;
         flex-flow: row;
         align-items: stretch;
 
-        width: 400px;
         height: 280px;
-        max-height: unset;
+    }
+
+    .datepicker__footer {
+        display: flex;
+        flex-flow: row;
+        justify-content: space-between;
+
+        padding: 6px 12px;
     }
 
     .datepicker {
@@ -227,11 +254,11 @@
         }
 
         .mx-calendar-header-label .mx-btn {
-            color: #1A051D;
+            color: #1a051d;
         }
 
         .mx-table thead {
-            color: #B1B1BE;
+            color: #b1b1be;
             font-weight: 600;
             text-transform: uppercase;
         }
@@ -246,12 +273,12 @@
         }
 
         .mx-table-date .cell:last-child {
-            color: #FF5569;
+            color: #ff5569;
         }
 
         .mx-table {
             .cell.not-current-month {
-                color: #E7ECF2;
+                color: #e7ecf2;
             }
 
             .cell.active {
@@ -259,8 +286,8 @@
 
                 & > div {
                     display: inline-block;
-                    background: #2E2EF9;
-                    color: #FFFFFF;
+                    background: #2e2ef9;
+                    color: #ffffff;
                     border-radius: 7px;
                     width: 25px;
                     height: 25px;
@@ -292,7 +319,7 @@
         }
 
         .mx-btn:hover {
-            color: #2E2EF9;
+            color: #2e2ef9;
         }
 
         .mx-table .cell.today {
@@ -313,8 +340,8 @@
         }
 
         .selected {
-            background: #2E2EF9;
-            color: #FFFFFF;
+            background: #2e2ef9;
+            color: #ffffff;
             border-radius: 7px;
         }
     }

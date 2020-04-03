@@ -7,28 +7,37 @@ import { getModuleList, ModuleLoaderInterceptor } from '../moduleLoader';
  * If not - initialize them and provide to store
  */
 
-ModuleLoaderInterceptor.on('loaded', (router) => {
+ModuleLoaderInterceptor.on('loaded', router => {
     const modules = Object.values(getModuleList());
-    const coreModule = modules.find(m => m.moduleInstance.routerPrefix === 'settings');
+    const settingsModules = modules.filter(m => m.moduleInstance.routerPrefix === 'settings');
 
     function initSettingsSections(to, from, next) {
-        if (!Store.getters['settings/sections'].length || !Store.getters['settings/sections'].find(section => section.scope === 'settings')) {
-            coreModule.moduleInstance.initSettingsSections();
+        if (
+            !Store.getters['settings/sections'].length ||
+            !Store.getters['settings/sections'].find(section => section.scope === 'settings')
+        ) {
+            settingsModules.forEach(m => m.moduleInstance.initSettingsSections());
         }
         next();
     }
 
     function initCompanySections(to, from, next) {
-        if (!Store.getters['settings/sections'].length || !Store.getters['settings/sections'].find(section => section.scope === 'company')) {
-            coreModule.moduleInstance.initCompanySections();
+        if (
+            !Store.getters['settings/sections'].length ||
+            !Store.getters['settings/sections'].find(section => section.scope === 'company')
+        ) {
+            settingsModules.forEach(m => m.moduleInstance.initCompanySections());
         }
 
         if (!Object.keys(Store.getters['user/user']).length) {
-            Store.watch(() => Store.getters['user/user'], user => {
-                return user.is_admin === 1 ? next() : next({name: 'forbidden'});
-            });
+            Store.watch(
+                () => Store.getters['user/user'],
+                user => {
+                    return user.is_admin === 1 ? next() : next({ name: 'forbidden' });
+                },
+            );
         } else {
-            return Store.getters['user/user'].is_admin === 1 ? next() : next({name: 'forbidden'});
+            return Store.getters['user/user'].is_admin === 1 ? next() : next({ name: 'forbidden' });
         }
     }
 
@@ -38,20 +47,26 @@ ModuleLoaderInterceptor.on('loaded', (router) => {
             name: 'company',
             component: () => import(/* webpackChunkName: "company" */ '../views/Settings/CompanySettings.vue'),
             meta: {
-                auth: true
+                auth: true,
             },
             beforeEnter: initCompanySections,
-            children: coreModule.moduleInstance.getCompanySectionsRoutes(),
+            children: settingsModules.reduce(
+                (total, m) => [...total, ...m.moduleInstance.getCompanySectionsRoutes()],
+                [],
+            ),
         },
         {
             path: '/settings',
             name: 'settings',
             component: () => import(/* webpackChunkName: "settings" */ '../views/Settings/Settings.vue'),
             meta: {
-                auth: true
+                auth: true,
             },
             beforeEnter: initSettingsSections,
-            children: coreModule.moduleInstance.getSettingSectionsRoutes(),
+            children: settingsModules.reduce(
+                (total, m) => [...total, ...m.moduleInstance.getSettingSectionsRoutes()],
+                [],
+            ),
         },
     ];
 

@@ -18,9 +18,14 @@
                         </template>
                     </at-input>
                     <ul class="users-list">
-                        <li class="list-item" v-for="user in filteredAddableUsers" :key="user[usersService.getIdParam()]"
+                        <li
+                            v-for="user in filteredAddableUsers"
+                            :key="user[usersService.getIdParam()]"
+                            class="list-item"
+                            :class="{
+                                'item-selected': selectedUsersIds.findIndex(i => i === user.id) > -1,
+                            }"
                             @click="handle(user.id, 'selectedUsersIds')"
-                            :class="{'item-selected': selectedUsersIds.findIndex(i => i === user.id) > -1}"
                         >
                             {{ user.full_name }}
                         </li>
@@ -34,10 +39,14 @@
                         </template>
                     </at-input>
                     <ul class="users-list">
-                        <li class="list-item" v-for="user in filteredRemovableUsers"
+                        <li
+                            v-for="user in filteredRemovableUsers"
                             :key="user[usersService.getIdParam()]"
+                            class="list-item"
+                            :class="{
+                                'item-selected': removableUsersIds.findIndex(i => i === user.id) > -1,
+                            }"
                             @click="handle(user.id, 'removableUsersIds')"
-                            :class="{'item-selected': removableUsersIds.findIndex(i => i === user.id) > -1}"
                         >
                             {{ user.full_name }}
                         </li>
@@ -71,13 +80,15 @@
 
                 search: {
                     addable: '',
-                    removable: ''
-                }
+                    removable: '',
+                },
             };
         },
 
         async mounted() {
-            this.project = (await this.projectService.getItem(this.$route.params[this.projectService.getIdParam()])).data;
+            this.project = (
+                await this.projectService.getItem(this.$route.params[this.projectService.getIdParam()])
+            ).data;
             this.projectUsers = this.project.users;
             this.users = (await this.usersService.getAll()).data;
         },
@@ -91,7 +102,10 @@
                 const users = this.users.filter(user => {
                     for (const id of this.selectedUsersIds) {
                         if (id === user.id) {
-                            this.selectedUsersIds.splice(this.selectedUsersIds.findIndex(i => i === id), 1);
+                            this.selectedUsersIds.splice(
+                                this.selectedUsersIds.findIndex(i => i === id),
+                                1,
+                            );
                             return true;
                         }
                     }
@@ -105,7 +119,10 @@
                     this.projectUsers = this.projectUsers.filter(user => {
                         for (const id of this.removableUsersIds) {
                             if (id === user.id) {
-                                this.removableUsersIds.splice(this.selectedUsersIds.findIndex(i => i === id), 1);
+                                this.removableUsersIds.splice(
+                                    this.selectedUsersIds.findIndex(i => i === id),
+                                    1,
+                                );
                                 return false;
                             }
                         }
@@ -115,16 +132,19 @@
             },
 
             filterList(q, list, field) {
-                const words = q.split(' ').map(s => s.trim()).filter(s => s.length !== 0);
+                const words = q
+                    .split(' ')
+                    .map(s => s.trim())
+                    .filter(s => s.length !== 0);
                 const hasTrailingSpace = q.endsWith(' ');
-                const regexString = words.map((word, i) => {
-                    if (i + 1 === words.length && !hasTrailingSpace)
-                        return `(?=.*\\b${escapeRegExp(word)})`;
-                    return `(?=.*\\b${escapeRegExp(word)}\\b)`;
-                }).join('');
+                const regexString = words
+                    .map((word, i) => {
+                        if (i + 1 === words.length && !hasTrailingSpace) return `(?=.*\\b${escapeRegExp(word)})`;
+                        return `(?=.*\\b${escapeRegExp(word)}\\b)`;
+                    })
+                    .join('');
                 const searchRegex = new RegExp(`${regexString}.+`, 'gi');
                 return list.filter(item => searchRegex.test(item[field]));
-
             },
 
             handle(id, propName) {
@@ -134,7 +154,7 @@
                 } else {
                     this[propName].push(id);
                 }
-            }
+            },
         },
 
         computed: {
@@ -158,15 +178,18 @@
                 if (this.projectUsers.length) {
                     const addedUsersIds = this.projectUsers.map(u => u[this.usersService.getIdParam()]);
                     addedUsersIds.forEach(id => {
-                        users.splice(users.findIndex(user => {
-                            return user[this.usersService.getIdParam()] === id;
-                        }), 1);
+                        users.splice(
+                            users.findIndex(user => {
+                                return user[this.usersService.getIdParam()] === id;
+                            }),
+                            1,
+                        );
                     });
                 }
 
                 return users;
-            }
-        }
+            },
+        },
     };
 </script>
 
@@ -191,7 +214,7 @@
                     list-style: none;
 
                     .list-item {
-                        padding: .5em 1em;
+                        padding: 0.5em 1em;
                         border-bottom: 1px solid $border-color-base;
 
                         &:hover {
