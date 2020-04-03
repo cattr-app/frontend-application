@@ -1,6 +1,6 @@
 <template>
     <div class="default-layout">
-        <Navigation/>
+        <Navigation />
         <div class="content-wrapper">
             <div class="container-fluid">
                 <slot></slot>
@@ -14,13 +14,11 @@
     import Navigation from '@/components/Navigation';
 
     export default {
-        name: "DefaultLayout",
+        name: 'default-layout',
         components: {
-            Navigation
-        }
-    }
+            Navigation,
+        },
+    };
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Application is restarting</title>
+    <meta content="Cool demo of Cattr is restarting" name="description">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <style>
+        @font-face {
+            font-family: 'Gilroy-ExtraBold';
+            src: url('/fallback-fonts/Gilroy-ExtraBold.otf') format('opentype');
+        }
+
+        h2, h3, h5 {
+            color: #151941;
+            font-family: 'Gilroy-ExtraBold', sans-serif;
+            font-style: normal;
+            margin: 4px 0;
+        }
+
+        h2 {
+            font-weight: 800;
+            font-size: 48px;
+            line-height: 60px;
+        }
+
+        h3 {
+            font-weight: 800;
+            font-size: 30px;
+            line-height: 40px;
+        }
+
+        h5 {
+            font-weight: 300;
+            font-size: 18px;
+            line-height: 22px;
+        }
+
+        a {
+            font-family: 'Gilroy-Light', sans-serif;
+            font-style: normal;
+            font-weight: 300;
+            font-size: 18px;
+            line-height: 22px;
+            color: #59566E;
+        }
+
+        .row {
+            max-width: 100%;
+            margin: 0;
+        }
+
+        h1, h2, h3, h4, h5, h6, p, a, span {
+            z-index: 2;
+        }
+
+        .text-center {
+            text-align: center !important;
+        }
+
+        .balloon {
+            position: absolute;
+            z-index: 1;
+        }
+
+        .balloon-container {
+            position: relative;
+        }
+
+        #balloon_8 {
+            left: 0;
+            top: -80px;
+        }
+
+        #balloon_9 {
+            right: 250px;
+            top: -120px;
+        }
+
+        #balloon_10 {
+            right: 0;
+            top: -80px;
+        }
+
+        body {
+            margin: 0
+        }
+
+        .logotype {
+            width: 48px;
+            height: 48px;
+        }
+
+        .software-title {
+            display: inline-block;
+            vertical-align: middle;
+            color: #151941;
+        }
+
+        .software-title.margin {
+            margin: 0 14px;
+        }
+
+        .logo-plus-title {
+            display: inline-block;
+        }
+
+        .align-self-start {
+            align-self: flex-start !important;
+        }
+
+        .col {
+            flex-basis: 0;
+            flex-grow: 1;
+            max-width: 100%;
+            position: relative;
+            width: 100%;
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+
+        .container {
+            max-width: 1140px;
+            width: 100%;
+            padding-right: 15px;
+            padding-left: 15px;
+            margin-right: auto;
+            margin-left: auto;
+        }
+
+        header {
+            padding: 45px 0;
+        }
+
+        img {
+            vertical-align: middle;
+            border-style: none;
+        }
+    </style>
+    <script>
+        'use strict';
+        setInterval(() => {
+            fetch(location.href).then((r) => {
+                if (r.ok) {
+                    location.reload();
+                }
+            });
+        }, 2000);
+    </script>
+</head>
+<body>
+<header class="container">
+    <div class="row">
+        <div class="col align-self-start">
+            <a class="logo-plus-title" href="https://catrr.app" style="text-decoration: none;">
+                <img alt="Cattr logotype with a cat inside of clock face" class="logotype" src="/resources/logo.svg">
+                <h3 class="software-title margin">Cattr</h3>
+            </a>
+        </div>
+    </div>
+</header>
+<section class="section-text">
+    <div class="balloon-container">
+        <img alt="" aria-hidden="true" class="balloon" id="balloon_8" src="/resources/balloon_8.png"/>
+        <img alt="" aria-hidden="true" class="balloon" id="balloon_9" src="/resources/balloon_9.png"/>
+        <img alt="" aria-hidden="true" class="balloon" id="balloon_10" src="/resources/balloon_10.png"/>
+    </div>
+    <div class="container text-center">
+        <h2>Application is restarting now</h2>
+        <h3>Please wait until application will be up and running</h3>
+        <h5>You will be redirected automatically or you can <a href="#" onclick="location.reload()">reload</a> page
+            manually</h5>
+        <svg height="200px" preserveAspectRatio="xMidYMid"
+             style="margin: auto; background: #FFF none repeat scroll 0% 0%; display: block;" viewBox="0 30 100 100"
+             width="200px" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <circle cx="84" cy="50" fill="#eac9d9" r="10">
+                <animate attributeName="r" begin="0s" calcMode="spline" dur="0.8928571428571428s"
+                         keySplines="0 0.5 0.5 1" keyTimes="0;1" repeatCount="indefinite" values="10;0"></animate>
+                <animate attributeName="fill" begin="0s" calcMode="discrete" dur="3.571428571428571s"
+                         keyTimes="0;0.25;0.5;0.75;1" repeatCount="indefinite"
+                         values="#eac9d9;#bfe0d2;#b1dae1;#cfcbef;#eac9d9"></animate>
+            </circle>
+            <circle cx="16" cy="50" fill="#eac9d9" r="10">
+                <animate attributeName="r" begin="0s" calcMode="spline" dur="3.571428571428571s"
+                         keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1" keyTimes="0;0.25;0.5;0.75;1"
+                         repeatCount="indefinite" values="0;0;10;10;10"></animate>
+                <animate attributeName="cx" begin="0s" calcMode="spline" dur="3.571428571428571s"
+                         keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1" keyTimes="0;0.25;0.5;0.75;1"
+                         repeatCount="indefinite" values="16;16;16;50;84"></animate>
+            </circle>
+            <circle cx="50" cy="50" fill="#cfcbef" r="10">
+                <animate attributeName="r" begin="-0.8928571428571428s" calcMode="spline" dur="3.571428571428571s"
+                         keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1" keyTimes="0;0.25;0.5;0.75;1"
+                         repeatCount="indefinite"
+                         values="0;0;10;10;10"></animate>
+                <animate attributeName="cx" begin="-0.8928571428571428s" calcMode="spline" dur="3.571428571428571s"
+                         keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1" keyTimes="0;0.25;0.5;0.75;1"
+                         repeatCount="indefinite"
+                         values="16;16;16;50;84"></animate>
+            </circle>
+            <circle cx="84" cy="50" fill="#b1dae1" r="10">
+                <animate attributeName="r" begin="-1.7857142857142856s" calcMode="spline" dur="3.571428571428571s"
+                         keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1" keyTimes="0;0.25;0.5;0.75;1"
+                         repeatCount="indefinite"
+                         values="0;0;10;10;10"></animate>
+                <animate attributeName="cx" begin="-1.7857142857142856s" calcMode="spline" dur="3.571428571428571s"
+                         keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1" keyTimes="0;0.25;0.5;0.75;1"
+                         repeatCount="indefinite"
+                         values="16;16;16;50;84"></animate>
+            </circle>
+            <circle cx="16" cy="50" fill="#bfe0d2" r="10">
+                <animate attributeName="r" begin="-2.6785714285714284s" calcMode="spline" dur="3.571428571428571s"
+                         keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1" keyTimes="0;0.25;0.5;0.75;1"
+                         repeatCount="indefinite"
+                         values="0;0;10;10;10"></animate>
+                <animate attributeName="cx" begin="-2.6785714285714284s" calcMode="spline" dur="3.571428571428571s"
+                         keySplines="0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1;0 0.5 0.5 1" keyTimes="0;0.25;0.5;0.75;1"
+                         repeatCount="indefinite"
+                         values="16;16;16;50;84"></animate>
+            </circle>
+        </svg>
+    </div>
+</section>
+</body>
+</html>

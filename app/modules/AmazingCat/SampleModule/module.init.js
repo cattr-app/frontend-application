@@ -19,7 +19,7 @@ export const ModuleConfig = {
     initOrder: 0,
 
     // Node module name
-    moduleName: 'AmazingCat_SampleModule'
+    moduleName: 'AmazingCat_SampleModule',
 };
 
 /**
@@ -34,6 +34,6 @@ export const ModuleConfig = {
  * @returns {Module}
  */
 export function init(context, router) {
-    context.addLocaleCode('de', 'Denmark');
+    context.addLocaleCode('dk', 'Danish');
     return context;
 }

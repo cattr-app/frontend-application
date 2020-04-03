@@ -3,7 +3,6 @@ import { getStartDay, getEndDay } from '../../utils/time';
 import { serialize } from '../../utils/url';
 
 export default class DashboardReportService {
-
     /**
      * @returns {Promise<AxiosResponse<T>>}
      * @param startAt
@@ -11,14 +10,14 @@ export default class DashboardReportService {
      * @param userIDs
      * @param config
      */
-    getReport(startAt, endAt, userIDs, config = {}) {
-        const params = serialize({
-            start_at: getStartDay(startAt),
-            end_at: getEndDay(endAt),
-            user_ids: userIDs,
+    getReport(params, config = {}) {
+        return axios.post(`reports/dashboard`, params, {
+            ...config,
+            responseType: 'blob',
         });
-
-        return axios.get(`reports/dashboard?${params}`, { ...config, responseType: 'blob' });
     }
 
+    sendInvites(emails) {
+        return axios.post(`register/create`, emails);
+    }
 }

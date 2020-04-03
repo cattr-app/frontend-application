@@ -16,6 +16,7 @@ const state = {
     users: [],
     latestIntervals: {},
     latestTasks: {},
+    latestProjects: {},
     timezone: moment.tz.guess(),
 };
 
@@ -28,6 +29,7 @@ const getters = {
     users: state => state.users,
     latestIntervals: state => state.latestIntervals,
     latestTasks: state => state.latestTasks,
+    latestProjects: state => state.latestProjects,
     events: state => {
         if (!state.intervals) {
             return {};
@@ -39,33 +41,9 @@ const getters = {
                 return result;
             }
 
-            const events = userSlice.intervals.reduce((events, interval) => {
-                if (!events.length) {
-                    const ids = typeof interval.ids !== 'undefined' ? interval.ids : [interval.id];
-
-                    return [{ ...interval, ids }];
-                }
-
-                const last = events[events.length - 1];
-                const ids = typeof interval.ids !== 'undefined' ? interval.ids : [interval.id];
-                const consecutive = moment(interval.start_at).diff(last.end_at, 'seconds') <= 1;
-                if (consecutive && interval.task_id === last.task_id && interval.is_manual === last.is_manual) {
-                    events[events.length - 1] = {
-                        ...last,
-                        ids: [...last.ids, ...ids],
-                        end_at: interval.end_at,
-                        duration: last.duration + interval.duration,
-                    };
-                } else {
-                    events.push({ ...interval, ids });
-                }
-
-                return events;
-            }, []);
-
             return {
                 ...result,
-                [userID]: events,
+                [userID]: userSlice.intervals,
             };
         }, {});
     },
@@ -80,7 +58,7 @@ const getters = {
                 if (!projects[event.project_id]) {
                     projects[event.project_id] = {
                         id: event.project_id,
-                        name: getters.projects[event.project_id] ? getters.projects[event.project_id].name : '',
+                        name: getters.tasks[event.task_id] ? getters.tasks[event.task_id].project.name : '',
                         duration: event.duration,
                         tasks: {},
                     };
@@ -93,7 +71,7 @@ const getters = {
                         id: event.task_id,
                         name: getters.tasks[event.task_id] ? getters.tasks[event.task_id].task_name : '',
                         duration: event.duration,
-                    }
+                    };
                 } else {
                     projects[event.project_id].tasks[event.task_id].duration += event.duration;
                 }
@@ -115,11 +93,33 @@ const getters = {
             }
 
             const userTimePerDay = userEvents.reduce((result, event) => {
-                const date = moment.tz(event.start_at, state.timezone).format('YYYY-MM-DD');
-                if (result[date]) {
-                    result[date] += event.duration;
+                const startAt = moment.tz(event.start_at, state.timezone);
+                const endAt = moment.tz(event.end_at, state.timezone);
+
+                const startDate = startAt.format('YYYY-MM-DD');
+                const endDate = endAt.format('YYYY-MM-DD');
+                if (startDate === endDate) {
+                    if (result[startDate]) {
+                        result[startDate] += event.duration;
+                    } else {
+                        result[startDate] = event.duration;
+                    }
                 } else {
-                    result[date] = event.duration;
+                    // If interval spans over midnight, divide it at midnight
+                    const startOfDay = endAt.clone().startOf('day');
+                    const startDateDuration = startOfDay.diff(startAt, 'seconds');
+                    if (result[startDate]) {
+                        result[startDate] += startDateDuration;
+                    } else {
+                        result[startDate] = startDateDuration;
+                    }
+
+                    const endDateDuration = endAt.diff(startOfDay, 'seconds');
+                    if (result[endDate]) {
+                        result[endDate] += endDateDuration;
+                    } else {
+                        result[endDate] = endDateDuration;
+                    }
                 }
 
                 return result;
@@ -158,6 +158,9 @@ const mutations = {
     },
     setLatestTasks(state, tasks) {
         state.latestTasks = tasks;
+    },
+    setLatestProjects(state, projects) {
+        state.latestProjects = projects;
     },
     setTimezone(state, timezone) {
         state.timezone = timezone;
@@ -203,6 +206,9 @@ const actions = {
     },
     setLatestTasks({ commit }, tasks) {
         commit('setLatestTasks', tasks);
+    },
+    setLatestProjects({ commit }, projects) {
+        commit('setLatestProjects', projects);
     },
     setTimezone({ commit }, timezone) {
         commit('setTimezone', timezone);

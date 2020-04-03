@@ -1,9 +1,7 @@
 import axios from 'axios';
 import { getStartDay, getEndDay } from '../../utils/time';
-import { serialize } from '../../utils/url';
 
 export default class ProjectReportService {
-
     /**
      * @returns {Promise<AxiosResponse<T>>}
      * @param filters
@@ -29,13 +27,16 @@ export default class ProjectReportService {
      * @param config
      */
     getReport(startAt, endAt, userIDs, projectIds, config = {}) {
-        const params = serialize({
+        const params = {
             start_at: getStartDay(startAt),
             end_at: getEndDay(endAt),
             uids: userIDs,
             pids: projectIds,
-        });
+        };
 
-        return axios.post(`reports/projects`, params, { ...config, responseType: 'blob' });
+        return axios.post(`reports/projects`, params, {
+            ...config,
+            responseType: 'blob',
+        });
     }
 }

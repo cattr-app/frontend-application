@@ -10,20 +10,20 @@ export function init(context, router) {
         name: 'screenshots',
         component: () => import(/* webpackChunkName: "screenshots" */ './views/Screenshots.vue'),
         meta: {
-            auth: true
-        }
+            auth: true,
+        },
     });
 
     context.addNavbarEntry({
         label: 'navigation.screenshots',
         to: {
-            name: 'screenshots'
-        }
+            name: 'screenshots',
+        },
     });
 
     context.addLocalizationData({
         en: require('./locales/en'),
-        ru: require('./locales/ru')
+        ru: require('./locales/ru'),
     });
 
     return context;

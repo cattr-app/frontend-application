@@ -4,6 +4,31 @@
   },
   "users": {
     "grid-title": "Users",
-    "crud-title": "User"
+    "crud-title": "User",
+    "role": {
+      "name": "Role",
+      "manager": "Manager",
+      "auditor": "Auditor",
+      "user": "User"
+    }
+  },
+  "settings": {
+    "gitlab": {
+      "label": "Gitlab Integration",
+      "url": "Gitlab URL",
+      "api_key": "Gitlab API Key"
+    },
+    "redmine": {
+      "label": "Redmine Integration",
+      "url": "Redmine URL",
+      "api_key": "Redmine API Key",
+      "statuses": "Open Statuses",
+      "priorities": "Priorities",
+      "sync_time": "Sync time to Redmine",
+      "notice": "Some settings may not be available. Wait for the synchronization to complete. This may take no more than 10 minutes."
+    },
+    "dashboard": {
+      "interval-color": "Color intervals"
+    }
   }
 }

@@ -1,5 +1,6 @@
 import StoreService from './storeService';
 import axios from 'axios';
+import has from 'lodash/has';
 
 export default class ApiService extends StoreService {
     storeNs = 'user';
@@ -8,6 +9,18 @@ export default class ApiService extends StoreService {
         super(context);
 
         axios.interceptors.response.use(
+            response => response,
+            error => {
+                if (has(error, 'response.status')) {
+                    const { status } = error.response;
+                    if (status === 401) {
+                        if (this.isLoggedIn()) {
+                            this.context.dispatch('forceUserExit', error.response.data.message);
+                        }
+                    }
+                }
+                return Promise.reject(error);
+            },
             response => response,
             error => {
                 if (error.hasOwnProperty('response')) {
@@ -21,9 +34,8 @@ export default class ApiService extends StoreService {
                     }
                 }
                 return Promise.reject(error);
-            }
+            },
         );
-
     }
 
     token() {
@@ -31,19 +43,22 @@ export default class ApiService extends StoreService {
     }
 
     checkApiAuth() {
-        return axios.get('/auth/me').then(({ data }) => {
-            const { user } = data;
+        return axios
+            .get('/auth/me')
+            .then(({ data }) => {
+                const { user } = data;
 
-            this.context.dispatch('setLoggedInStatus', true);
-            this.context.dispatch('setUser', user);
+                this.context.dispatch('setLoggedInStatus', true);
+                this.context.dispatch('setUser', user);
 
-            return Promise.resolve();
-        }).catch(() => {
-            localStorage.removeItem('access_token');
-            this.context.dispatch('forceUserExit');
+                return Promise.resolve();
+            })
+            .catch(() => {
+                localStorage.removeItem('access_token');
+                this.context.dispatch('forceUserExit');
 
-            return Promise.reject();
-        });
+                return Promise.reject();
+            });
     }
 
     setUserData(user) {
@@ -71,15 +86,18 @@ export default class ApiService extends StoreService {
     }
 
     attemptLogin(credentials) {
-        return axios.post('/auth/login', credentials).then(({ data }) => {
-            this.setUserToken(data.access_token);
-            this.setUserData(data.user);
-            this.setLoggedInStatus();
+        return axios
+            .post('/auth/login', credentials)
+            .then(({ data }) => {
+                this.setUserToken(data.access_token);
+                this.setUserData(data.user);
+                this.setLoggedInStatus();
 
-            return Promise.resolve(data);
-        }).catch(response => {
-            return Promise.reject(response);
-        });
+                return Promise.resolve(data);
+            })
+            .catch(response => {
+                return Promise.reject(response);
+            });
     }
 
     logout() {
@@ -89,9 +107,17 @@ export default class ApiService extends StoreService {
     }
 
     async getAllowedRules() {
-        const { data } = await axios.get('/roles/allowed-rules?with_project_roles=true');
+        const { data } = await axios.get('/roles/allowed-rules');
 
         this.context.dispatch('setAllowedRules', data.res);
+
+        return data;
+    }
+
+    async getProjectRules() {
+        const { data } = await axios.get('/roles/project-rules');
+
+        this.context.dispatch('setProjectRules', data.res);
 
         return data;
     }

@@ -9,6 +9,6 @@ export default class MessageService extends StoreService {
         return {
             data: this.context.getters.message,
             type: this.context.getters.type,
-        }
+        };
     }
 }

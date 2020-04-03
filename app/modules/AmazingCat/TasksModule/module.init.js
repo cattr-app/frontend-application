@@ -1,23 +1,22 @@
 import TasksService from '@/service/resource/tasksService';
-import ProjectsService from '../../../core/service/resource/projectService';
-import UsersService from '../../../core/service/resource/usersService';
+import ProjectsService from '@/service/resource/projectService';
+import UsersService from '@/service/resource/usersService';
 import { ModuleLoaderInterceptor } from '@/moduleLoader';
-import UserAvatar from '../../../core/components/UserAvatar';
+import UserAvatar from '@/components/UserAvatar';
 import i18n from '@/i18n';
-import { havePermission } from '@/utils/user';
+import { formatDurationString } from '@/utils/time';
 
 export const ModuleConfig = {
     enabled: true,
-    routerPrefix: 'tasks'
+    routerPrefix: 'tasks',
 };
 
 export function init(context, router) {
-
     let routes = {};
 
-    ModuleLoaderInterceptor.on('AmazingCat_UsersModule', m => {
+    ModuleLoaderInterceptor.on('AmazingCat_CoreModule', m => {
         m.routes.forEach(route => {
-            if (route.name.search('view') > 0) {
+            if (route.name.search('users.view') > 0) {
                 routes.usersView = route.name;
             }
         });
@@ -31,7 +30,10 @@ export function init(context, router) {
         });
     });
 
-    const crud = context.createCrud('tasks.crud-title', 'tasks', TasksService, { with: 'priority, project, user' });
+    const crud = context.createCrud('tasks.crud-title', 'tasks', TasksService, {
+        with: 'priority, project, user',
+    });
+
     crud.view.addToMetaProperties('titleCallback', ({ values }) => values.task_name, crud.view.getRouterConfig());
 
     const crudViewRoute = crud.view.getViewRouteName();
@@ -41,7 +43,10 @@ export function init(context, router) {
     crud.new.addToMetaProperties('permissions', 'tasks/create', crud.new.getRouterConfig());
     crud.edit.addToMetaProperties('permissions', 'tasks/edit', crud.edit.getRouterConfig());
 
-    const grid = context.createGrid('tasks.grid-title', 'tasks', TasksService, { with: 'priority, project, user' });
+    const grid = context.createGrid('tasks.grid-title', 'tasks', TasksService, {
+        with: 'priority, project, user',
+        is_active: true,
+    });
 
     const fieldsToShow = [
         {
@@ -49,18 +54,25 @@ export function init(context, router) {
             label: 'field.active',
             render: (h, { currentValue }) => {
                 return h('span', currentValue ? i18n.t('control.yes') : i18n.t('control.no'));
-            }
+            },
         },
         {
             key: 'project',
             label: 'field.project',
             render: (h, { currentValue }) => {
-                return h('router-link', {
-                    props: {
-                        to: { name: routes.projectsView, params: { id: currentValue.id } }
-                    }
-                }, currentValue.name);
-            }
+                return h(
+                    'router-link',
+                    {
+                        props: {
+                            to: {
+                                name: routes.projectsView,
+                                params: { id: currentValue.id },
+                            },
+                        },
+                    },
+                    currentValue.name,
+                );
+            },
         },
         {
             key: 'priority',
@@ -71,52 +83,104 @@ export function init(context, router) {
                 }
 
                 return h('span', currentValue.name);
-            }
+            },
         },
         {
             key: 'user',
             label: 'field.user',
             render: (h, { currentValue }) => {
-                return h('router-link', {
-                    props: {
-                        to: {
-                            name: routes.usersView, params: { id: currentValue.id }
-                        }
-                    }
-                }, currentValue.full_name);
-            }
+                return h(
+                    'router-link',
+                    {
+                        props: {
+                            to: {
+                                name: routes.usersView,
+                                params: { id: currentValue.id },
+                            },
+                        },
+                    },
+                    currentValue.full_name,
+                );
+            },
         },
         {
             key: 'description',
-            label: 'field.description'
+            label: 'field.description',
+        },
+        {
+            key: 'total_spent_time',
+            label: 'field.total_spent',
+            render: (h, props) => h('span', formatDurationString(props.currentValue)),
+        },
+        {
+            key: 'workers',
+            label: 'field.workers',
+            render: (h, props) => {
+                const data = [];
+                Object.keys(props.currentValue).forEach(k => {
+                    props.currentValue[k].time = formatDurationString(+props.currentValue[k].duration);
+                    data.push(props.currentValue[k]);
+                });
+                return h('AtTable', {
+                    props: {
+                        columns: [
+                            {
+                                title: 'User',
+                                render: (h, { item }) => {
+                                    return h(
+                                        'router-link',
+                                        {
+                                            props: {
+                                                to: {
+                                                    name: routes.usersView,
+                                                    params: { id: item.user_id },
+                                                },
+                                            },
+                                        },
+                                        item.full_name,
+                                    );
+                                },
+                            },
+                            {
+                                key: 'time',
+                                title: 'Time',
+                            },
+                        ],
+                        data,
+                    },
+                });
+            },
         },
     ];
 
     const fieldsToFill = [
         {
             key: 'id',
-            displayable: false
+            displayable: false,
         },
         {
             label: 'field.project',
             key: 'project_id',
             type: 'resource-select',
             service: new ProjectsService(),
-            required: true
+            required: true,
         },
         {
             label: 'field.task_name',
             key: 'task_name',
             type: 'input',
-            required: true
+            required: true,
+            placeholder: 'field.name',
         },
         {
             label: 'field.description',
             key: 'description',
-            type: 'textarea'
+            type: 'textarea',
+            placeholder: 'field.description',
         },
         {
             label: 'field.important',
+            tooltipValue: 'tooltip.task_important',
             key: 'important',
             type: 'checkbox',
             initialValue: false,
@@ -126,7 +190,8 @@ export function init(context, router) {
             key: 'user_id',
             type: 'resource-select',
             service: new UsersService(),
-            required: true
+            required: true,
+            default: ({ getters }) => getters['user/user'].id,
         },
         {
             label: 'field.priority',
@@ -135,26 +200,28 @@ export function init(context, router) {
             options: [
                 {
                     value: 1,
-                    label: 'Low'
+                    label: 'Low',
                 },
                 {
                     value: 2,
-                    label: 'Normal'
+                    label: 'Normal',
                 },
                 {
                     value: 3,
-                    label: 'High'
-                }
+                    label: 'High',
+                },
             ],
             initialValue: 2,
-            required: true
+            required: true,
+            default: 2,
         },
         {
             label: 'field.active',
             key: 'active',
             type: 'checkbox',
             initialValue: true,
-        }
+            default: 1,
+        },
     ];
 
     crud.view.addField(fieldsToShow);
@@ -171,10 +238,14 @@ export function init(context, router) {
                     classes.push('tasks-grid__task--inactive');
                 }
 
-                return h('span', {
-                    class: classes,
-                    attrs: { title: item.task_name },
-                }, item.task_name);
+                return h(
+                    'span',
+                    {
+                        class: classes,
+                        attrs: { title: item.task_name },
+                    },
+                    item.task_name,
+                );
             },
         },
         {
@@ -187,11 +258,15 @@ export function init(context, router) {
                     projectName = item.project.name;
                 }
 
-                return h('span', {
-                    class: 'tasks-grid__project',
-                    attrs: { title: projectName },
-                }, projectName);
-            }
+                return h(
+                    'span',
+                    {
+                        class: 'tasks-grid__project',
+                        attrs: { title: projectName },
+                    },
+                    projectName,
+                );
+            },
         },
         {
             title: 'field.user',
@@ -202,35 +277,38 @@ export function init(context, router) {
                     return null;
                 }
 
-                return h('div', {class: 'flex'}, [
-                    h('AtTooltip', {
-                        props: {
-                            placement: 'top',
-                            content: user.full_name
-                        }
-                    }, 
-                    [
-                        h(UserAvatar, {
+                return h('div', { class: 'flex' }, [
+                    h(
+                        'AtTooltip',
+                        {
                             props: {
-                                user,
-                                showTooltip: true
-                            }
-                        })
-                    ])
+                                placement: 'top',
+                                content: user.full_name,
+                            },
+                        },
+                        [
+                            h(UserAvatar, {
+                                props: {
+                                    user,
+                                    showTooltip: true,
+                                },
+                            }),
+                        ],
+                    ),
                 ]);
-            }
+            },
         },
     ]);
 
     grid.addFilter([
         {
-            filterName: 'filter.tasks.name',
-            referenceKey: 'task_name'
+            filterName: 'filter.fields.task_name',
+            referenceKey: 'task_name',
         },
         {
-            filterName: 'filter.tasks.project_name',
-            referenceKey: 'project.name'
-        }
+            filterName: 'filter.fields.project_name',
+            referenceKey: 'project.name',
+        },
     ]);
 
     grid.addAction([
@@ -243,7 +321,7 @@ export function init(context, router) {
             renderCondition({ $store }) {
                 // User always can view assigned tasks
                 return true;
-            }
+            },
         },
         {
             title: 'control.edit',
@@ -251,31 +329,81 @@ export function init(context, router) {
             onClick: (router, params) => {
                 router.push({ name: crudEditRoute, params: { id: params.item.id } });
             },
-            renderCondition: ({ $store }) => {
-                return havePermission($store.getters['user/allowedRules'], 'tasks/edit');
-            }
+            renderCondition: ({ $store }, item) => {
+                const userCan = $store.getters['user/can']('tasks/edit', item.project_id);
+                const fromIntegration = typeof item.integration !== 'undefined';
+
+                return userCan && !fromIntegration;
+            },
         },
         {
             title: 'control.delete',
             actionType: 'error',
             icon: 'icon-trash-2',
             onClick: async (router, params, context) => {
-                const taskService = new TasksService();
-                await taskService.deleteItem(params.item.id);
-                context.tableData = context.tableData.filter(item => item.id !== params.item.id);
-                context.$Notify({
-                    type: 'success',
-                    title: 'Success',
-                    message: 'Task deleted successfully'
+                const res = await context.$CustomModal({
+                    title: 'Delete this Task?',
+                    content: 'After deletion this task cannot be restored',
+                    okText: 'Delete',
+                    cancelText: 'Cancel',
+                    showClose: false,
+                    styles: {
+                        'border-radius': '10px',
+                        'text-align': 'center',
+                        footer: {
+                            'text-align': 'center',
+                        },
+                        header: {
+                            padding: '16px 35px 4px 35px',
+                            color: 'red',
+                        },
+                        body: {
+                            padding: '16px 35px 4px 35px',
+                        },
+                    },
+                    width: 320,
+                    type: 'trash',
+                    typeButton: 'error',
                 });
+
+                if (res === 'confirm') {
+                    const taskService = new TasksService();
+                    await taskService.deleteItem(params.item.id);
+                    context.tableData = context.tableData.filter(item => item.id !== params.item.id);
+                    context.$Notify({
+                        type: 'success',
+                        title: 'Success',
+                        message: 'Task deleted successfully',
+                    });
+                }
             },
-            renderCondition: ({ $store }) => {
-                return havePermission($store.getters['user/allowedRules'], 'tasks/remove');
-            }
-        }
+            renderCondition: ({ $store }, item) => {
+                const userCan = $store.getters['user/can']('tasks/remove', item.project_id);
+                const fromIntegration = typeof item.integration !== 'undefined';
+
+                return userCan && !fromIntegration;
+            },
+        },
     ]);
 
     grid.addPageControls([
+        {
+            key: 'isActive',
+            frontedType: 'checkbox',
+            label: 'control.show_active',
+            onChange: data => {
+                if (data.values.isActive) {
+                    data.$set(data.queryParams, 'active', ['=', data.values.isActive]);
+                } else {
+                    data.$delete(data.queryParams, 'active');
+                }
+
+                data.fetchData();
+            },
+            renderCondition: ({ $store }) => {
+                return $store.getters['user/canInAnyProject']('tasks/create');
+            },
+        },
         {
             label: 'control.create',
             type: 'primary',
@@ -284,21 +412,21 @@ export function init(context, router) {
                 $router.push({ name: crudNewRoute });
             },
             renderCondition: ({ $store }) => {
-                return havePermission($store.getters['user/allowedRules'], 'tasks/create');
-            }
-        }
+                return $store.getters['user/canInAnyProject']('tasks/create');
+            },
+        },
     ]);
 
     context.addNavbarEntry({
         label: 'navigation.tasks',
         to: {
-            name: 'AmazingCat_TasksModule.crud.tasks'
-        }
+            name: 'AmazingCat_TasksModule.crud.tasks',
+        },
     });
 
     context.addLocalizationData({
         en: require('./locales/en'),
-        ru: require('./locales/ru')
+        ru: require('./locales/ru'),
     });
 
     context.addRoute(crud.getRouterConfig());

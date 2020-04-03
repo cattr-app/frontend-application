@@ -1,10 +1,5 @@
 <template>
-    <ListBox
-        keyField="id"
-        labelField="name"
-        valueField="selected"
-        :values="listBoxItems"
-        @change="onChange" />
+    <ListBox labelField="name" valueField="selected" :values="listBoxItems" keyField="id" @change="onChange" />
 </template>
 
 <script>
@@ -33,13 +28,16 @@
 
             changeHandler: {
                 type: Function,
-                default: () => (value) => {},
-            }
+                default: () => value => {},
+            },
         },
 
         computed: {
             listBoxItems() {
-                return this.statuses.map(status => ({ ...status, selected: this.selected.includes(status.id) }));
+                return this.statuses.map(status => ({
+                    ...status,
+                    selected: this.selected.includes(status.id),
+                }));
             },
         },
 

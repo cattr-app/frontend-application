@@ -5,11 +5,5 @@
   "tasks": {
     "grid-title": "Задачи",
     "crud-title": "Задача"
-  },
-  "filter": {
-    "tasks": {
-      "name": "Поиск по имени задачи",
-      "project_name": "Поиск по имени проекта"
-    }
   }
 }

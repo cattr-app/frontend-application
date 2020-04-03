@@ -1,8 +1,6 @@
-import AbstractCrud from "./abstractCrud";
-
+import AbstractCrud from './abstractCrud';
 
 export default class View extends AbstractCrud {
-
     context = {};
     routerConfig = {};
 
@@ -24,8 +22,8 @@ export default class View extends AbstractCrud {
                     title: context.crudName,
                     type: 'view',
                     pageControls: [],
-                }
-            }
+                },
+            },
         };
     }
 

@@ -1,8 +1,8 @@
 <template>
     <div v-if="Object.keys(reportsList).length">
         <at-collapse simple class="list">
-            <at-collapse-item class="list__item" v-for="(user, index) in reportsList" :key="index">
-                <div class="item-header" slot="title">
+            <at-collapse-item v-for="(user, index) in reportsList" :key="index" class="list__item">
+                <div slot="title" class="item-header">
                     <div class="row flex-middle">
                         <div class="col-xs-4 col-md-2 col-lg-1">
                             <user-avatar :user="user.user" :size="35"></user-avatar>
@@ -15,31 +15,34 @@
                         </div>
                         <div class="col-xs-5 col-md-9 col-lg-8 d-xs-none">
                             <at-progress
-                                    :percent="getUserPercentage(user.total_time, user.total_time)"
-                                    class="time-percentage"
-                                    status="success"
-                                    :stroke-width="15"
+                                :percent="getUserPercentage(user.total_time, user.total_time)"
+                                class="time-percentage"
+                                status="success"
+                                :stroke-width="15"
                             />
                         </div>
                     </div>
                 </div>
 
-                <div
-                        class="row flex-middle at-collapse__header"
-                        v-for="task in user.tasks"
-                        :key="task.task_id"
-                >
+                <div v-for="task in user.tasks" :key="task.task_id" class="row flex-middle at-collapse__header">
                     <div class="col-xs-7 col-md-6 col-lg-7 text-ellipsis">
-                        <router-link class="h5 link"
-                                     :title="task.project_name"
-                                     :to="{ name: projectViewRoute, params: { id: task.project_id } }">
+                        <router-link
+                            class="h5 link"
+                            :title="task.project_name"
+                            :to="{
+                                name: projectViewRoute,
+                                params: { id: task.project_id },
+                            }"
+                        >
                             {{ task.project_name }}
                         </router-link>
                     </div>
                     <div class="col-xs-7 col-md-6 col-lg-7 text-ellipsis">
-                        <router-link class="h5 link"
-                                     :title="task.name"
-                                     :to="{ name: taskViewRoute, params: { id: task.task_id } }">
+                        <router-link
+                            class="h5 link"
+                            :title="task.name"
+                            :to="{ name: taskViewRoute, params: { id: task.task_id } }"
+                        >
                             {{ task.name }}
                         </router-link>
                     </div>
@@ -47,11 +50,11 @@
                         <span class="h4">{{ formatDurationString(task.total_time) }}</span>
                     </div>
                     <div class="col-xs-5 col-md-9 col-lg-8 d-xs-none">
-                            <at-progress
-                                    :percent="getUserPercentage(task.total_time, user.total_time)"
-                                    :stroke-width="15"
-                                    status="success"
-                            />
+                        <at-progress
+                            :percent="getUserPercentage(task.total_time, user.total_time)"
+                            :stroke-width="15"
+                            status="success"
+                        />
                     </div>
                 </div>
             </at-collapse-item>
@@ -60,28 +63,28 @@
 </template>
 
 <script>
-    import {formatDurationString} from "@/utils/time";
-    import {getModuleList} from '@/moduleLoader';
-    import UserAvatar from '@/components/UserAvatar'
+    import { formatDurationString } from '@/utils/time';
+    import { getModuleList } from '@/moduleLoader';
+    import UserAvatar from '@/components/UserAvatar';
 
     export default {
         props: {
-            reportsList: {}
+            reportsList: {},
         },
         components: {
-            UserAvatar
+            UserAvatar,
         },
         data() {
             let projectRoute = {},
                 taskRoute = {};
             Object.values(getModuleList()).forEach(i => {
                 const moduleName = i.moduleInstance.getModuleName();
-                if (moduleName === "AmazingCat_TasksModule") {
+                if (moduleName === 'AmazingCat_TasksModule') {
                     taskRoute = i.moduleInstance.getRoutes().find(route => route.name.includes('view'));
                 }
 
-                if (moduleName === "AmazingCat_ProjectsModule") {
-                    projectRoute = i.moduleInstance.getRoutes().find(route => route.name.includes('view'))
+                if (moduleName === 'AmazingCat_ProjectsModule') {
+                    projectRoute = i.moduleInstance.getRoutes().find(route => route.name.includes('view'));
                 }
             });
 
@@ -96,8 +99,8 @@
             formatDurationString,
             getUserPercentage(minutes, totalTime) {
                 return Math.floor((minutes * 100) / totalTime);
-            }
-        }
+            },
+        },
     };
 </script>
 
@@ -106,7 +109,7 @@
         color: $gray-2;
 
         &__content .at-collapse__header {
-           cursor: default;
+            cursor: default;
         }
     }
 

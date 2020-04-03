@@ -1,135 +1,127 @@
 <template>
-    <div class="project-roles">
-        <ul>
-            <li class="project-roles__item" v-for="(relation, index) in relations" :key="index">
-                <at-select class="project-roles__project" :value="relation.project_id" filterable
-                           @on-change="onChangeProject(relation, $event)">
-                    <at-option v-for="project in projects"
-                               :key="project.id" :value="+project.id">{{project.name}}
-                    </at-option>
-                </at-select>
+    <div v-if="Object.keys(roles).length > 0" class="project-roles">
+        <div v-for="role in roles" :key="role.id">
+            <div class="row">
+                <div class="col-7 col-md-12 col-sm-12 projects-container">
+                    <validation-provider :ref="'provider' + '_' + role.id" v-slot="{ errors }" vid="relation_provider">
+                        <MultiSelect
+                            :key="role.id"
+                            :service="service"
+                            :selected="getProjectsForRole(role.id)"
+                            :inputHandler="projectIds => updateRelation(role.id, projectIds)"
+                            :class="{
+                                'at-select--error': errors.length > 0,
+                            }"
+                        >
+                        </MultiSelect>
+                        <small v-if="errors.length" class="error">{{ errors[0] }}</small>
+                    </validation-provider>
+                </div>
 
-                <at-select class="project-roles__role" :value="relation.role_id" filterable
-                           @on-change="onChangeRole(relation, $event)">
-                    <at-option v-for="role in roles"
-                               :key="role.id" :value="+role.id">{{role.name}}
-                    </at-option>
-                </at-select>
-
-                <at-button class="project-roles__remove"
-                           @click.prevent="onRemoveRelation(relation, index)">
-                    <span class="icon icon-x"></span>
-                </at-button>
-            </li>
-        </ul>
-
-        <at-button class="project-roles__add"
-                   @click.prevent="relations.push({ user_id: userID, project_id: 0, role_id: 0 })">
-            {{ $t('control.add') }}
-        </at-button>
+                <div class="col-3 col-md-6 col-sm-6 role-container">
+                    <at-input readonly :value="$t('users.role.' + role.name)">
+                        <template slot="prepend"> {{ $t('users.role.name') }} </template>
+                    </at-input>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
-    import { mapGetters, mapActions } from 'vuex';
-    import ProjectService from '@/service/resource/projectService';
-    import UsersService from '@/service/resource/usersService';
+    import { mapActions, mapGetters } from 'vuex';
+    import MultiSelect from '@/components/MultiSelect';
+    import { ValidationProvider } from 'vee-validate';
 
     export default {
         name: 'ProjectRoles',
-
+        props: {
+            relations: {
+                type: Object,
+                required: true,
+            },
+            service: {
+                type: Object,
+                required: true,
+            },
+        },
+        components: {
+            MultiSelect,
+            ValidationProvider,
+        },
         data() {
             return {
-                userID: null,
                 projects: [],
-                relations: [],
-                projectService: new ProjectService(),
+                selectedProjects: [],
             };
         },
-
         computed: {
             ...mapGetters('roles', ['roles']),
         },
-
         methods: {
             ...mapActions({
                 getRoles: 'roles/loadRoles',
             }),
-
             async load() {
-                this.userID = +this.$route.params.id;
-
                 await this.getRoles();
-                this.projects = (await this.projectService.getAll()).data;
-                this.relations = (await this.projectService.getUserProjectRelations(this.userID)).data;
-
             },
+            getProjectsForRole(roleId) {
+                return roleId in this.relations ? this.relations[roleId].project_ids : [];
+            },
+            updateRelation(roleId, projectIds) {
+                let selectedProjects = [];
+                Object.keys(this.relations).forEach(roleID => {
+                    selectedProjects = selectedProjects.concat(this.relations[roleID].project_ids);
+                });
 
-            addRelation(relation) {
-                const { user_id, project_id, role_id } = relation;
-                if (!user_id || !project_id || !role_id) {
-                    return;
+                let result = {};
+                let duplicatesCheck = new Set(selectedProjects).size !== selectedProjects.length;
+
+                if (duplicatesCheck) {
+                    result = {
+                        errors: ['This project(-s) were already used for another role!'],
+                        valid: false,
+                        failedRules: {},
+                    };
+                } else {
+                    result = {
+                        errors: [],
+                        valid: true,
+                        failedRules: {},
+                    };
                 }
 
-                return this.projectService.addUserProjectRelation(user_id, project_id, role_id);
-            },
+                this.$refs['provider' + '_' + roleId][0].applyResult(result);
 
-            removeRelation(relation) {
-                const { user_id, project_id, role_id } = relation;
-                if (!user_id || !project_id || !role_id) {
-                    return;
+                if (roleId in this.relations) {
+                    this.relations[roleId].project_ids = projectIds;
+                } else {
+                    this.relations[roleId] = {
+                        project_ids: projectIds,
+                        role_id: roleId,
+                    };
                 }
 
-                return this.projectService.removeUserProjectRelation(user_id, project_id);
-            },
-
-            async onChangeProject(relation, newProjectID) {
-                await this.removeRelation(relation);
-                await this.addRelation({ ...relation, project_id: newProjectID });
-
-                relation.project_id = newProjectID;
-
-            },
-
-            async onChangeRole(relation, newRoleID) {
-                await this.removeRelation(relation);
-                await this.addRelation({ ...relation, role_id: newRoleID });
-
-                relation.role_id = newRoleID;
-
-            },
-
-            async onRemoveRelation(relation, index) {
-                await this.removeRelation(relation);
-
-                this.relations.splice(index, 1);
+                this.$emit('updateRelation', this.relations);
+                return this.relations;
             },
         },
-
-        mounted() {
-            this.load();
+        async created() {
+            await this.load();
         },
     };
 </script>
 
 <style lang="scss" scoped>
-    .project-roles {
+    .projects-container {
+        align-self: center;
+    }
 
-        &__item {
-            display: flex;
-            flex-flow: row nowrap;
-        }
+    .role-container {
+        margin: 1em;
+    }
 
-        &__project,
-        &__role {
-            flex: 1;
-
-            margin-right: .75em;
-            margin-bottom: .75em;
-        }
-
-        &__remove {
-            height: 40px;
-        }
+    .role-name {
+        line-height: 2em;
     }
 </style>

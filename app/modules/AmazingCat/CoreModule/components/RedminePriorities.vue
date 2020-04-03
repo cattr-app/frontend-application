@@ -1,19 +1,25 @@
 <template>
     <ul class="redmine-priorities">
-        <li class="redmine-priorities__item"
+        <li
             v-for="(redminePriority, index) of redminePriorities"
-            :key="redminePriority.id">
+            :key="redminePriority.id"
+            class="redmine-priorities__item"
+        >
             <label class="redmine-priorities__field">
                 <span class="redmine-priorities__label">
                     {{ redminePriority.name }}
                 </span>
 
-                <at-select class="redmine-priorities__select"
+                <at-select
+                    class="redmine-priorities__select"
                     :value="+redminePriority.priority_id"
-                    @on-change="onChange(index, $event)">
+                    @on-change="onChange(index, $event)"
+                >
                     <at-option
                         v-for="internalPriority of internalPriorities"
-                        :key="internalPriority.id" :value="+internalPriority.id">
+                        :key="internalPriority.id"
+                        :value="+internalPriority.id"
+                    >
                         {{ internalPriority.name }}
                     </at-option>
                 </at-select>
@@ -42,8 +48,8 @@
 
             changeHandler: {
                 type: Function,
-                default: () => (value) => {},
-            }
+                default: () => value => {},
+            },
         },
 
         methods: {

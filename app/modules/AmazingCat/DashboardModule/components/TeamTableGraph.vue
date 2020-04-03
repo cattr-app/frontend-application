@@ -1,9 +1,9 @@
 <template>
-    <div class="canvas" ref="canvasWrapper">
+    <div ref="canvasWrapper" class="canvas">
         <canvas ref="canvas"></canvas>
 
-        <div class="scrollbar-bottom" @scroll="onScroll" ref="scrollbarBottom">
-            <div :style="{ width: `${contentWidth}px` }"></div>
+        <div ref="scrollbarBottom" class="scrollbar-top" @scroll="onScroll">
+            <div :style="{ width: `${contentWidth}px` }" />
         </div>
     </div>
 </template>
@@ -13,6 +13,25 @@
     import debounce from 'lodash/debounce';
     import moment from 'moment';
     import { formatDurationString } from '@/utils/time';
+
+    const defaultColorConfig = [
+        {
+            start: 0,
+            end: 0.75,
+            color: '#ffb6c2',
+        },
+        {
+            start: 0.76,
+            end: 1,
+            color: '#93ecda',
+        },
+        {
+            start: 1,
+            end: 0,
+            color: '#3cd7b6',
+            isOverTime: true,
+        },
+    ];
 
     const fabricObjectOptions = {
         editable: false,
@@ -58,6 +77,17 @@
             };
         },
         computed: {
+            workingHours() {
+                return 'work_time' in this.$store.getters['user/companyData'] &&
+                    this.$store.getters['user/companyData'].work_time
+                    ? this.$store.getters['user/companyData'].work_time
+                    : 7;
+            },
+            colorRules() {
+                return this.$store.getters['user/companyData'].color
+                    ? this.$store.getters['user/companyData'].color
+                    : defaultColorConfig;
+            },
             canvasWidth() {
                 if (!this.canvas) {
                     return 500;
@@ -101,6 +131,19 @@
             window.removeEventListener('resize', this.onResize);
         },
         methods: {
+            getColor(progress) {
+                let color = '#3cd7b6';
+
+                this.colorRules.forEach(el => {
+                    if ('isOverTime' in el && progress > el.start) {
+                        color = el.color;
+                    } else if (progress >= el.start && progress <= el.end) {
+                        color = el.color;
+                    }
+                });
+
+                return color;
+            },
             onDown({ e }) {
                 this.canvas.selection = false;
                 this.isDragging = true;
@@ -150,7 +193,7 @@
                 this.setScroll(0);
             },
             formatDuration: formatDurationString,
-            draw: debounce(function () {
+            draw: debounce(function() {
                 this.canvas.clear();
 
                 const width = this.contentWidth;
@@ -161,126 +204,246 @@
                 const cursor = this.contentWidth > this.canvasWidth ? 'move' : 'default';
 
                 // Background
-                this.canvas.add(new fabric.Rect({
-                    left: 0, top: titleHeight + subtitleHeight,
-                    width: width - 1, height: height - 1,
-                    rx: 20, ry: 20,
-                    fill: '#FAFAFA',
-                    stroke: '#DFE5ED',
-                    strokeWidth: 1,
-                    ...fabricObjectOptions,
-                    cursor,
-                    hoverCursor: cursor,
-                }));
+                this.canvas.add(
+                    new fabric.Rect({
+                        left: 0,
+                        top: titleHeight + subtitleHeight,
+                        width: width - 1,
+                        height: height - 1,
+                        rx: 20,
+                        ry: 20,
+                        fill: '#FAFAFA',
+                        stroke: '#DFE5ED',
+                        strokeWidth: 1,
+                        ...fabricObjectOptions,
+                        cursor,
+                        hoverCursor: cursor,
+                    }),
+                );
 
                 for (let column = 0; column < this.columns; ++column) {
-                    const date = start.clone().locale(this.$i18n.locale).add(column, 'days');
+                    const date = start
+                        .clone()
+                        .locale(this.$i18n.locale)
+                        .add(column, 'days');
                     const left = this.columnWidth * column;
 
                     // Column headers - day
-                    this.canvas.add(new fabric.Textbox(date.locale(this.$i18n.locale).format('D'), {
-                        left, top: 0,
-                        width: this.columnWidth, height: titleHeight,
-                        textAlign: 'center',
-                        fontFamily: 'Nunito, sans-serif',
-                        fontSize: 15,
-                        fill: '#151941',
-                        ...fabricObjectOptions,
-                        cursor,
-                        hoverCursor: cursor,
-                    }));
-
-                    // Column headers - am/pm
-                    this.canvas.add(new fabric.Textbox(date.format('dddd').toUpperCase(), {
-                        left, top: titleHeight,
-                        width: this.columnWidth, height: subtitleHeight,
-                        textAlign: 'center',
-                        fontFamily: 'Nunito, sans-serif',
-                        fontSize: 10,
-                        fontWeight: '600',
-                        fill: '#B1B1BE',
-                        ...fabricObjectOptions,
-                        cursor,
-                        hoverCursor: cursor,
-                    }));
-
-                    // Vertical grid lines
-                    if (column > 0) {
-                        this.canvas.add(new fabric.Line([
-                            0, 0,
-                            0, height,
-                        ], {
-                            left, top: titleHeight + subtitleHeight,
-                            stroke: '#DFE5ED',
-                            strokeWidth: 1,
+                    this.canvas.add(
+                        new fabric.Textbox(date.locale(this.$i18n.locale).format('D'), {
+                            left,
+                            top: 0,
+                            width: this.columnWidth,
+                            height: titleHeight,
+                            textAlign: 'center',
+                            fontFamily: 'Nunito, sans-serif',
+                            fontSize: 15,
+                            fill: '#151941',
                             ...fabricObjectOptions,
                             cursor,
                             hoverCursor: cursor,
-                        }));
+                        }),
+                    );
+
+                    // Column headers - am/pm
+                    this.canvas.add(
+                        new fabric.Textbox(date.format('dddd').toUpperCase(), {
+                            left,
+                            top: titleHeight,
+                            width: this.columnWidth,
+                            height: subtitleHeight,
+                            textAlign: 'center',
+                            fontFamily: 'Nunito, sans-serif',
+                            fontSize: 10,
+                            fontWeight: '600',
+                            fill: '#B1B1BE',
+                            ...fabricObjectOptions,
+                            cursor,
+                            hoverCursor: cursor,
+                        }),
+                    );
+
+                    // Vertical grid lines
+                    if (column > 0) {
+                        this.canvas.add(
+                            new fabric.Line([0, 0, 0, height], {
+                                left,
+                                top: titleHeight + subtitleHeight,
+                                stroke: '#DFE5ED',
+                                strokeWidth: 1,
+                                ...fabricObjectOptions,
+                                cursor,
+                                hoverCursor: cursor,
+                            }),
+                        );
                     }
                 }
 
+                const countAllRows = this.users.length - 1;
+                const countAllColumns = this.columns - 1;
+
                 this.users.forEach((user, row) => {
                     const top = row * rowHeight + titleHeight + subtitleHeight;
-
                     const userTime = this.timePerDay[user.id];
+
                     if (userTime) {
-                        Object.keys(userTime).forEach(day => {
+                        Object.keys(userTime).forEach((day, i) => {
                             const column = -start.diff(day, 'days');
                             const duration = userTime[day];
                             const left = column * this.columnWidth;
-
-                            const total = 60 * 60 * 7;
+                            const total = 60 * 60 * this.workingHours;
                             const progress = duration / total;
                             const height = Math.ceil(Math.min(progress, 1) * (rowHeight - 1));
-                            const color = progress < 0.75 ? '#ffb6c2' : (progress < 1 ? '#93ecda' : '#3cd7b6');
+                            const color = this.getColor(progress);
 
-                            // Cell background
-                            this.canvas.add(new fabric.Rect({
-                                left: left + 1, top: Math.floor(top + (rowHeight - height)),
-                                width: this.columnWidth, height,
-                                fill: color,
-                                strokeWidth: 0,
-                                ...fabricObjectOptions,
-                                cursor,
-                                hoverCursor: cursor,
-                            }));
+                            if (column === 0 && row === 0) {
+                                // Cell background
+                                this.canvas.add(
+                                    new fabric.Rect({
+                                        left: left + 1,
+                                        top: Math.floor(top + (rowHeight - height)),
+                                        width: this.columnWidth,
+                                        height,
+                                        fill: color,
+                                        strokeWidth: 0,
+                                        ...fabricObjectOptions,
+                                        cursor,
+                                        hoverCursor: cursor,
+                                        clipPath: new fabric.Rect({
+                                            left: 0,
+                                            top: titleHeight + subtitleHeight,
+                                            width: this.contentWidth,
+                                            height: this.users.length * rowHeight,
+                                            rx: 20,
+                                            ry: 20,
+                                            absolutePositioned: true,
+                                        }),
+                                    }),
+                                );
+                            } else if (column === 0 && row === countAllRows) {
+                                this.canvas.add(
+                                    new fabric.Rect({
+                                        left: left + 1,
+                                        top: Math.floor(top + (rowHeight - height)),
+                                        width: this.columnWidth,
+                                        height,
+                                        fill: color,
+                                        strokeWidth: 0,
+                                        ...fabricObjectOptions,
+                                        cursor,
+                                        hoverCursor: cursor,
+                                        clipPath: new fabric.Rect({
+                                            left: 0,
+                                            top: titleHeight + subtitleHeight,
+                                            width: this.contentWidth,
+                                            height: this.users.length * rowHeight,
+                                            rx: 20,
+                                            ry: 20,
+                                            absolutePositioned: true,
+                                        }),
+                                    }),
+                                );
+                            } else if (countAllColumns === column && row === 0) {
+                                this.canvas.add(
+                                    new fabric.Rect({
+                                        left: left + 1,
+                                        top: Math.floor(top + (rowHeight - height)),
+                                        width: this.columnWidth,
+                                        height,
+                                        fill: color,
+                                        strokeWidth: 0,
+                                        ...fabricObjectOptions,
+                                        cursor,
+                                        hoverCursor: cursor,
+                                        clipPath: new fabric.Rect({
+                                            left: 0,
+                                            top: titleHeight + subtitleHeight,
+                                            width: this.contentWidth,
+                                            height: this.users.length * rowHeight,
+                                            rx: 20,
+                                            ry: 20,
+                                            absolutePositioned: true,
+                                        }),
+                                    }),
+                                );
+                            } else if (countAllColumns === column && row === countAllRows) {
+                                this.canvas.add(
+                                    new fabric.Rect({
+                                        left: left + 1,
+                                        top: Math.floor(top + (rowHeight - height)),
+                                        width: this.columnWidth,
+                                        height,
+                                        fill: color,
+                                        strokeWidth: 0,
+                                        ...fabricObjectOptions,
+                                        cursor,
+                                        hoverCursor: cursor,
+                                        clipPath: new fabric.Rect({
+                                            left: 0,
+                                            top: titleHeight + subtitleHeight,
+                                            width: this.contentWidth,
+                                            height: this.users.length * rowHeight,
+                                            rx: 20,
+                                            ry: 20,
+                                            absolutePositioned: true,
+                                        }),
+                                    }),
+                                );
+                            } else {
+                                this.canvas.add(
+                                    new fabric.Rect({
+                                        left: left + 1,
+                                        top: Math.floor(top + (rowHeight - height)),
+                                        width: this.columnWidth,
+                                        height,
+                                        fill: color,
+                                        strokeWidth: 0,
+                                        ...fabricObjectOptions,
+                                        cursor,
+                                        hoverCursor: cursor,
+                                    }),
+                                );
+                            }
 
                             // Time label
-                            this.canvas.add(new fabric.Textbox(this.formatDuration(duration), {
-                                left, top: top + 22,
-                                width: this.columnWidth, height: rowHeight,
-                                textAlign: 'center',
-                                fontFamily: 'Nunito, sans-serif',
-                                fontSize: 15,
-                                fontWeight: '600',
-                                fill: '#151941',
-                                ...fabricObjectOptions,
-                                cursor,
-                                hoverCursor: cursor,
-                            }));
+                            this.canvas.add(
+                                new fabric.Textbox(this.formatDuration(duration), {
+                                    left,
+                                    top: top + 22,
+                                    width: this.columnWidth,
+                                    height: rowHeight,
+                                    textAlign: 'center',
+                                    fontFamily: 'Nunito, sans-serif',
+                                    fontSize: 15,
+                                    fontWeight: '600',
+                                    fill: '#151941',
+                                    ...fabricObjectOptions,
+                                    cursor,
+                                    hoverCursor: cursor,
+                                }),
+                            );
                         });
                     }
 
                     // Horizontal grid lines
                     if (row > 0) {
-                        this.canvas.add(new fabric.Line([
-                            0, 0,
-                            width, 0,
-                        ], {
-                            left: 0, top,
-                            stroke: '#DFE5ED',
-                            strokeWidth: 1,
-                            ...fabricObjectOptions,
-                            cursor,
-                            hoverCursor: cursor,
-                        }));
+                        this.canvas.add(
+                            new fabric.Line([0, 0, width, 0], {
+                                left: 0,
+                                top,
+                                stroke: '#DFE5ED',
+                                strokeWidth: 1,
+                                ...fabricObjectOptions,
+                                cursor,
+                                hoverCursor: cursor,
+                            }),
+                        );
                     }
                 });
 
                 this.canvas.requestRenderAll();
             }, 100),
-            onResize: debounce(function () {
+            onResize: debounce(function() {
                 const { width } = this.$refs.canvasWrapper.getBoundingClientRect();
                 const height = this.users.length * rowHeight + titleHeight + subtitleHeight;
                 this.canvas.setWidth(width);
@@ -297,7 +460,7 @@
                 this.draw();
             },
         },
-    }
+    };
 </script>
 
 <style lang="scss" scoped>
@@ -309,14 +472,25 @@
         position: relative;
     }
 
+    .scrollbar-top {
+        position: absolute;
+        left: 0;
+        top: -25px;
+        width: 100%;
+        overflow-x: auto;
+    }
+
     .scrollbar-bottom {
         position: absolute;
         left: 0;
         bottom: -5px;
         width: 100%;
         overflow-x: auto;
+    }
 
-        scrollbar-color: #2E2EF9 transparent;
+    .scrollbar-bottom,
+    .scrollbar-top {
+        scrollbar-color: #2e2ef9 transparent;
         scrollbar-width: thin;
 
         & > div {
@@ -336,7 +510,7 @@
         }
 
         &::-webkit-scrollbar-thumb {
-            background: #2E2EF9;
+            background: #2e2ef9;
             border-radius: 3px;
         }
     }

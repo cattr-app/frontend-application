@@ -4,7 +4,6 @@
  * Data is stored inside store -> settings -> sections -> data
  */
 export default class SettingsService {
-
     /**
      * API endpoint URL
      * @returns string

@@ -1,5 +1,5 @@
 export function getMimeType(extension) {
-    switch(extension) {
+    switch (extension) {
         case 'csv':
             return 'text/csv';
 

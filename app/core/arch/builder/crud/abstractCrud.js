@@ -1,14 +1,12 @@
-import _ from 'lodash';
+import set from 'lodash/set';
 
 export default class AbstractCrud {
-
     /**
      * @param property
      * @param data
      * @param routerConfig
      */
     addToMetaProperties(property, data, routerConfig) {
-        _.set(routerConfig.meta, property, data);
+        set(routerConfig.meta, property, data);
     }
-
 }

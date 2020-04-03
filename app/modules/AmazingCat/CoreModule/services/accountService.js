@@ -1,7 +1,7 @@
-import axios from "@/config/app";
-import SettingsService from "./settingsService";
-import Store from "@/store";
-import i18n from "@/i18n";
+import axios from '@/config/app';
+import SettingsService from './settingsService';
+import Store from '@/store';
+import i18n from '@/i18n';
 
 /**
  * Section service class.
@@ -9,7 +9,6 @@ import i18n from "@/i18n";
  * Data is stored inside store -> settings -> sections -> data
  */
 export default class AccountService extends SettingsService {
-
     /**
      * API endpoint URL
      * @returns string
@@ -27,29 +26,29 @@ export default class AccountService extends SettingsService {
         if (Object.keys(user).length) {
             Promise.resolve().then(() => {
                 return {
-                    data : {
+                    data: {
                         id: user.id,
                         active: user.active,
                         password: user.password,
                         email: user.email,
                         full_name: user.full_name,
-                        user_language: user.user_language
-                    }
-                }
-            })
+                        user_language: user.user_language,
+                    },
+                };
+            });
         }
 
         return axios.get(this.getItemRequestUri()).then(({ data }) => {
             return {
-                data : {
+                data: {
                     id: data.user.id,
                     active: data.user.active, // TODO UserController Validation Rule is required -- should be removed on Backend (i guess)
                     password: data.user.password,
                     email: data.user.email,
                     full_name: data.user.full_name,
-                    user_language: data.user.user_language
-                }
-            }
+                    user_language: data.user.user_language,
+                },
+            };
         });
     }
 

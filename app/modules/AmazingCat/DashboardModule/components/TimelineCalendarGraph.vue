@@ -1,5 +1,5 @@
 <template>
-    <div class="canvas" ref="canvasWrapper">
+    <div ref="canvasWrapper" class="canvas">
         <canvas ref="canvas"></canvas>
     </div>
 </template>
@@ -57,7 +57,7 @@
         },
         methods: {
             formatDuration: formatDurationString,
-            draw: debounce(function () {
+            draw: debounce(function() {
                 this.canvas.clear();
 
                 const width = this.canvas.getWidth();
@@ -72,29 +72,41 @@
                 const rows = lastDay.diff(firstDay, 'weeks') + 1;
 
                 // Background
-                this.canvas.add(new fabric.Rect({
-                    left: 0, top: headerHeight,
-                    width: width - 1, height: rows * rowHeight - 1,
-                    rx: 20, ry: 20,
-                    fill: '#FAFAFA',
-                    stroke: '#DFE5ED',
-                    strokeWidth: 1,
-                    ...fabricObjectOptions,
-                }));
+                this.canvas.add(
+                    new fabric.Rect({
+                        left: 0,
+                        top: headerHeight,
+                        width: width - 1,
+                        height: rows * rowHeight - 1,
+                        rx: 20,
+                        ry: 20,
+                        fill: '#FAFAFA',
+                        stroke: '#DFE5ED',
+                        strokeWidth: 1,
+                        ...fabricObjectOptions,
+                    }),
+                );
 
                 // Column headers
                 for (let column = 0; column < columns; column++) {
-                    const date = firstDay.clone().locale(this.$i18n.locale).add(column, 'days');
-                    this.canvas.add(new fabric.Textbox(date.format('dddd').toUpperCase(), {
-                        left: column * columnWidth, top: 0,
-                        width: columnWidth, height: headerHeight,
-                        textAlign: 'center',
-                        fontFamily: 'Nunito, sans-serif',
-                        fontSize: 10,
-                        fontWeight: 600,
-                        fill: '#2E2EF9',
-                        ...fabricObjectOptions,
-                    }));
+                    const date = firstDay
+                        .clone()
+                        .locale(this.$i18n.locale)
+                        .add(column, 'days');
+                    this.canvas.add(
+                        new fabric.Textbox(date.format('dddd').toUpperCase(), {
+                            left: column * columnWidth,
+                            top: 0,
+                            width: columnWidth,
+                            height: headerHeight,
+                            textAlign: 'center',
+                            fontFamily: 'Nunito, sans-serif',
+                            fontSize: 10,
+                            fontWeight: 600,
+                            fill: '#2E2EF9',
+                            ...fabricObjectOptions,
+                        }),
+                    );
                 }
 
                 const { timePerDay } = this;
@@ -109,99 +121,118 @@
 
                         // Selected cell background
                         if (isInSelection) {
-                            this.canvas.add(new fabric.Rect({
-                                left: cellLeft + 1, top: cellTop + 1,
-                                width: columnWidth - 2, height: rowHeight - 2,
-                                fill: '#F4F4FF',
-                                strokeWidth: 0,
-                                clipPath: new fabric.Rect({
-                                    left: 0, top: headerHeight,
-                                    width: width - 1, height: rows * rowHeight - 1,
-                                    rx: 20, ry: 20,
-                                    absolutePositioned: true,
+                            this.canvas.add(
+                                new fabric.Rect({
+                                    left: cellLeft + 1,
+                                    top: cellTop + 1,
+                                    width: columnWidth - 2,
+                                    height: rowHeight - 2,
+                                    fill: '#F4F4FF',
+                                    strokeWidth: 0,
+                                    clipPath: new fabric.Rect({
+                                        left: 0,
+                                        top: headerHeight,
+                                        width: width - 1,
+                                        height: rows * rowHeight - 1,
+                                        rx: 20,
+                                        ry: 20,
+                                        absolutePositioned: true,
+                                    }),
+                                    ...fabricObjectOptions,
                                 }),
-                                ...fabricObjectOptions,
-                            }));
+                            );
                         }
 
                         // Date label
-                        this.canvas.add(new fabric.Textbox(date.format('D'), {
-                            left: cellLeft, top: cellTop + 10,
-                            width: columnWidth - 13, height: rowHeight,
-                            textAlign: 'right',
-                            fontFamily: 'Nunito, sans-serif',
-                            fontSize: 15,
-                            fontWeight: isInSelection ? 600 : 400,
-                            fill: isInSelection ? '#2E2EF9' : (isInSelectedMonth ? '#59566E' : '#B1B1BE'),
-                            ...fabricObjectOptions,
-                        }));
+                        this.canvas.add(
+                            new fabric.Textbox(date.format('D'), {
+                                left: cellLeft,
+                                top: cellTop + 10,
+                                width: columnWidth - 13,
+                                height: rowHeight,
+                                textAlign: 'right',
+                                fontFamily: 'Nunito, sans-serif',
+                                fontSize: 15,
+                                fontWeight: isInSelection ? 600 : 400,
+                                fill: isInSelection ? '#2E2EF9' : isInSelectedMonth ? '#59566E' : '#B1B1BE',
+                                ...fabricObjectOptions,
+                            }),
+                        );
 
                         // Worked time label
                         const dateKey = date.format('YYYY-MM-DD');
                         if (timePerDay[dateKey]) {
-                            this.canvas.add(new fabric.Textbox(this.formatDuration(timePerDay[dateKey]), {
-                                left: cellLeft + 13, top: cellTop + rowHeight - 30,
-                                width: columnWidth, height: rowHeight,
-                                textAlign: 'left',
-                                fontFamily: 'Nunito, sans-serif',
-                                fontSize: 15,
-                                fontWeight: isInSelection ? 600 : 400,
-                                fill: '#59566E',
-                                ...fabricObjectOptions,
-                            }));
+                            this.canvas.add(
+                                new fabric.Textbox(this.formatDuration(timePerDay[dateKey]), {
+                                    left: cellLeft + 13,
+                                    top: cellTop + rowHeight - 30,
+                                    width: columnWidth,
+                                    height: rowHeight,
+                                    textAlign: 'left',
+                                    fontFamily: 'Nunito, sans-serif',
+                                    fontSize: 15,
+                                    fontWeight: isInSelection ? 600 : 400,
+                                    fill: '#59566E',
+                                    ...fabricObjectOptions,
+                                }),
+                            );
                         }
 
                         // Selected cell bottom border
                         if (isInSelection) {
-                            this.canvas.add(new fabric.Line([
-                                0, 0,
-                                columnWidth, 0,
-                            ], {
-                                left: columnWidth * column, top: cellTop + rowHeight - 3,
-                                stroke: '#2E2EF9',
-                                strokeWidth: 3,
-                                rx: 1.5, ry: 1.5,
-                                clipPath: new fabric.Rect({
-                                    left: 0, top: headerHeight,
-                                    width: width - 1, height: rows * rowHeight - 1,
-                                    rx: 20, ry: 20,
-                                    absolutePositioned: true,
+                            this.canvas.add(
+                                new fabric.Line([0, 0, columnWidth, 0], {
+                                    left: columnWidth * column,
+                                    top: cellTop + rowHeight - 3,
+                                    stroke: '#2E2EF9',
+                                    strokeWidth: 3,
+                                    rx: 1.5,
+                                    ry: 1.5,
+                                    clipPath: new fabric.Rect({
+                                        left: 0,
+                                        top: headerHeight,
+                                        width: width - 1,
+                                        height: rows * rowHeight - 1,
+                                        rx: 20,
+                                        ry: 20,
+                                        absolutePositioned: true,
+                                    }),
+                                    ...fabricObjectOptions,
                                 }),
-                                ...fabricObjectOptions,
-                            }));
+                            );
                         }
                     }
                 }
 
                 // Horizontal grid lines
                 for (let row = 1; row < rows; row++) {
-                    this.canvas.add(new fabric.Line([
-                        0, 0,
-                        width, 0,
-                    ], {
-                        left: 0, top: rowHeight * row + headerHeight,
-                        stroke: '#DFE5ED',
-                        strokeWidth: 1,
-                        ...fabricObjectOptions,
-                    }));
+                    this.canvas.add(
+                        new fabric.Line([0, 0, width, 0], {
+                            left: 0,
+                            top: rowHeight * row + headerHeight,
+                            stroke: '#DFE5ED',
+                            strokeWidth: 1,
+                            ...fabricObjectOptions,
+                        }),
+                    );
                 }
 
                 // Vertical grid lines
                 for (let column = 1; column < columns; column++) {
-                    this.canvas.add(new fabric.Line([
-                        0, 0,
-                        0, rowHeight * rows,
-                    ], {
-                        left: columnWidth * column, top: 20,
-                        stroke: '#DFE5ED',
-                        strokeWidth: 1,
-                        ...fabricObjectOptions,
-                    }));
+                    this.canvas.add(
+                        new fabric.Line([0, 0, 0, rowHeight * rows], {
+                            left: columnWidth * column,
+                            top: 20,
+                            stroke: '#DFE5ED',
+                            strokeWidth: 1,
+                            ...fabricObjectOptions,
+                        }),
+                    );
                 }
 
                 this.canvas.requestRenderAll();
             }),
-            onResize: debounce(function () {
+            onResize: debounce(function() {
                 const { width } = this.$refs.canvasWrapper.getBoundingClientRect();
                 this.canvas.setWidth(width);
 

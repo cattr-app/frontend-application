@@ -4,11 +4,13 @@ import TasksService from '@/service/resource/tasksService';
 import LazySelect from './components/LazySelect';
 import DatetimeInput from './components/DatetimeInput';
 import moment from 'moment';
+import axios from 'axios';
+import env from '_app/etc/env';
 
 export const ModuleConfig = {
     enabled: true,
     routerPrefix: 'time-intervals',
-    loadOrder: 1
+    loadOrder: 1,
 };
 
 export function init(context, router) {
@@ -24,7 +26,7 @@ export function init(context, router) {
             key: 'user_id',
             type: 'resource-select',
             service: new UsersService(),
-            required: true
+            required: true,
         },
         {
             label: 'field.task',
@@ -35,18 +37,21 @@ export function init(context, router) {
                         service: new TasksService(),
                         inputHandler: props.inputHandler,
                         userID: props.values.user_id,
-                    }
+                    },
                 });
             },
-            required: true
+            required: true,
         },
         {
             label: 'field.start_at',
             key: 'start_at',
             render: (h, props) => {
-                const value = typeof props.currentValue === 'string'
-                    ? props.currentValue
-                    : moment().startOf('hour').toISOString();
+                const value =
+                    typeof props.currentValue === 'string'
+                        ? props.currentValue
+                        : moment()
+                              .startOf('hour')
+                              .toISOString();
 
                 return h(DatetimeInput, {
                     props: {
@@ -54,31 +59,39 @@ export function init(context, router) {
                         value,
                     },
                     on: {
-                        change: (value) => {
-                            value = moment(value).add(10, 'minutes').toISOString();
+                        change: value => {
+                            value = moment(value)
+                                .add(10, 'minutes')
+                                .toISOString();
                             props.setValue('end_at', value);
+
+                            // Set is_manual for task here, because it`s stupid to fill it manually each time
+                            props.setValue('is_manual', true);
                         },
                     },
                 });
             },
-            required: true
+            required: true,
         },
         {
             label: 'field.end_at',
             key: 'end_at',
             render: (h, props) => {
-                const value = typeof props.currentValue === 'string'
-                    ? props.currentValue
-                    : moment().startOf('day').toISOString();
+                const value =
+                    typeof props.currentValue === 'string'
+                        ? props.currentValue
+                        : moment()
+                              .startOf('day')
+                              .toISOString();
 
                 return h(DatetimeInput, {
                     props: {
                         inputHandler: props.inputHandler,
                         value,
-                    }
+                    },
                 });
             },
-            required: true
+            required: true,
         },
     ];
 
@@ -88,7 +101,7 @@ export function init(context, router) {
 
     context.addLocalizationData({
         en: require('./locales/en'),
-        ru: require('./locales/ru')
+        ru: require('./locales/ru'),
     });
 
     return context;

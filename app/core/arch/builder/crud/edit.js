@@ -1,9 +1,7 @@
-import AbstractCrud from "./abstractCrud";
-import Store from "../../../store";
-
+import AbstractCrud from './abstractCrud';
+import Store from '../../../store';
 
 export default class Edit extends AbstractCrud {
-
     context = {};
     routerConfig = {};
 
@@ -14,7 +12,7 @@ export default class Edit extends AbstractCrud {
         this.routerConfig = {
             path: `${context.routerPrefix}${context.defaultPrefix.length ? '/' + context.defaultPrefix : ''}/edit/:id`,
             name: this.getEditRouteName(),
-            component: () => import(/* webpackChunkName: "itemview" */ '../../../views/Crud/EditView.vue'),
+            component: () => import(/* webpackChunkName: "editview" */ '../../../views/Crud/EditView.vue'),
             meta: {
                 auth: true,
                 service: context.serviceClass,
@@ -25,8 +23,8 @@ export default class Edit extends AbstractCrud {
                     title: context.crudName,
                     type: 'edit',
                     pageControls: [],
-                }
-            }
+                },
+            },
         };
     }
 

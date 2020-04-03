@@ -9,39 +9,42 @@
                         </h1>
 
                         <div class="control-items">
-                            <at-button size="large" @click="$router.go(-1)" class="control-item">{{ $t('control.back') }}
+                            <at-button size="large" class="control-item" @click="$router.go(-1)"
+                                >{{ $t('control.back') }}
                             </at-button>
                             <template v-if="pageData.pageControls && pageData.pageControls.length > 0">
                                 <template v-for="(button, key) of pageData.pageControls">
                                     <at-button
-                                            class="control-item"
-                                            :key="key"
-                                            size="large"
-                                            :type="button.renderType || ''"
-                                            :icon="button.icon || ''"
-                                            @click="handleClick(button)"
-                                            v-if="checkRenderCondition(button)"
-                                    >{{ $t(button.label) }}
+                                        v-if="checkRenderCondition(button)"
+                                        :key="key"
+                                        class="control-item"
+                                        size="large"
+                                        :type="button.renderType || ''"
+                                        :icon="button.icon || ''"
+                                        @click="handleClick(button)"
+                                        >{{ $t(button.label) }}
                                     </at-button>
                                 </template>
                             </template>
                         </div>
                     </div>
-                    <component v-for="(component, index) of pageData.topComponents" :key="index"
-                               :is="component" :parent="this"></component>
+                    <component
+                        :is="component"
+                        v-for="(component, index) of pageData.topComponents"
+                        :key="index"
+                        :parent="this"
+                    ></component>
                     <div class="data-entries">
-                        <div class="data-entry" v-for="(field, key) of fields" v-bind:key="key">
+                        <div v-for="(field, key) of fields" v-bind:key="key" class="data-entry">
                             <div class="row">
-                                <div class="col-6 label">
-                                    {{ $t(field.label) }}:
-                                </div>
+                                <div class="col-6 label">{{ $t(field.label) }}:</div>
                                 <div class="col">
                                     <Skeleton :loading="isDataLoading">
                                         <renderable-field
-                                                v-if="typeof field.render !== 'undefined' && Object.keys(values).length > 0"
-                                                :render="field.render"
-                                                :value="values[field.key]"
-                                                :field="field"
+                                            v-if="typeof field.render !== 'undefined' && Object.keys(values).length > 0"
+                                            :render="field.render"
+                                            :value="values[field.key]"
+                                            :field="field"
                                         ></renderable-field>
                                         <template v-else>{{ values[field.key] }}</template>
                                     </Skeleton>
@@ -49,8 +52,12 @@
                             </div>
                         </div>
                     </div>
-                    <component v-for="(component, index) of pageData.bottomComponents" v-bind:key="index"
-                               v-bind:is="component" :parent="this"></component>
+                    <component
+                        v-bind:is="component"
+                        v-for="(component, index) of pageData.bottomComponents"
+                        v-bind:key="index"
+                        :parent="this"
+                    ></component>
                 </div>
             </div>
             <!-- /.col-24 -->
@@ -68,15 +75,15 @@
 
         components: {
             RenderableField,
-            Skeleton
+            Skeleton,
         },
 
         computed: {
             title() {
-                const {fields, values, service, filters, pageData} = this;
-                const {titleCallback} = this.$route.meta;
+                const { fields, values, service, filters, pageData } = this;
+                const { titleCallback } = this.$route.meta;
                 if (typeof titleCallback === 'function') {
-                    return titleCallback({fields, values, service, filters, pageData});
+                    return titleCallback({ fields, values, service, filters, pageData });
                 }
 
                 return this.$t(pageData.title);
@@ -96,10 +103,10 @@
                     title: pageData.title || null,
                     topComponents: pageData.topComponents || [],
                     bottomComponents: pageData.bottomComponents || [],
-                    pageControls: pageData.pageControls || []
+                    pageControls: pageData.pageControls || [],
                 },
 
-                isDataLoading: false
+                isDataLoading: false,
             };
         },
 
@@ -108,14 +115,17 @@
 
             this.isDataLoading = true;
 
-            await this.service.getItem(id, this.filters).then(({ data }) => {
-                this.isDataLoading = false;
-                this.values = data;
-            }).catch(({ response }) => {
-                if (response.data.error_type === 'query.item_not_found') {
-                    this.$router.push({ name: 'forbidden' });
-                }
-            });
+            await this.service
+                .getItem(id, this.filters)
+                .then(({ data }) => {
+                    this.isDataLoading = false;
+                    this.values = data;
+                })
+                .catch(({ response }) => {
+                    if (response.data.error_type === 'query.item_not_found') {
+                        this.$router.push({ name: 'forbidden' });
+                    }
+                });
         },
 
         methods: {
@@ -125,8 +135,8 @@
 
             checkRenderCondition(button) {
                 return typeof button.renderCondition !== 'undefined' ? button.renderCondition(this) : true;
-            }
-        }
+            },
+        },
     };
 </script>
 
@@ -139,7 +149,7 @@
                 justify-content: space-between;
 
                 .control-item {
-                    margin-right: .5em;
+                    margin-right: 0.5em;
 
                     &:last-child {
                         margin-right: 0;

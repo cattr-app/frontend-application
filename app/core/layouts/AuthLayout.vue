@@ -1,15 +1,13 @@
 <template>
     <div class="auth-layout">
-        <slot/>
+        <slot />
     </div>
 </template>
 
 <script>
     export default {
-        name: "AuthLayout"
-    }
+        name: 'auth-layout',
+    };
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

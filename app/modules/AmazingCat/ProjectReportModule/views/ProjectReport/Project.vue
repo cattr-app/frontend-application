@@ -5,8 +5,8 @@
             <span class="h3">{{ formatDurationString(project.project_time) }}</span>
         </div>
         <at-collapse simple class="list__item">
-            <at-collapse-item class="list__item" v-for="user in project.users" :key="user.id">
-                <div class="row flex-middle" slot="title">
+            <at-collapse-item v-for="user in project.users" :key="user.id" class="list__item">
+                <div slot="title" class="row flex-middle">
                     <div class="col-3 col-xs-2 col-md-1">
                         <user-avatar :user="user" :size="avatarSize"></user-avatar>
                     </div>
@@ -17,17 +17,18 @@
                         <span class="h4">{{ formatDurationString(user.tasks_time) }}</span>
                     </div>
                     <div class="col-10">
-                        <at-progress status="success"
-                                     :stroke-width="15"
-                                     :percent="getUserPercentage(user.tasks_time, project.project_time)">
+                        <at-progress
+                            status="success"
+                            :stroke-width="15"
+                            :percent="getUserPercentage(user.tasks_time, project.project_time)"
+                        >
                         </at-progress>
                     </div>
                 </div>
 
-                <at-collapse @on-change="handleCollapseTask(user, $event)" simple accordion>
-                    <at-collapse-item v-for="task in user.tasks" :key="`tasks-${task.id}`"
-                                      :name="task.id">
-                        <div class="row" slot="title">
+                <at-collapse simple accordion @on-change="handleCollapseTask(user, $event)">
+                    <at-collapse-item v-for="task in user.tasks" :key="`tasks-${task.id}`" :name="task.id">
+                        <div slot="title" class="row">
                             <div class="col-10 col-md-11 col-lg-12">
                                 <span class="h4">{{ task.task_name }}</span>
                             </div>
@@ -35,20 +36,29 @@
                                 <span class="h4">{{ formatDurationString(task.duration) }}</span>
                             </div>
                             <div class="col-10">
-                                <at-progress status="success"
-                                             :stroke-width="15"
-                                             :percent="getUserPercentage(task.duration, user.tasks_time)">
+                                <at-progress
+                                    status="success"
+                                    :stroke-width="15"
+                                    :percent="getUserPercentage(task.duration, user.tasks_time)"
+                                >
                                 </at-progress>
                             </div>
                         </div>
-                        <at-collapse class="project__screenshots screenshots" @on-change="handleCollapseDate" accordion>
+                        <at-collapse class="project__screenshots screenshots" accordion @on-change="handleCollapseDate">
                             <span class="screenshots__title">{{ $t('field.screenshots') }}</span>
-                            <at-collapse-item v-for="(dateScreens, date) of task.screenshots"
-                                              :key="date"
-                                              :name="`${task.id}-${date}`">
-                                <div class="row" slot="title">
+                            <at-collapse-item
+                                v-for="(dateScreens, date) of task.screenshots"
+                                :key="date"
+                                :name="`${task.id}-${date}`"
+                            >
+                                <div slot="title" class="row">
                                     <div class="col-12">
-                                        <span class="h5">{{ moment(date).locale($i18n.locale).format('MMMM DD, YYYY') }}
+                                        <span class="h5 screenshots__date"
+                                            >{{
+                                                moment(date)
+                                                    .locale($i18n.locale)
+                                                    .format('MMMM DD, YYYY')
+                                            }}
                                         </span>
                                     </div>
                                     <div class="col-12">
@@ -58,26 +68,30 @@
 
                                 <template v-if="isDateOpened(`${task.id}-${date}`)">
                                     <template v-for="(hourScreens, idx) in dateScreens">
-                                        <div class="row"
-                                            :key="`screen-${task.id}-${date}-${idx}`">
-                                            <div class="col-12 col-md-6 col-lg-4"
-                                                 :key="index" v-for="(interval, index) in getHourRow(hourScreens)">
-                                                <Screenshot v-if="interval"
-                                                            class="screenshots__item"
-                                                            :key="index"
-                                                            :screenshot="interval"
-                                                            :user="user"
-                                                            :task="task"
-                                                            :disableModal="true"
-                                                            :showNavigation="true"
-                                                            :showTask="false"
-                                                            @click="onShow(dateScreens, interval, user, task)"
+                                        <div :key="`screen-${task.id}-${date}-${idx}`" class="row">
+                                            <div
+                                                v-for="(interval, index) in getHourRow(hourScreens)"
+                                                :key="index"
+                                                class="col-12 col-md-6 col-lg-4"
+                                            >
+                                                <Screenshot
+                                                    v-if="interval"
+                                                    :key="index"
+                                                    class="screenshots__item"
+                                                    :screenshot="interval"
+                                                    :user="user"
+                                                    :task="task"
+                                                    :disableModal="true"
+                                                    :showNavigation="true"
+                                                    :showTask="false"
+                                                    @click="onShow(dateScreens, interval, user, task)"
                                                 ></Screenshot>
 
-                                                <div v-else
-                                                     :key="index"
-                                                     class="screenshots__item screenshots__placeholder">
-                                                </div>
+                                                <div
+                                                    v-else
+                                                    :key="index"
+                                                    class="screenshots__item screenshots__placeholder"
+                                                ></div>
                                             </div>
                                         </div>
                                     </template>
@@ -86,20 +100,19 @@
                         </at-collapse>
                     </at-collapse-item>
                 </at-collapse>
-
             </at-collapse-item>
         </at-collapse>
 
         <ScreenshotModal
-                :show="modal.show"
-                :screenshot="modal.screenshot"
-                :project="modal.project"
-                :task="modal.task"
-                :user="modal.user"
-                :showNavigation="true"
-                @close="onHide"
-                @showPrevious="onShowPrevious"
-                @showNext="onShowNext"
+            :show="modal.show"
+            :screenshot="modal.screenshot"
+            :project="modal.project"
+            :task="modal.task"
+            :user="modal.user"
+            :showNavigation="true"
+            @close="onHide"
+            @showPrevious="onShowPrevious"
+            @showNext="onShowNext"
         />
     </div>
 </template>
@@ -107,9 +120,9 @@
 <script>
     import moment from 'moment';
     import env from '_app/etc/env';
-    import Screenshot from "@/components/Screenshot";
-    import ScreenshotModal from "@/components/ScreenshotModal";
-    import UserAvatar from "@/components/UserAvatar";
+    import Screenshot from '@/components/Screenshot';
+    import ScreenshotModal from '@/components/ScreenshotModal';
+    import UserAvatar from '@/components/UserAvatar';
     import ProjectReportService from '@/service/reports/ProjectReportService';
     import { getEndDay, getStartDay, formatDurationString } from '@/utils/time';
 
@@ -124,7 +137,7 @@
 
         data() {
             return {
-                apiPath: (env.API_URL || `${window.location.origin}/api`),
+                apiPath: env.API_URL || `${window.location.origin}/api`,
                 modal: {
                     show: false,
                     dateScreenshots: {},
@@ -137,14 +150,14 @@
                 avatarSize: 35,
                 reportService: new ProjectReportService(),
                 taskDurations: {},
-                screenshotsPerRow: 6
-            }
+                screenshotsPerRow: 6,
+            };
         },
 
         props: {
             project: {
                 type: Object,
-                required: true
+                required: true,
             },
             start: {
                 type: String,
@@ -187,9 +200,24 @@
                 };
             },
 
+            onKeyDown(e) {
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    this.onShowPrevious();
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    this.onShowNext();
+                }
+            },
+
             onShowPrevious() {
-                const screenshots = Object.values(this.modal.dateScreenshots)
-                    .reduce((total, current) => total.concat(current), []);
+                const screenshots = Object.values(this.modal.dateScreenshots).reduce((total, current) => {
+                    if (Array.isArray(current)) {
+                        return total.concat(current);
+                    } else {
+                        return total.concat(Object.values(current));
+                    }
+                }, []);
                 const currentIndex = screenshots
                     .filter(screenshot => screenshot)
                     .findIndex(screenshot => +screenshot.id === +this.modal.screenshot.id);
@@ -205,8 +233,13 @@
             },
 
             onShowNext() {
-                const screenshots = Object.values(this.modal.dateScreenshots)
-                    .reduce((total, current) => total.concat(current), []);
+                const screenshots = Object.values(this.modal.dateScreenshots).reduce((total, current) => {
+                    if (Array.isArray(current)) {
+                        return total.concat(current);
+                    } else {
+                        return total.concat(Object.values(current));
+                    }
+                }, []);
                 const currentIndex = screenshots
                     .filter(screenshot => screenshot)
                     .findIndex(screenshot => +screenshot.id === +this.modal.screenshot.id);
@@ -219,16 +252,6 @@
                     show: true,
                     screenshot: screenshots[currentIndex + 1],
                 };
-            },
-
-            onKeyDown(e) {
-                if (e.key === 'ArrowLeft') {
-                    e.preventDefault();
-                    this.onShowPrevious();
-                } else if (e.key === 'ArrowRight') {
-                    e.preventDefault();
-                    this.onShowNext();
-                }
             },
 
             isDateOpened(collapseId) {
@@ -252,7 +275,7 @@
             },
 
             getDateTime(task, date) {
-                date = moment(date).format("YYYY-MM-DD");
+                date = moment(date).format('YYYY-MM-DD');
                 return this.formatDurationString(task.dates[date]);
             },
 
@@ -267,14 +290,14 @@
             getHourRow(screenshots) {
                 let result = new Array(this.screenshotsPerRow).fill(null);
 
-                for(let key in screenshots) {
+                for (let key in screenshots) {
                     if (screenshots.hasOwnProperty(key)) {
                         result[key] = screenshots[key];
                     }
                 }
                 return result;
             },
-        }
+        },
     };
 </script>
 
@@ -309,6 +332,10 @@
             font-weight: bold;
         }
 
+        &__date {
+            padding-left: 20px;
+        }
+
         &__item {
             margin-bottom: $spacing-04;
         }
@@ -327,6 +354,17 @@
             img {
                 object-fit: cover;
                 height: 150px;
+            }
+
+            .at-collapse__icon {
+                top: 20px;
+                left: 0;
+
+                color: black;
+            }
+
+            .at-collapse__icon.icon-chevron-right {
+                display: block;
             }
         }
     }

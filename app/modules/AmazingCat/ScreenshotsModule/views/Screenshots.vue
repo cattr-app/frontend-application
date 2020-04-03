@@ -3,28 +3,26 @@
         <h1 class="page-title">{{ $t('navigation.screenshots') }}</h1>
         <div class="controls-row">
             <div class="controls-row__item">
-                <Calendar
-                        :start="datepicker.date.start"
-                        :end="datepicker.date.end"
-                        @change="onCalendarChange"
-                />
+                <Calendar :sessionStorageKey="sessionStorageKey" @change="onCalendarChange" />
             </div>
             <div class="controls-row__item">
                 <UserSelect @change="onUsersChange"></UserSelect>
             </div>
             <div class="controls-row__item">
-                <multi-select name="projects"
-                              :inputHandler="selectedProjects"
-                              :service="projectService">
-                </multi-select>
+                <ProjectSelect @change="onProjectsChange"></ProjectSelect>
             </div>
         </div>
         <div class="at-container">
             <div class="at-container__inner">
                 <template v-if="this.screenshots.length > 0">
                     <div class="row">
-                        <div class="col-4 screenshots__card" v-for="screenshot in this.screenshots" :key="screenshot.id">
-                            <Screenshot class="screenshot"
+                        <div
+                            v-for="screenshot in this.screenshots"
+                            :key="screenshot.id"
+                            class="col-4 screenshots__card"
+                        >
+                            <Screenshot
+                                class="screenshot"
                                 :disableModal="true"
                                 :screenshot="screenshot"
                                 :task="screenshot.timeinterval.task"
@@ -34,24 +32,17 @@
                         </div>
                     </div>
 
-                    <div class="screenshots__pagination">
-                        <at-pagination :total="screenshotsTotal"
-                                       :current="page"
-                                       :page-size="limit"
-                                       @page-change="loadPage"
-                        ></at-pagination>
-                    </div>
-
-                    <ScreenshotModal :project="modal.project"
-                                     :screenshot="modal.screenshot"
-                                     :show="modal.show"
-                                     :showNavigation="true"
-                                     :task="modal.task"
-                                     :user="modal.user"
-                                     @close="onHide"
-                                     @remove="removeScreenshot"
-                                     @showNext="showNext"
-                                     @showPrevious="showPrevious"
+                    <ScreenshotModal
+                        :project="modal.project"
+                        :screenshot="modal.screenshot"
+                        :show="modal.show"
+                        :showNavigation="true"
+                        :task="modal.task"
+                        :user="modal.user"
+                        @close="onHide"
+                        @remove="removeScreenshot"
+                        @showNext="showNext"
+                        @showPrevious="showPrevious"
                     />
                 </template>
 
@@ -61,48 +52,51 @@
                 <preloader v-if="isDataLoading"></preloader>
             </div>
         </div>
+        <div class="screenshots__pagination">
+            <at-pagination
+                :total="screenshotsTotal"
+                :current="page"
+                :page-size="limit"
+                @page-change="loadPage"
+            ></at-pagination>
+        </div>
     </div>
 </template>
 
 <script>
     import { mapGetters } from 'vuex';
-    import Calendar from "@/components/Calendar";
-    import Screenshot from "@/components/Screenshot";
+    import Calendar from '@/components/Calendar';
+    import Screenshot from '@/components/Screenshot';
     import ScreenshotModal from '@/components/ScreenshotModal';
-    import UserSelect from "@/components/UserSelect";
-    import ProjectService from "@/service/resource/projectService";
-    import ScreenshotService from "@/service/resource/screenshotService";
-    import { formatDate, formatDurationString } from '@/utils/time';
-    import {getDateToday, getEndDay, getStartDay} from "@/utils/time";
-    import MultiSelect from "@/components/MultiSelect";
+    import UserSelect from '@/components/UserSelect';
+    import ProjectService from '@/service/resource/projectService';
+    import ScreenshotService from '@/service/resource/screenshotService';
+    import { getDateToday, getEndDay, getStartDay } from '@/utils/time';
     import Preloader from '@/components/Preloader';
+    import ProjectSelect from '@/components/ProjectSelect';
 
     export default {
-        name: "Screenshots",
+        name: 'Screenshots',
         components: {
             Calendar,
             Screenshot,
             ScreenshotModal,
             UserSelect,
-            MultiSelect,
-            Preloader
+            Preloader,
+            ProjectSelect,
         },
 
         data() {
             const limit = 30;
-            const today = this.getDateToday();
             const localStorageKey = 'user-select.users';
+            const sessionStorageKey = 'amazingcat.session.storage.screenshots';
 
             return {
                 screenshots: [],
                 userIDs: null,
                 projectsList: [],
-                datepicker: {
-                    date: {
-                        start: today,
-                        end: today,
-                    }
-                },
+                datepickerDateStart: '',
+                datepickerDateEnd: '',
                 projectService: new ProjectService(),
                 screenshotsService: new ScreenshotService(),
                 modal: {
@@ -112,47 +106,50 @@
                 page: 1,
                 screenshotsTotal: 0,
                 localStorageKey: localStorageKey,
-                isDataLoading: false
-            }
+                sessionStorageKey: sessionStorageKey,
+                isDataLoading: false,
+            };
         },
 
         computed: {
-            ...mapGetters('timeline', [
-                'service',
-                'users',
-            ]),
-            ...mapGetters('user', [
-                'user',
-            ]),
-        },
-
-        watch: {
-            'datepicker.date': function () {
-                this.getScreenshots();
-            },
+            ...mapGetters('timeline', ['service', 'users']),
+            ...mapGetters('user', ['user']),
         },
 
         async mounted() {
+            window.addEventListener('keydown', this.onKeyDown);
+
             await this.getScreenshots();
         },
 
+        beforeDestroy() {
+            window.removeEventListener('keydown', this.onKeyDown);
+        },
+
         methods: {
-            formatDate,
-            formatDurationString,
             getStartDay,
             getEndDay,
-            getDateToday,
-            onHide () {
+
+            onHide() {
                 this.modal.show = false;
             },
-            showPrevious () {
+            onKeyDown(e) {
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    this.showPrevious();
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    this.showNext();
+                }
+            },
+            showPrevious() {
                 const currentIndex = this.screenshots.findIndex(x => x.id === this.modal.screenshot.id);
 
                 if (currentIndex !== 0) {
                     this.modal.screenshot = this.screenshots[currentIndex - 1];
                 }
             },
-            showNext () {
+            showNext() {
                 const currentIndex = this.screenshots.findIndex(x => x.id === this.modal.screenshot.id);
 
                 if (currentIndex + 1 !== this.screenshots.length) {
@@ -160,32 +157,31 @@
                 }
             },
             showImage(screenshot) {
-                const userId = screenshot.timeinterval.user_id;
-                const availableUsers = this.users;
-
-                const user = availableUsers.find(user => user.id === userId);
-
                 this.modal = {
-                    user,
                     screenshot,
+                    user: screenshot.timeinterval.user,
                     task: screenshot.timeinterval.task,
-                    show: true
+                    project: screenshot.timeinterval.task?.project,
+                    show: true,
                 };
             },
-
             onUsersChange(userIDs) {
                 this.userIDs = userIDs;
                 if (this._isMounted) {
                     this.getScreenshots();
                 }
             },
-
-            onCalendarChange({start, end}) {
-                this.datepicker.date.start = start;
-                this.datepicker.date.end = end;
+            onProjectsChange(projectIDs) {
+                this.projectsList = projectIDs;
+                if (this._isMounted) {
+                    this.getScreenshots();
+                }
+            },
+            onCalendarChange({ start, end }) {
+                this.datepickerDateStart = start;
+                this.datepickerDateEnd = end;
                 this.getScreenshots();
             },
-
             async getScreenshots() {
                 if (this.userIDs === 'undefined') {
                     return;
@@ -193,31 +189,28 @@
 
                 this.isDataLoading = true;
 
-                let {data, total} = (await this.screenshotsService.getWithFilters({
+                let { data } = await this.screenshotsService.getWithFilters({
                     'timeInterval.user_id': ['in', this.userIDs],
                     'timeInterval.task.project_id': ['in', this.projectsList],
-                    'timeInterval.start_at': ['>=', this.getStartDay(this.datepicker.date.start)],
-                    'timeInterval.end_at': ['<=', this.getEndDay(this.datepicker.date.end)],
+                    'timeInterval.start_at': ['>=', this.getStartDay(this.datepickerDateStart)],
+                    'timeInterval.end_at': ['<=', this.getEndDay(this.datepickerDateEnd)],
                     paginate: true,
                     perPage: this.limit,
                     page: this.page,
-                    with: 'timeinterval.task',
-                }).then(({ data }) => {
-                    this.isDataLoading = false;
-                    return data;
-                }));
+                    with: 'timeinterval.task,timeinterval.task.project,timeinterval.user',
+                });
 
-                this.screenshotsTotal = total;
-                this.screenshots = data;
+                this.isDataLoading = false;
+                this.screenshotsTotal = data.total;
+                this.screenshots = data.data;
             },
-
             async removeScreenshot(screenshot) {
                 try {
                     await this.screenshotsService.deleteItem(screenshot.id);
                     this.$Notify({
                         type: 'success',
                         title: 'Deleted Successfully',
-                        message: 'Screenshot was deleted successfully'
+                        message: 'Screenshot was deleted successfully',
                     });
 
                     this.screenshots = this.screenshots.filter(screen => screen.id !== screenshot.id);
@@ -225,27 +218,22 @@
                     this.$Notify({
                         type: 'error',
                         title: 'Deletion Error',
-                        message: 'This screenshot can not be deleted OR something unusual happened during the request'
+                        message: 'This screenshot can not be deleted OR something unusual happened during the request',
                     });
                 }
             },
-
             async loadPage(page) {
                 this.page = page;
                 await this.getScreenshots();
             },
-
-            selectedProjects(values) {
-                this.projectsList = values;
-                this.getScreenshots();
-            }
-        }
-    }
+        },
+    };
 </script>
 
 <style lang="scss" scoped>
     .at-container {
         overflow: hidden;
+        margin-bottom: $layout-01;
 
         &__inner {
             position: relative;
@@ -256,7 +244,6 @@
         &__card {
             margin-bottom: $layout-02;
             cursor: pointer;
-            border-radius: 10px;
         }
 
         &__pagination {
@@ -265,8 +252,13 @@
         }
     }
 
-    .screenshot {
-        height: 150px;
+    .screenshot::v-deep {
+        .screenshot-image {
+            img {
+                height: 150px;
+                border-radius: 5px;
+            }
+        }
     }
 
     .no-data {

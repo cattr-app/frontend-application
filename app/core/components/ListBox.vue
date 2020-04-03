@@ -1,6 +1,6 @@
 <template>
     <ul class="listbox">
-        <li class="listbox__item" v-for="(value, index) of values" :key="value[keyField]">
+        <li v-for="(value, index) of values" :key="value[keyField]" class="listbox__item">
             <at-checkbox :checked="value[valueField]" @on-change="onChange(index, $event)">
                 {{ value[labelField] }}
             </at-checkbox>
@@ -46,11 +46,11 @@
 
 <style lang="scss" scoped>
     .listbox {
-        border: 1px solid #C5D9E8;
+        border: 1px solid #c5d9e8;
         border-radius: 4px;
-        transition: border .2s;
+        transition: border 0.2s;
 
-        margin-bottom: .75em;
+        margin-bottom: 0.75em;
         padding: 8px 12px;
 
         min-height: 40px;
@@ -59,7 +59,7 @@
         overflow-y: auto;
 
         &:hover {
-            border-color: #79A1EB;
+            border-color: #79a1eb;
         }
     }
 </style>

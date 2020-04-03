@@ -1,14 +1,22 @@
 import Builder from '../builder';
-import View from "./crud/view";
-import Edit from "./crud/edit";
-import New from "./crud/new";
+import View from './crud/view';
+import Edit from './crud/edit';
+import New from './crud/new';
 
 export default class Crud extends Builder {
     view = {};
     edit = {};
     new = {};
 
-    constructor(crudName, id, serviceClass, filters = {}, moduleContext, defaultPrefix = '', hasPages = { edit: true, view: true, new: true }) {
+    constructor(
+        crudName,
+        id,
+        serviceClass,
+        filters = {},
+        moduleContext,
+        defaultPrefix = '',
+        hasPages = { edit: true, view: true, new: true },
+    ) {
         super(moduleContext);
 
         this.moduleContext = moduleContext;
@@ -51,5 +59,4 @@ export default class Crud extends Builder {
         }
         return toReturn;
     }
-
 }

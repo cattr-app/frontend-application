@@ -11,7 +11,7 @@ requireModule.keys().forEach(fn => {
 
     modules[camelCase(fn.split('/')[1].replace(/(\.\/|\.js)/g, ''))] = {
         namespaced: true,
-        ...requireModule(fn).default
+        ...requireModule(fn).default,
     };
 });
 

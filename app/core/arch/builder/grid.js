@@ -1,5 +1,5 @@
 import Builder from '../builder';
-import _ from 'lodash';
+import set from 'lodash/set';
 
 export default class Grid extends Builder {
     constructor(label, id, serviceClass, moduleContext, gridData = undefined, gridRouterPath = '') {
@@ -19,12 +19,13 @@ export default class Grid extends Builder {
                     title: label,
                     columns: [],
                     filters: [],
+                    filterFields: [],
                     actions: [],
 
                     service: typeof serviceClass === 'object' ? serviceClass : new serviceClass(),
 
                     ...gridData,
-                }
+                },
             },
         };
     }
@@ -47,6 +48,12 @@ export default class Grid extends Builder {
         return this;
     }
 
+    addFilterField() {
+        const arg = arguments[0];
+        this.addToGridData('filterFields', arg);
+        return this;
+    }
+
     addToGridData(property, data) {
         if (Array.isArray(data)) {
             data.forEach(p => {
@@ -58,7 +65,7 @@ export default class Grid extends Builder {
     }
 
     addToMetaProperties(property, data, routerConfig) {
-        _.set(routerConfig.meta, property, data);
+        set(routerConfig.meta, property, data);
     }
 
     addPageControls() {

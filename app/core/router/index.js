@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Store from '../store/index';
-import { havePermissions } from '../utils/user';
 
 // Fixing new issue with VueRouter caused by new Promise API
 const originalPush = VueRouter.prototype.push;
@@ -18,7 +17,7 @@ const routes = [
         name: 'auth.login',
         meta: {
             auth: false,
-            layout: 'auth-layout'
+            layout: 'auth-layout',
         },
         component: () => import(/* webpackChunkName: "login" */ '../views/Auth/Login.vue'),
         beforeEnter: (to, from, next) => {
@@ -27,48 +26,57 @@ const routes = [
             } else {
                 next();
             }
-        }
+        },
     },
     {
         path: '/auth/password/reset',
         name: 'auth.password.reset',
         meta: {
             auth: false,
-            layout: 'auth-layout'
         },
-        component: () => import('../views/Auth/ResetPassword.vue'),
+        component: () => import(/* webpackChunkName: "ResetPassword" */ '../views/Auth/ResetPassword.vue'),
+    },
+    {
+        path: '/auth/register',
+        name: 'auth.register',
+        meta: {
+            auth: false,
+        },
+        component: () => import(/* webpackChunkName: "Register" */ '../views/Auth/Register.vue'),
     },
     {
         path: '*',
+        name: 'not-found',
         meta: {
-            auth: false
+            auth: false,
         },
-        component: () => import('../views/PageNotFound.vue')
+        component: () => import(/* webpackChunkName: "PageNotFound" */ '../views/PageNotFound.vue'),
     },
     {
         path: '/forbidden',
         name: 'forbidden',
         meta: {
-            auth: false
+            auth: false,
         },
-        component: () => import('../views/PageForbidden.vue')
-    }
+        component: () => import(/* webpackChunkName: "PageForbidden" */ '../views/PageForbidden.vue'),
+    },
 ];
 
 const router = new VueRouter({
     mode: 'history',
     base: process.env.BASE_URL,
-    routes
+    routes,
 });
 
 router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.auth || typeof record.meta.auth === 'undefined')) {
         if (!Store.getters['user/loggedIn']) {
-            return next({name: 'auth.login'});
+            return next({ name: 'auth.login' });
         }
     }
 
-    const requiredPermissions = to.matched.map(record => record.meta.permissions)
+    const requiredPermissions = to.matched
+        .map(record => record.meta.permissions)
         .filter(permissions => permissions)
         .reduce((total, permissions) => total.concat(permissions), []);
 
@@ -76,20 +84,24 @@ router.beforeEach((to, from, next) => {
         return next();
     }
 
-    if (!Object.keys(Store.getters['user/allowedRules']).length) {
-        Store.watch(() => Store.getters['user/allowedRules'], allowedRules => {
-            if (!Store.getters['user/user'].is_admin && !havePermissions(allowedRules, requiredPermissions)) {
-                return next({name: 'forbidden'});
-            }
-            return next();
-        });
-    } else {
-        if (!Store.getters['user/user'].is_admin
-            && !havePermissions(Store.getters['user/allowedRules'], requiredPermissions)
+    const checkPermissions = () => {
+        if (
+            Store.getters['user/user'].is_admin ||
+            requiredPermissions.every(permission => Store.getters['user/canInAnyProject'](permission))
         ) {
-            return next({name: 'forbidden'});
+            return next();
         }
-        return next();
+
+        next({ name: 'forbidden' });
+    };
+
+    if (!Store.getters['user/rulesLoaded']) {
+        Store.watch(
+            () => Store.getters['user/rulesLoaded'],
+            () => checkPermissions(),
+        );
+    } else {
+        checkPermissions();
     }
 });
 

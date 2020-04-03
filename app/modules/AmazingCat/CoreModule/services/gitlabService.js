@@ -1,5 +1,5 @@
-import axios from "@/config/app";
-import SettingsService from "./settingsService";
+import axios from '@/config/app';
+import SettingsService from './settingsService';
 
 /**
  * Section service class.
@@ -7,7 +7,6 @@ import SettingsService from "./settingsService";
  * Data is stored inside store -> settings -> sections -> data
  */
 export default class GitlabService extends SettingsService {
-
     /**
      * API endpoint URL
      * @returns string

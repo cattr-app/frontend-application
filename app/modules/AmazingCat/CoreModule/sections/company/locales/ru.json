@@ -4,6 +4,28 @@
   },
   "users": {
     "grid-title": "Пользователи",
-    "crud-title": "Пользователь"
+    "crud-title": "Пользователь",
+    "role": {
+      "name": "Роль",
+      "manager": "Менеджер",
+      "auditor": "Аудитор",
+      "user": "Пользователь"
+    }
+  },
+  "settings": {
+    "gitlab": {
+      "label": "Gitlab Интеграция",
+      "url": "Gitlab URL",
+      "api_key": "Gitlab API Ключ"
+    },
+    "redmine": {
+      "label": "Redmine Интеграция",
+      "url": "Redmine URL",
+      "api_key": "Redmine API Ключ",
+      "statuses": "Открытые статусы",
+      "priorities": "Приоритеты",
+      "sync_time": "Синхронизировать время в Redmine",
+      "notice": "Некоторые настройки могут быть недоступны. Дождитесь окончания синхронизации. Это может занять не более 10 минут"
+    }
   }
 }

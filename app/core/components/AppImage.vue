@@ -1,5 +1,8 @@
 <template>
-    <img :src="url" @click="$emit('click', $event)"/>
+    <lazy-component v-if="lazy">
+        <img v-auth-image="url" @click="$emit('click', $event)" />
+    </lazy-component>
+    <img v-else v-auth-image="url" @click="$emit('click', $event)" />
 </template>
 
 <script>
@@ -11,16 +14,20 @@
         props: {
             src: {
                 type: String,
-                required: true
+                required: true,
             },
             isBlob: {
                 type: Boolean,
-                default: true
-            }
+                default: true,
+            },
+            lazy: {
+                type: Boolean,
+                default: false,
+            },
         },
         data() {
             return {
-                url: (env.API_URL || `${window.location.origin}/api`) + '/' + this.src
+                url: (env.API_URL || `${window.location.origin}/api`) + '/' + this.src,
             };
         },
         methods: {
@@ -31,15 +38,17 @@
                 }
 
                 if (this.src) {
-                    axios.get(this.src, {
-                        baseURL: (env.API_URL || `${window.location.origin}/api`) + '/',
-                        responseType: 'blob'
-                    }).then(response => {
-                        const blob = response.data;
-                        this.url = URL.createObjectURL(blob);
-                    });
+                    axios
+                        .get(this.src, {
+                            baseURL: (env.API_URL || `${window.location.origin}/api`) + '/',
+                            responseType: 'blob',
+                        })
+                        .then(response => {
+                            const blob = response.data;
+                            this.url = URL.createObjectURL(blob);
+                        });
                 }
-            }
+            },
         },
         mounted() {
             if (this.isBlob) {
@@ -59,10 +68,15 @@
                 } else {
                     this.url = (env.API_URL || `${window.location.origin}/api`) + '/' + this.src;
                 }
-            }
-        }
+            },
+        },
     };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+    img {
+        width: 100%;
+        object-fit: cover;
+        background-color: $gray-5;
+    }
 </style>

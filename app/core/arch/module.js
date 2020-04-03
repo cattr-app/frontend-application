@@ -1,7 +1,7 @@
 import Grid from './builder/grid';
 import Crud from './builder/crud';
 import NavbarEntry from './builder/navbar';
-import SettingsSection from "./builder/sections";
+import SettingsSection from './builder/sections';
 import isObject from 'lodash/isObject';
 import Store from '@/store';
 
@@ -15,6 +15,7 @@ export default class Module {
     companySections = [];
     navEntriesDropdown = {};
     locales = {};
+    additionalFields = [];
 
     constructor(routerPrefix, moduleName) {
         this.routerPrefix = routerPrefix;
@@ -43,7 +44,7 @@ export default class Module {
      */
     registerVuexModule(vuexModule) {
         if (!isObject(vuexModule)) {
-            throw new Error("Vuex Module must be an object.");
+            throw new Error('Vuex Module must be an object.');
         }
 
         Store.registerModule(this.moduleName, vuexModule);
@@ -60,8 +61,7 @@ export default class Module {
      * @returns {Grid}
      */
     createGrid(label, id, serviceClass, gridData = undefined, gridRouterPath = '') {
-        const grid = new Grid(label, id, serviceClass, this, gridData, gridRouterPath);
-        return grid;
+        return new Grid(label, id, serviceClass, this, gridData, gridRouterPath);
     }
 
     /**
@@ -70,13 +70,13 @@ export default class Module {
      * @param label
      * @param id
      * @param serviceClass
+     * @param filters
      * @param defaultPrefix
      * @param pages
      * @returns {Crud}
      */
     createCrud(label, id, serviceClass, filters, defaultPrefix = '', pages = { edit: true, view: true, new: true }) {
-        const crud = new Crud(label, id, serviceClass, filters, this, defaultPrefix, pages);
-        return crud;
+        return new Crud(label, id, serviceClass, filters, this, defaultPrefix, pages);
     }
 
     /**
@@ -101,8 +101,8 @@ export default class Module {
      */
     addNavbarEntry() {
         Array.from(arguments).forEach(p => {
-            this.navEntries.push(new NavbarEntry(p.label, p.to,
-                p.hasOwnProperty('displayCondition') ? p.displayCondition : () => true)
+            this.navEntries.push(
+                new NavbarEntry(p.label, p.to, p.hasOwnProperty('displayCondition') ? p.displayCondition : () => true),
             );
         });
     }
@@ -115,8 +115,13 @@ export default class Module {
             if (!this.navEntriesDropdown.hasOwnProperty(p.section)) {
                 this.navEntriesDropdown[p.section] = [];
             }
-            this.navEntriesDropdown[p.section].push(new NavbarEntry(p.label, p.to,
-                p.hasOwnProperty('displayCondition') ? p.displayCondition : () => true, p.section)
+            this.navEntriesDropdown[p.section].push(
+                new NavbarEntry(
+                    p.label,
+                    p.to,
+                    p.hasOwnProperty('displayCondition') ? p.displayCondition : () => true,
+                    p.section,
+                ),
             );
         });
     }
@@ -129,7 +134,7 @@ export default class Module {
             const { path, name, meta, children } = route;
             const section = new SettingsSection(path, name, meta, accessCheck, scope, component, children);
             this.settingsSections.push(section);
-        })
+        });
     }
 
     /**
@@ -140,7 +145,11 @@ export default class Module {
             const { path, name, meta, children } = route;
             const section = new SettingsSection(path, name, meta, accessCheck, scope, component, children);
             this.companySections.push(section);
-        })
+        });
+    }
+
+    addField(scope, path, field) {
+        this.additionalFields.push({ scope, path, field });
     }
 
     /**
@@ -155,6 +164,12 @@ export default class Module {
      * @returns {Promise<void>[]}
      */
     initSettingsSections() {
+        this.additionalFields
+            .filter(({ scope }) => scope === 'settings')
+            .forEach(({ scope, path, field }) => {
+                Store.dispatch('settings/addField', { scope, path, field });
+            });
+
         return this.settingsSections.map(s => s.initSection());
     }
 
@@ -163,7 +178,21 @@ export default class Module {
      * @returns {Promise<void>[]}
      */
     initCompanySections() {
+        this.additionalFields
+            .filter(({ scope }) => scope === 'company')
+            .forEach(({ scope, path, field }) => {
+                Store.dispatch('settings/addField', { scope, path, field });
+            });
+
         return this.companySections.map(s => s.initSection());
+    }
+
+    /**
+     * Init all available sections
+     */
+    reinitAllSections() {
+        this.initSettingsSections();
+        this.initCompanySections();
     }
 
     /**
@@ -200,7 +229,6 @@ export default class Module {
         return this.navEntriesDropdown;
     }
 
-
     /**
      * Get module-scoped routes for Vue Router
      *
@@ -209,7 +237,6 @@ export default class Module {
     getRoutes() {
         return this.routes;
     }
-
 
     /**
      * Get locales

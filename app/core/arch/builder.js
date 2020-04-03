@@ -3,7 +3,7 @@ export default class Builder {
 
     constructor(moduleContext) {
         this.moduleContext = moduleContext;
-        this.routerPrefix = (moduleContext.getRouterPrefix().indexOf(0) !== '/' ? '/' : '') + moduleContext.getRouterPrefix();
+        this.routerPrefix =
+            (moduleContext.getRouterPrefix().indexOf(0) !== '/' ? '/' : '') + moduleContext.getRouterPrefix();
     }
-
 }

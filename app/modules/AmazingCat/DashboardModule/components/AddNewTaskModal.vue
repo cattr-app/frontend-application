@@ -1,27 +1,34 @@
 <template>
-    <at-modal
-            :value="showModal"
-            :title="$t('control.add_new_task')"
-            @on-cancel="cancel"
-            @on-confirm="confirm"
-    >
-        <validation-observer v-slot="{}" ref="form">
-            <validation-provider ref="project" rules="required" v-slot="{ errors }" :name="$t('field.project')" mode="passive">
+    <at-modal :value="showModal" :title="$t('control.add_new_task')" @on-cancel="cancel" @on-confirm="confirm">
+        <validation-observer ref="form" v-slot="{}">
+            <validation-provider
+                ref="project"
+                v-slot="{ errors }"
+                rules="required"
+                :name="$t('field.project')"
+                mode="passive"
+            >
                 <div class="input-group">
                     <small>{{ $t('field.project') }}</small>
 
                     <resource-select
-                            v-model="projectId"
-                            class="input"
-                            :service="projectsService"
-                            :class="{'at-select--error': errors.length > 0}"
+                        v-model="projectId"
+                        class="input"
+                        :service="projectsService"
+                        :class="{ 'at-select--error': errors.length > 0 }"
                     />
 
                     <p>{{ errors[0] }}</p>
                 </div>
             </validation-provider>
 
-            <validation-provider ref="taskName" rules="required" v-slot="{ errors }" :name="$t('field.task_name')" mode="passive">
+            <validation-provider
+                ref="taskName"
+                v-slot="{ errors }"
+                rules="required"
+                :name="$t('field.task_name')"
+                mode="passive"
+            >
                 <div class="input-group">
                     <small>{{ $t('field.task_name') }}</small>
 
@@ -31,7 +38,13 @@
                 </div>
             </validation-provider>
 
-            <validation-provider ref="taskDescription" rules="required" v-slot="{ errors }" :name="$t('field.task_description')" mode="passive">
+            <validation-provider
+                ref="taskDescription"
+                v-slot="{ errors }"
+                rules="required"
+                :name="$t('field.task_description')"
+                mode="passive"
+            >
                 <div class="input-group">
                     <small>{{ $t('field.task_description') }}</small>
 
@@ -44,18 +57,12 @@
 
         <div slot="footer">
             <at-button @click="cancel">{{ $t('control.cancel') }}</at-button>
-            <at-button
-                    type="primary"
-                    @click="confirm"
-                    :disabled="disableButtons"
-            >{{ $t('control.save') }}
-            </at-button>
+            <at-button type="primary" :disabled="disableButtons" @click="confirm">{{ $t('control.save') }} </at-button>
         </div>
     </at-modal>
 </template>
 
 <script>
-    import moment from 'moment';
     import ResourceSelect from '@/components/ResourceSelect';
     import ProjectService from '@/service/resource/projectService';
     import TasksService from '@/service/resource/tasksService';
@@ -66,7 +73,7 @@
         components: {
             ResourceSelect,
             ValidationObserver,
-            ValidationProvider
+            ValidationProvider,
         },
         props: {
             showModal: {
@@ -86,7 +93,7 @@
 
                 projectsService: new ProjectService(),
                 tasksService: new TasksService(),
-            }
+            };
         },
         methods: {
             cancel() {

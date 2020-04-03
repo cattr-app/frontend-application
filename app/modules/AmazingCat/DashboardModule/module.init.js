@@ -1,28 +1,31 @@
 export const ModuleConfig = {
     enabled: true,
     routerPrefix: 'dashboard',
-    loadOrder: 1
+    loadOrder: 1,
 };
 
 export function init(context, router) {
     context.addRoute({
-        path: '/',
+        path: '/dashboard',
+        alias: '/',
         name: 'dashboard',
         component: () => import(/* webpackChunkName: "dashboard" */ './views/Dashboard.vue'),
         meta: {
-            auth: true
+            auth: true,
         },
         children: [
             {
                 path: 'timeline',
+                alias: '/timeline',
                 name: 'dashboard.timeline',
                 component: () => import(/* webpackChunkName: "dashboard" */ './views/Dashboard/Timeline.vue'),
                 meta: {
-                    auth: true
-                }
+                    auth: true,
+                },
             },
             {
                 path: 'team',
+                alias: '/team',
                 name: 'dashboard.team',
                 component: () => import(/* webpackChunkName: "dashboard" */ './views/Dashboard/Team.vue'),
                 meta: {
@@ -35,13 +38,13 @@ export function init(context, router) {
     context.addNavbarEntry({
         label: 'navigation.dashboard',
         to: {
-            name: 'dashboard.timeline'
-        }
+            name: 'dashboard',
+        },
     });
 
     context.addLocalizationData({
         en: require('./locales/en'),
-        ru: require('./locales/ru')
+        ru: require('./locales/ru'),
     });
 
     return context;
