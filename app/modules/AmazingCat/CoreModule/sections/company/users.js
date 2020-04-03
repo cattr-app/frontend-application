@@ -36,6 +36,8 @@ export function fieldsToFillProvider() {
             label: 'field.active',
             key: 'active',
             required: true,
+            default: true,
+            type: 'checkbox',
             render(h, props) {
                 if (typeof props.currentValue === 'object') {
                     return;
