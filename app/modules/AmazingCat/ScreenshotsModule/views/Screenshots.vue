@@ -204,16 +204,16 @@
                 this.screenshotsTotal = data.total;
                 this.screenshots = data.data;
             },
-            async removeScreenshot(screenshot) {
+            async removeScreenshot(id) {
                 try {
-                    await this.screenshotsService.deleteItem(screenshot.id);
+                    await this.screenshotsService.deleteItem(id);
                     this.$Notify({
                         type: 'success',
                         title: 'Deleted Successfully',
                         message: 'Screenshot was deleted successfully',
                     });
 
-                    this.screenshots = this.screenshots.filter(screen => screen.id !== screenshot.id);
+                    this.screenshots = this.screenshots.filter(screen => screen.id !== id);
                 } catch (e) {
                     this.$Notify({
                         type: 'error',
