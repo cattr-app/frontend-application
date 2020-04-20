@@ -112,6 +112,9 @@ export function init(context, router) {
         {
             key: 'description',
             label: 'field.description',
+            render: (h, props) => {
+                return h('pre', {}, props.currentValue);
+            },
         },
         {
             key: 'url',
