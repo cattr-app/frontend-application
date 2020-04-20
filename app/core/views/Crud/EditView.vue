@@ -88,10 +88,26 @@
                                         </validation-provider>
 
                                         <validation-provider
+                                            v-else-if="field.key === 'email'"
+                                            v-slot="{ errors }"
+                                            :rules="field.required ? 'required|email' : ''"
+                                            :name="field.key"
+                                            :vid="field.key"
+                                        >
+                                            <at-input
+                                                v-model="values[field.key]"
+                                                :placeholder="$t(field.placeholder) || ''"
+                                                :type="field.frontendType || ''"
+                                                :status="errors.length > 0 ? 'error' : ''"
+                                            ></at-input>
+                                            <small>{{ errors[0] }}</small>
+                                        </validation-provider>
+
+                                        <validation-provider
                                             v-else-if="field.type === 'input' || field.type === 'text'"
                                             v-slot="{ errors }"
                                             :rules="field.required ? 'required' : ''"
-                                            :name="$t(field.label)"
+                                            :name="field.key"
                                             :vid="field.key"
                                         >
                                             <at-input
