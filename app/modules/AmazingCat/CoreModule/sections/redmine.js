@@ -28,6 +28,7 @@ export default {
                     key: 'redmine_api_key',
                     fieldOptions: {
                         type: 'input',
+                        placeholder: 'settings.redmine.api_key',
                         disableAutocomplete: true,
                     },
                 },

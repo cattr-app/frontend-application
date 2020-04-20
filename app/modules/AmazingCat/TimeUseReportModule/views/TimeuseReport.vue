@@ -14,7 +14,7 @@
         </div>
         <div class="at-container">
             <div class="total-time-row">
-                <span class="total-time-label">Total Time</span>
+                <span class="total-time-label">{{ $t('field.total_time') }}</span>
                 <span class="total-time-value">{{ formatDurationString(totalTime) }}</span>
             </div>
             <div v-if="Object.keys(userReportsList).length && !isDataLoading">

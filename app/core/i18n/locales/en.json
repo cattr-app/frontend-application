@@ -103,6 +103,7 @@
     "status": "Status",
     "email": "E-mail",
     "user": "User",
+    "users": "Users",
     "active":  "Active",
     "change_password": "Change password",
     "screenshot": "Screenshot",
@@ -131,8 +132,9 @@
     "send_invite": "Send invite",
     "selected": "Selected",
     "total": "Total",
+    "total_time": "Total time",
     "total_spent": "Total Spent Time",
-    "workers": "Workers",
+    "time": "Time",
     "statuses": {
       "any": "Any",
       "active": "Active",
@@ -151,7 +153,8 @@
       "client": "Client"
     },
     "work_time": "Working Hours",
-    "notice": "Notice"
+    "notice": "Notice",
+    "report": "Report"
   },
   "filter": {
     "enter-single": "Enter {0}",
@@ -173,6 +176,8 @@
     "page_not_found": "Looks like the page you're looking for doesn't exist :(",
     "page_forbidden": "Access forbidden",
     "field_is_required": "This field is required",
+    "something_went_wrong": "Что то пошло не так",
+    "error": "Ошибка",
     "vulnerable_version": "You are using a vulnerable version of the app, please update to the latest available version",
     "update_version": "A new version is available"
   },
@@ -203,5 +208,55 @@
     "these_emails": "These emails:",
     "already_exists": "is already exists",
     "already_sent": "to these addresses is already sent"
+  },
+  "notification": {
+    "record": {
+      "save": {
+        "success": {
+          "title": "Success",
+          "message": "Record was saved successfully"
+        }
+      },
+      "delete": {
+        "confirmation": {
+          "title": "Delete record?",
+          "message": "Are you sure you want delete record?"
+        },
+        "success": {
+          "title": "Success",
+          "message": "Record was successfully deleted"
+        }
+      }
+    },
+    "settings": {
+      "save": {
+        "success": {
+          "title": "Success",
+          "message": "Settings were saved successfully"
+        }
+      }
+    },
+    "screenshot": {
+      "save": {
+        "success": {
+          "title": "Success",
+          "message": "Screenshots was saved successfully"
+        },
+        "error": {
+          "title": "Error",
+          "message": "Failed to save these screenshots"
+        }
+      },
+      "delete": {
+        "success": {
+          "title": "Success",
+          "message": "Screenshots was successfully deleted"
+        },
+        "error": {
+          "title": "Error",
+          "message": "Failed to remove these screenshots"
+        }
+      }
+    }
   }
 }

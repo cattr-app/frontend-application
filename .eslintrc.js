@@ -4,7 +4,7 @@ module.exports = {
         node: true,
     },
     extends: ['plugin:vue/essential', 'eslint:recommended'],
-    plugins: ["prettier"],
+    plugins: ['prettier'],
     rules: {
         'prettier/prettier': 'error',
         'no-console': 'off',

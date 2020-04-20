@@ -35,6 +35,7 @@ export default {
                     key: 'gitlab_url',
                     fieldOptions: {
                         type: 'input',
+                        placeholder: 'https://git.example.com',
                     },
                 },
             ],

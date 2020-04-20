@@ -23,7 +23,7 @@
 
         <div class="at-container">
             <div class="total-time-row">
-                <span class="total-time-label">Total Time</span>
+                <span class="total-time-label">{{ $t('field.total_time') }}</span>
                 <span class="total-time-value">{{ formatDurationString(totalTime) }}</span>
             </div>
 
@@ -92,8 +92,8 @@
             exportFilename() {
                 const days = moment(this.datepickerDateEnd).diff(this.datepickerDateStart, 'days');
                 return days > 1
-                    ? `AT Report from ${this.datepickerDateStart} to ${this.datepickerDateEnd}`
-                    : `AT Report ${this.datepickerDateStart}`;
+                    ? `Project Report from ${this.datepickerDateStart} to ${this.datepickerDateEnd}`
+                    : `Project Report ${this.datepickerDateStart}`;
             },
             totalTime() {
                 return this.projects.reduce((total, current) => total + current.project_time, 0);

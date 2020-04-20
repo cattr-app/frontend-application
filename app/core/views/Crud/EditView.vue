@@ -200,7 +200,7 @@
                     :key="index"
                     :parent="this"
                 ></component>
-                <at-button type="primary" :disabled="invalid" :loading="isSubmitBtnDisabled" @click="submit">{{
+                <at-button type="primary" :disabled="invalid || isLoading" :loading="isLoading" @click="submit">{{
                     $t('control.save')
                 }}</at-button>
             </validation-observer>
@@ -242,7 +242,7 @@
                     editRouteName: pageData.editRouteName || '',
                 },
 
-                isSubmitBtnDisabled: false,
+                isLoading: false,
                 isDataLoading: false,
                 afterSubmitCallback: meta.afterSubmitCallback,
             };
@@ -300,16 +300,16 @@
                     return;
                 }
 
-                this.isSubmitBtnDisabled = true;
+                this.isLoading = true;
                 try {
                     const data = (await this.service.save(this.values, this.pageData.type === 'new')).data;
                     this.$Notify({
                         type: 'success',
-                        title: 'Information Saved',
-                        message: 'View saved successfully',
+                        title: this.$t('notification.record.save.success.title'),
+                        message: this.$t('notification.record.save.success.message'),
                     });
 
-                    this.isSubmitBtnDisabled = false;
+                    this.isLoading = false;
 
                     if (this.afterSubmitCallback) {
                         this.afterSubmitCallback();
@@ -320,7 +320,7 @@
                         });
                     }
                 } catch ({ response }) {
-                    this.isSubmitBtnDisabled = false;
+                    this.isLoading = false;
                     this.$refs.form.setErrors(response.data.info);
                 }
             },

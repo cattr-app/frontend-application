@@ -18,7 +18,11 @@ import i18n from './i18n';
 import './vee-validate';
 import VueLazyload from 'vue-lazyload';
 
-if (process.env.NODE_ENV !== 'development' && process.env.VUE_APP_SENTRY_DSN) {
+if (
+    process.env.NODE_ENV !== 'development' &&
+    'VUE_APP_SENTRY_DSN' in process.env &&
+    process.env.VUE_APP_SENTRY_DSN !== 'undefined'
+) {
     Sentry.init({
         release: process.env.VUE_APP_VERSION,
         environment: process.env.NODE_ENV,

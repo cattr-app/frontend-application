@@ -182,7 +182,7 @@
             this.isLoading = false;
 
             if (!localStorage.getItem(localStorageKey)) {
-                this.userIDs = this.users.map(user => user.id);
+                this.userIDs = this.users.filter(user => user.active).map(user => user.id);
                 localStorage.setItem(localStorageKey, JSON.stringify(this.userIDs));
             }
 
@@ -198,11 +198,9 @@
                 this.$emit('change', this.userIDs);
             }
         },
-
         beforeDestroy() {
             window.removeEventListener('click', this.hidePopup);
         },
-
         computed: {
             activeUsers() {
                 return this.users.filter(user => user.active);

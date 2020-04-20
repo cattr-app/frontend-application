@@ -52,6 +52,7 @@ export function init(context, router) {
         with: 'priority, project, user',
         is_active: true,
     });
+    grid.addToMetaProperties('navigation', navigation, grid.getRouterConfig());
 
     const fieldsToShow = [
         {
@@ -139,7 +140,7 @@ export function init(context, router) {
         },
         {
             key: 'workers',
-            label: 'field.workers',
+            label: 'field.users',
             render: (h, props) => {
                 const data = [];
                 Object.keys(props.currentValue).forEach(k => {
@@ -150,7 +151,7 @@ export function init(context, router) {
                     props: {
                         columns: [
                             {
-                                title: 'User',
+                                title: i18n.t('field.user'),
                                 render: (h, { item }) => {
                                     return h(
                                         'router-link',
@@ -168,7 +169,7 @@ export function init(context, router) {
                             },
                             {
                                 key: 'time',
-                                title: 'Time',
+                                title: i18n.t('field.time'),
                             },
                         ],
                         data,
@@ -340,8 +341,8 @@ export function init(context, router) {
         {
             title: 'control.view',
             icon: 'icon-eye',
-            onClick: (router, { item }) => {
-                router.push({ name: crudViewRoute, params: { id: item.id } });
+            onClick: (router, { item }, context) => {
+                context.onView(item);
             },
             renderCondition({ $store }) {
                 // User always can view assigned tasks
@@ -351,8 +352,8 @@ export function init(context, router) {
         {
             title: 'control.edit',
             icon: 'icon-edit',
-            onClick: (router, params) => {
-                router.push({ name: crudEditRoute, params: { id: params.item.id } });
+            onClick: (router, { item }, context) => {
+                context.onEdit(item);
             },
             renderCondition: ({ $store }, item) => {
                 const userCan = $store.getters['user/can']('tasks/edit', item.project_id);
@@ -365,42 +366,8 @@ export function init(context, router) {
             title: 'control.delete',
             actionType: 'error',
             icon: 'icon-trash-2',
-            onClick: async (router, params, context) => {
-                const res = await context.$CustomModal({
-                    title: 'Delete this Task?',
-                    content: 'After deletion this task cannot be restored',
-                    okText: 'Delete',
-                    cancelText: 'Cancel',
-                    showClose: false,
-                    styles: {
-                        'border-radius': '10px',
-                        'text-align': 'center',
-                        footer: {
-                            'text-align': 'center',
-                        },
-                        header: {
-                            padding: '16px 35px 4px 35px',
-                            color: 'red',
-                        },
-                        body: {
-                            padding: '16px 35px 4px 35px',
-                        },
-                    },
-                    width: 320,
-                    type: 'trash',
-                    typeButton: 'error',
-                });
-
-                if (res === 'confirm') {
-                    const taskService = new TasksService();
-                    await taskService.deleteItem(params.item.id);
-                    context.tableData = context.tableData.filter(item => item.id !== params.item.id);
-                    context.$Notify({
-                        type: 'success',
-                        title: 'Success',
-                        message: 'Task deleted successfully',
-                    });
-                }
+            onClick: async (router, { item }, context) => {
+                context.onDelete(item);
             },
             renderCondition: ({ $store }, item) => {
                 const userCan = $store.getters['user/can']('tasks/remove', item.project_id);

@@ -35,6 +35,7 @@ export default {
                     label: 'settings.redmine.url',
                     key: 'redmine_url',
                     fieldOptions: {
+                        placeholder: 'https://redmine.example.com',
                         type: 'input',
                     },
                 },
@@ -43,6 +44,7 @@ export default {
                     key: 'redmine_api_key',
                     fieldOptions: {
                         type: 'input',
+                        placeholder: 'settings.redmine.api_key',
                         frontendType: 'password',
                     },
                 },

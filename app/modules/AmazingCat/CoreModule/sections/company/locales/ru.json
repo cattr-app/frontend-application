@@ -16,16 +16,23 @@
     "gitlab": {
       "label": "Gitlab Интеграция",
       "url": "Gitlab URL",
-      "api_key": "Gitlab API Ключ"
+      "api_key": "API Ключ"
     },
     "redmine": {
       "label": "Redmine Интеграция",
       "url": "Redmine URL",
-      "api_key": "Redmine API Ключ",
+      "api_key": "API Ключ",
       "statuses": "Открытые статусы",
       "priorities": "Приоритеты",
       "sync_time": "Синхронизировать время в Redmine",
       "notice": "Некоторые настройки могут быть недоступны. Дождитесь окончания синхронизации. Это может занять не более 10 минут"
+    },
+    "color_interval": {
+      "label": "Прогресс рабочего дня",
+      "notification" : {
+        "gt_100": "Значение не может быть больше 100",
+        "interval_already_in_use": "Этот интервал уже используется"
+      }
     }
   }
 }

@@ -87,7 +87,7 @@
 
             <div ref="tableWrapper" class="crud__table">
                 <at-table ref="table" size="large" :columns="columns" :data="displayableData" />
-                <preloader v-if="isDataLoading" />
+                <preloader v-if="isDataLoading" :is-transparent="true" />
             </div>
         </div>
 
@@ -111,11 +111,9 @@
 
     export default {
         name: 'GridView',
-
         components: {
             Preloader,
         },
-
         data() {
             const { gridData, sortable } = this.$route.meta;
 
@@ -217,7 +215,6 @@
                     this.loadPage(firstPage);
                 }, 500);
             },
-
             filterFieldsData() {
                 clearTimeout(this.filterFieldsTimeout);
 
@@ -242,21 +239,17 @@
                     this.loadPage(firstPage);
                 }, 500);
             },
-
             checkWithCtx(callback) {
                 return callback ? callback(this) : true;
             },
-
             handleWithCtx(callback) {
                 callback(this);
             },
-
             async loadPage(page) {
                 history.pushState({}, null, `?page=${page}`);
                 this.queryParams.page = page;
                 await this.fetchData();
             },
-
             async fetchData() {
                 this.isDataLoading = true;
 
@@ -288,7 +281,6 @@
                 this.tableData = data;
                 this.initialData = data;
             },
-
             handleResize() {
                 const { table } = this.$refs;
                 if (!table) {
@@ -304,7 +296,6 @@
                     });
                 });
             },
-
             handleTableClick(e) {
                 const { sortable, orderBy } = this;
                 if (!sortable) {
@@ -339,8 +330,50 @@
 
                 this.fetchData();
             },
-        },
+            onView({ id }) {
+                this.$router.push({ name: this.$route.meta.navigation.view, params: { id } });
+            },
+            onEdit({ id }) {
+                this.$router.push({ name: this.$route.meta.navigation.edit, params: { id } });
+            },
+            async onDelete({ id }) {
+                const isConfirm = await this.$CustomModal({
+                    title: this.$t('notification.record.delete.confirmation.title'),
+                    content: this.$t('notification.record.delete.confirmation.message'),
+                    okText: this.$t('control.delete'),
+                    cancelText: this.$t('control.cancel'),
+                    showClose: false,
+                    styles: {
+                        'border-radius': '10px',
+                        'text-align': 'center',
+                        footer: {
+                            'text-align': 'center',
+                        },
+                        header: {
+                            padding: '16px 35px 4px 35px',
+                            color: 'red',
+                        },
+                        body: {
+                            padding: '16px 35px 4px 35px',
+                        },
+                    },
+                    width: 320,
+                    type: 'trash',
+                    typeButton: 'error',
+                });
 
+                if (isConfirm === 'confirm') {
+                    await this.service.deleteItem(id);
+                    this.$Notify({
+                        type: 'success',
+                        title: this.$t('notification.record.delete.success.title'),
+                        message: this.$t('notification.record.delete.success.message'),
+                    });
+
+                    this.fetchData();
+                }
+            },
+        },
         updated() {
             const { sortable, orderBy } = this;
             if (!sortable || !orderBy) {
@@ -370,12 +403,10 @@
                 column.insertAdjacentHTML('beforeend', '<i class="icon icon-chevron-down chevron"></i>');
             }
         },
-
         computed: {
             displayableData() {
                 return this.tableData;
             },
-
             filterPlaceholder() {
                 const filters = [...this.filters];
                 const last = filters.pop();
@@ -386,11 +417,9 @@
                     return this.$t('filter.enter-single', [this.$t(last.filterName)]);
                 }
             },
-
             itemsPerPage() {
                 return this.$route.meta.itemsPerPage || defaultItemsPerPage;
             },
-
             crudClass() {
                 const styles = {};
                 if (typeof this.$route.meta.style !== 'undefined') {
@@ -403,17 +432,14 @@
 
                 return styles;
             },
-
             sortable() {
                 return !!this.$route.meta.sortable;
             },
         },
-
         async beforeRouteUpdate(from, to, next) {
             this.fetchData();
             next();
         },
-
         async mounted() {
             if (!this.initialData.length) {
                 await this.fetchData();
@@ -424,7 +450,6 @@
 
             this.$refs.tableWrapper.addEventListener('click', this.handleTableClick);
         },
-
         beforeDestory() {
             window.removeEventListener('resize', this.handleResize);
 

@@ -249,6 +249,7 @@ export default (context, router) => {
     crud.edit.addToMetaProperties('permissions', 'users/edit', crud.edit.getRouterConfig());
 
     const grid = usersContext.createGrid('users.grid-title', 'users', CoreUsersService, { with: ['role'] });
+    grid.addToMetaProperties('navigation', navigation, grid.getRouterConfig());
     grid.addToMetaProperties('permissions', () => Store.getters['user/user'].is_admin === 1, grid.getRouterConfig());
     grid.addToMetaProperties('itemsPerPage', 50, grid.getRouterConfig());
     grid.addToMetaProperties('style', 'compact', grid.getRouterConfig());
@@ -270,6 +271,9 @@ export default (context, router) => {
         {
             label: 'field.active',
             key: 'active',
+            render: (h, { currentValue }) => {
+                return h('span', currentValue ? i18n.t('control.yes') : i18n.t('control.no'));
+            },
         },
         {
             label: 'field.role',
@@ -378,8 +382,8 @@ export default (context, router) => {
         {
             title: 'control.view',
             icon: 'icon-eye',
-            onClick: (router, params) => {
-                router.push({ name: crudViewRoute, params: { id: params.item.id } });
+            onClick: (router, { item }, context) => {
+                context.onView(item);
             },
             renderCondition({ $store }) {
                 return $store.getters['user/can']('users/show');
@@ -388,8 +392,8 @@ export default (context, router) => {
         {
             title: 'control.edit',
             icon: 'icon-edit',
-            onClick: (router, params) => {
-                router.push({ name: crudEditRoute, params: { id: params.item.id } });
+            onClick: (router, { item }, context) => {
+                context.onEdit(item);
             },
             renderCondition({ $store }) {
                 return $store.getters['user/can']('users/edit');
@@ -399,15 +403,8 @@ export default (context, router) => {
             title: 'control.delete',
             actionType: 'error',
             icon: 'icon-trash-2',
-            onClick: async (router, params, context) => {
-                const usersService = new UsersService();
-                await usersService.deleteItem(params.item.id);
-                context.tableData = context.tableData.filter(item => item.id !== params.item.id);
-                context.$Notify({
-                    type: 'success',
-                    title: 'Success',
-                    message: 'Task deleted successfully',
-                });
+            onClick: (router, { item }, context) => {
+                context.onDelete(item);
             },
             renderCondition({ $store }) {
                 return $store.getters['user/can']('users/remove');
