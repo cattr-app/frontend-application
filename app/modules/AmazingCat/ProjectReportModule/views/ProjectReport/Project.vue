@@ -137,7 +137,7 @@
 
         data() {
             return {
-                apiPath: env.API_URL || `${window.location.origin}/api`,
+                apiPath: env.API_URL,
                 modal: {
                     show: false,
                     dateScreenshots: {},

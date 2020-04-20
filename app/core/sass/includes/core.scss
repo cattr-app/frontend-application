@@ -46,6 +46,10 @@ body {
     &--left-auto {
       margin-left: auto;
     }
+
+    .at-select__selection {
+      border: 1px solid #eeeef5;
+    }
   }
 
   &__btn {

@@ -93,6 +93,12 @@
                 const items = [
                     {
                         to: {
+                            name: 'about',
+                        },
+                        title: `<i class="icon icon-info"></i> ${this.$t('navigation.about')}`,
+                    },
+                    {
+                        to: {
                             name: 'settings',
                         },
                         title: `<i class="icon icon-settings"></i> ${this.$t('navigation.settings')}`,

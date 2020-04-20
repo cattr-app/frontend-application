@@ -72,6 +72,7 @@ export function fieldsToFillProvider() {
             type: 'checkbox',
             tooltipValue: 'tooltip.user_change_password',
             default: 1,
+            displayable: view => !view.values.id,
         },
         {
             label: 'field.screenshots_active',
@@ -120,7 +121,7 @@ export function fieldsToFillProvider() {
             type: 'input',
             placeholder: 'field.screenshots_interval',
             tooltipValue: 'tooltip.user_interval_screenshot',
-            default: 600,
+            default: 10,
         },
         {
             label: 'field.computer_time_popup',
@@ -128,7 +129,7 @@ export function fieldsToFillProvider() {
             type: 'input',
             tooltipValue: 'tooltip.user_computer_time_popup',
             placeholder: 'field.computer_time_popup',
-            default: 180,
+            default: 3,
         },
         {
             label: 'field.timezone',
@@ -162,6 +163,7 @@ export function fieldsToFillProvider() {
             type: 'checkbox',
             tooltipValue: 'tooltip.user_send_invite',
             default: 1,
+            displayable: view => !view.values.id,
         },
         {
             label: 'field.default_role',
@@ -236,9 +238,15 @@ export default (context, router) => {
     const crudEditRoute = crud.edit.getEditRouteName();
     const crudNewRoute = crud.new.getNewRouteName();
 
-    crud.new.addToMetaProperties('permissions', 'users/create', crud.new.getRouterConfig());
-    crud.edit.addToMetaProperties('permissions', 'users/edit', crud.edit.getRouterConfig());
+    const navigation = { view: crudViewRoute, edit: crudEditRoute, new: crudNewRoute };
+
     crud.view.addToMetaProperties('permissions', 'users/show', crud.view.getRouterConfig());
+    crud.view.addToMetaProperties('navigation', navigation, crud.view.getRouterConfig());
+
+    crud.new.addToMetaProperties('permissions', 'users/create', crud.new.getRouterConfig());
+    crud.new.addToMetaProperties('navigation', navigation, crud.new.getRouterConfig());
+
+    crud.edit.addToMetaProperties('permissions', 'users/edit', crud.edit.getRouterConfig());
 
     const grid = usersContext.createGrid('users.grid-title', 'users', CoreUsersService, { with: ['role'] });
     grid.addToMetaProperties('permissions', () => Store.getters['user/user'].is_admin === 1, grid.getRouterConfig());

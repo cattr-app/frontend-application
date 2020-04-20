@@ -214,6 +214,7 @@
                     });
 
                     this.screenshots = this.screenshots.filter(screen => screen.id !== id);
+                    this.onHide();
                 } catch (e) {
                     this.$Notify({
                         type: 'error',

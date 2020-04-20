@@ -39,11 +39,20 @@
         },
         methods: {
             async reinitSections() {
-                await this.$store.dispatch('user/setCompanyData', {});
-                const userApi = await this.$store.getters['user/apiService'];
-                await this.$store.dispatch('settings/clearSections').then(async () => {
+                if (this.reloadingSections) {
+                    return;
+                }
+
+                this.reloadingSections = true;
+
+                try {
+                    await this.$store.dispatch('user/setCompanyData', {});
+                    await this.$store.dispatch('settings/clearSections');
+                    const userApi = await this.$store.getters['user/apiService'];
                     await userApi.getCompanyData();
-                });
+                } finally {
+                    this.reloadingSections = false;
+                }
             },
         },
 

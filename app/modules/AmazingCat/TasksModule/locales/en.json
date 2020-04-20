@@ -4,6 +4,12 @@
   },
   "tasks": {
     "grid-title": "Tasks",
-    "crud-title": "Task"
+    "crud-title": "Task",
+    "source": {
+      "internal": "Internal"
+    }
+  },
+  "field": {
+    "source": "Source"
   }
 }

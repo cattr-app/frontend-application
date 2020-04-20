@@ -60,6 +60,11 @@ const routes = [
         },
         component: () => import(/* webpackChunkName: "PageForbidden" */ '../views/PageForbidden.vue'),
     },
+    {
+        path: '/about',
+        name: 'about',
+        component: () => import(/* webpackChunkName: "About" */ '../views/About.vue'),
+    },
 ];
 
 const router = new VueRouter({

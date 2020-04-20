@@ -22,7 +22,7 @@
         </div>
 
         <template v-slot:footer>
-            <at-button class="modal-remove" type="text" icon="icon-trash-2" @click="onRemove"></at-button>
+            <at-button class="modal-remove" type="text" icon="icon-trash-2" @click="onRemove" />
 
             <div v-if="project" class="modal-field">
                 <span class="modal-label">{{ $t('field.project') }}:</span>

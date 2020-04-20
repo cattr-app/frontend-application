@@ -9,7 +9,10 @@
                         </h1>
 
                         <div class="control-items">
-                            <at-button size="large" class="control-item" @click="$router.go(-1)"
+                            <at-button
+                                size="large"
+                                class="control-item"
+                                @click="$router.go($route.meta.navigation.from)"
                                 >{{ $t('control.back') }}
                             </at-button>
                             <template v-if="pageData.pageControls && pageData.pageControls.length > 0">
@@ -94,19 +97,17 @@
             const { fields, service, filters, pageData } = this.$route.meta;
 
             return {
-                fields: fields || [],
-                values: {},
                 service,
                 filters,
-
+                values: {},
+                fields: fields || [],
+                isDataLoading: false,
                 pageData: {
                     title: pageData.title || null,
                     topComponents: pageData.topComponents || [],
                     bottomComponents: pageData.bottomComponents || [],
                     pageControls: pageData.pageControls || [],
                 },
-
-                isDataLoading: false,
             };
         },
 
@@ -115,17 +116,26 @@
 
             this.isDataLoading = true;
 
-            await this.service
-                .getItem(id, this.filters)
-                .then(({ data }) => {
-                    this.isDataLoading = false;
-                    this.values = data;
-                })
-                .catch(({ response }) => {
-                    if (response.data.error_type === 'query.item_not_found') {
-                        this.$router.push({ name: 'forbidden' });
-                    }
-                });
+            try {
+                const data = (await this.service.getItem(id, this.filters)).data;
+                this.values = data;
+            } catch ({ response }) {
+                if (response.data.error_type === 'query.item_not_found') {
+                    this.$router.push({ name: 'forbidden' });
+                }
+            }
+
+            this.isDataLoading = false;
+        },
+
+        beforeRouteEnter(to, from, next) {
+            if ('pageData' in from.meta && from.meta.pageData.type === 'new') {
+                to.meta.navigation.from = -2;
+            } else {
+                to.meta.navigation.from = -1;
+            }
+
+            next();
         },
 
         methods: {

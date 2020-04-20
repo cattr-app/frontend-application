@@ -1,5 +1,6 @@
 {
   "navigation": {
+    "about":  "About",
     "settings": "Settings",
     "company_settings": "Company Settings",
     "logout": "Logout",
@@ -171,7 +172,9 @@
     "no_data": "No data to display",
     "page_not_found": "Looks like the page you're looking for doesn't exist :(",
     "page_forbidden": "Access forbidden",
-    "field_is_required": "This field is required"
+    "field_is_required": "This field is required",
+    "vulnerable_version": "You are using a vulnerable version of the app, please update to the latest available version",
+    "update_version": "A new version is available"
   },
   "time": {
     "h": "h",

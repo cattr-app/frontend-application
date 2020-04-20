@@ -5,7 +5,6 @@ const isDevMod = process.env.NODE_ENV !== 'production';
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const SentryPlugin = require('@sentry/webpack-plugin');
-const fs = require('fs');
 
 let coreAlias;
 
@@ -27,7 +26,8 @@ Object.keys(env).forEach(p => {
     process.env[`VUE_APP_${p}`] = env[p];
 });
 
-process.env.VUE_APP_VERSION = `${process.env.npm_package_version}@${process.env.COMMIT_SHA}`;
+process.env.VUE_APP_VERSION = process.env.npm_package_version;
+process.env.VUE_APP_SENTRY_DSN = process.env.SENTRY_DSN;
 
 module.exports = {
     css: {
@@ -75,20 +75,9 @@ module.exports = {
             }),
             new SentryPlugin({
                 release: process.env.VUE_APP_VERSION,
-                dryRun:
-                    !isDevMod ||
-                    !('SENTRY_ORG' in process.env) ||
-                    !('SENTRY_AUTH_TOKEN' in process.env) ||
-                    !('VUE_APP_SENTRY_DSN' in process.env),
+                dryRun: isDevMod || !('SENTRY_DSN' in process.env),
                 include: '.',
-                ext: [
-                  'js',
-                  'map',
-                  'jsbundle',
-                  'bundle',
-                  'vue',
-                  'json'
-                ],
+                ext: ['js', 'map', 'jsbundle', 'bundle', 'vue', 'json'],
                 ignore: [
                     'node_modules',
                     'vue.config.js',
@@ -97,6 +86,11 @@ module.exports = {
                     'prettier.config.js',
                     'dist',
                 ],
+                setCommits: require('fs').existsSync('.git')
+                    ? {
+                          auto: true,
+                      }
+                    : undefined,
             }),
             new BundleAnalyzerPlugin({
                 analyzerMode: isDevMod ? 'server' : 'disabled',

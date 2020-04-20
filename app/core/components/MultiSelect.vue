@@ -55,7 +55,7 @@
                 options: [],
             };
         },
-        async beforeMount() {
+        async created() {
             await this.service.getAll().then(({ data }) => {
                 const all = data.map(project => {
                     return {
@@ -69,8 +69,7 @@
             if (this.selected) {
                 this.model = this.selected;
             }
-        },
-        mounted() {
+
             if (this.model.length && this.model.length === Object.keys(this.options).length) {
                 this.$refs.select.$children.forEach(option => (option.selected = true));
             } else {
@@ -87,6 +86,11 @@
             selected() {
                 this.model = this.selected.hasOwnProperty('length') ? this.selected : [];
             },
+            model(value) {
+                if (this.inputHandler) {
+                    this.inputHandler(value);
+                }
+            },
         },
         methods: {
             selectAll() {
@@ -98,11 +102,8 @@
             clearSelect() {
                 this.$emit('input', []);
                 this.model = [];
-                if (this.inputHandler) {
-                    this.inputHandler([]);
-                }
             },
-            onClick(e) {
+            onClick() {
                 if (this.showCount) {
                     this.showCount = false;
                 } else {
@@ -167,7 +168,6 @@
             }
 
             &__selection {
-                border: 1px solid #eeeef5;
                 border-radius: 5px;
                 color: black;
             }

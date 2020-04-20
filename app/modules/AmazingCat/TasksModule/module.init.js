@@ -34,13 +34,18 @@ export function init(context, router) {
         with: 'priority, project, user',
     });
 
-    crud.view.addToMetaProperties('titleCallback', ({ values }) => values.task_name, crud.view.getRouterConfig());
-
     const crudViewRoute = crud.view.getViewRouteName();
     const crudEditRoute = crud.edit.getEditRouteName();
     const crudNewRoute = crud.new.getNewRouteName();
 
+    const navigation = { view: crudViewRoute, edit: crudEditRoute, new: crudNewRoute };
+
+    crud.view.addToMetaProperties('titleCallback', ({ values }) => values.task_name, crud.view.getRouterConfig());
+    crud.view.addToMetaProperties('navigation', navigation, crud.view.getRouterConfig());
+
     crud.new.addToMetaProperties('permissions', 'tasks/create', crud.new.getRouterConfig());
+    crud.new.addToMetaProperties('navigation', navigation, crud.new.getRouterConfig());
+
     crud.edit.addToMetaProperties('permissions', 'tasks/edit', crud.edit.getRouterConfig());
 
     const grid = context.createGrid('tasks.grid-title', 'tasks', TasksService, {
@@ -106,6 +111,26 @@ export function init(context, router) {
         {
             key: 'description',
             label: 'field.description',
+        },
+        {
+            key: 'url',
+            label: 'field.source',
+            render: (h, props) => {
+                if (props.currentValue && props.currentValue.length && props.currentValue.toLowerCase() !== 'url') {
+                    return h(
+                        'a',
+                        {
+                            attrs: {
+                                href: props.currentValue,
+                                target: '_blank',
+                            },
+                        },
+                        props.currentValue,
+                    );
+                } else {
+                    return h('span', {}, i18n.t('tasks.source.internal'));
+                }
+            },
         },
         {
             key: 'total_spent_time',

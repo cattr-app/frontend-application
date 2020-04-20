@@ -36,7 +36,7 @@
             <validation-observer ref="form" v-slot="{ invalid }">
                 <div class="data-entries">
                     <template v-for="(field, key) of fields">
-                        <template v-if="typeof field.displayable !== 'undefined' ? field.displayable : true">
+                        <template v-if="isDisplayable(field)">
                             <div :key="key" class="data-entry">
                                 <div class="row">
                                     <div class="col-6">
@@ -301,31 +301,28 @@
                 }
 
                 this.isSubmitBtnDisabled = true;
+                try {
+                    const data = (await this.service.save(this.values, this.pageData.type === 'new')).data;
+                    this.$Notify({
+                        type: 'success',
+                        title: 'Information Saved',
+                        message: 'View saved successfully',
+                    });
 
-                this.service.save(this.values, this.pageData.type === 'new').then(
-                    ({ data }) => {
-                        this.$Notify({
-                            type: 'success',
-                            title: 'Information Saved',
-                            message: 'View saved successfully',
+                    this.isSubmitBtnDisabled = false;
+
+                    if (this.afterSubmitCallback) {
+                        this.afterSubmitCallback();
+                    } else if (this.pageData.type === 'new') {
+                        this.$router.push({
+                            name: this.$route.meta.navigation.view,
+                            params: { id: data.res[this.service.getIdParam()] },
                         });
-
-                        this.isSubmitBtnDisabled = false;
-
-                        if (this.afterSubmitCallback) {
-                            this.afterSubmitCallback();
-                        } else if (this.pageData.type === 'new') {
-                            this.$router.push({
-                                name: this.pageData.editRouteName,
-                                params: { id: data.res[this.service.getIdParam()] },
-                            });
-                        }
-                    },
-                    ({ response }) => {
-                        this.isSubmitBtnDisabled = false;
-                        this.$refs.form.setErrors(response.data.info);
-                    },
-                );
+                    }
+                } catch ({ response }) {
+                    this.isSubmitBtnDisabled = false;
+                    this.$refs.form.setErrors(response.data.info);
+                }
             },
 
             handleClick(button) {
@@ -338,6 +335,18 @@
 
             setValue(key, value) {
                 this.$set(this.values, key, value);
+            },
+
+            isDisplayable(field) {
+                if (typeof field.displayable === 'function') {
+                    return field.displayable(this);
+                }
+
+                if (typeof field.displayable !== 'undefined') {
+                    return !!field.displayable;
+                }
+
+                return true;
             },
         },
     };
@@ -367,7 +376,7 @@
 
             .data-entries {
                 .data-entry {
-                    margin-bottom: 1em;
+                    margin-bottom: $layout-02;
 
                     .label {
                         font-weight: bold;

@@ -18,6 +18,7 @@ function formatDateTime(value, timezone) {
 
 export function init(context, router) {
     let routes = {};
+
     ModuleLoaderInterceptor.on('AmazingCat_CoreModule', m => {
         m.routes.forEach(route => {
             if (route.name.search('users.view') > 0) {
@@ -35,13 +36,19 @@ export function init(context, router) {
     });
 
     const crud = context.createCrud('projects.crud-title', 'projects', ProjectService);
-    crud.view.addToMetaProperties('titleCallback', ({ values }) => values.name, crud.view.getRouterConfig());
 
     const crudViewRoute = crud.view.getViewRouteName();
     const crudEditRoute = crud.edit.getEditRouteName();
     const crudNewRoute = crud.new.getNewRouteName();
 
+    const navigation = { view: crudViewRoute, edit: crudEditRoute, new: crudNewRoute };
+
+    crud.view.addToMetaProperties('titleCallback', ({ values }) => values.name, crud.view.getRouterConfig());
+    crud.view.addToMetaProperties('navigation', navigation, crud.view.getRouterConfig());
+
     crud.new.addToMetaProperties('permissions', 'projects/create', crud.new.getRouterConfig());
+    crud.new.addToMetaProperties('navigation', navigation, crud.new.getRouterConfig());
+
     crud.edit.addToMetaProperties('permissions', 'projects/edit', crud.edit.getRouterConfig());
 
     const grid = context.createGrid('projects.grid-title', 'projects', ProjectService, {

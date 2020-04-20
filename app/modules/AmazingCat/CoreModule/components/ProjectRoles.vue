@@ -1,10 +1,16 @@
 <template>
     <div v-if="Object.keys(roles).length > 0" class="project-roles">
-        <div v-for="role in roles" :key="role.id">
+        <div v-for="role in getUsefulRoles" :key="role.id" class="project-roles__role">
             <div class="row">
-                <div class="col-7 col-md-12 col-sm-12 projects-container">
+                <div class="col-7">
+                    <at-input readonly :value="$t('users.role.' + role.name)">
+                        <template slot="prepend"> {{ $t('users.role.name') }} </template>
+                    </at-input>
+                </div>
+
+                <div class="col-17">
                     <validation-provider :ref="'provider' + '_' + role.id" v-slot="{ errors }" vid="relation_provider">
-                        <MultiSelect
+                        <multi-select
                             :key="role.id"
                             :service="service"
                             :selected="getProjectsForRole(role.id)"
@@ -13,15 +19,9 @@
                                 'at-select--error': errors.length > 0,
                             }"
                         >
-                        </MultiSelect>
+                        </multi-select>
                         <small v-if="errors.length" class="error">{{ errors[0] }}</small>
                     </validation-provider>
-                </div>
-
-                <div class="col-3 col-md-6 col-sm-6 role-container">
-                    <at-input readonly :value="$t('users.role.' + role.name)">
-                        <template slot="prepend"> {{ $t('users.role.name') }} </template>
-                    </at-input>
                 </div>
             </div>
         </div>
@@ -57,6 +57,10 @@
         },
         computed: {
             ...mapGetters('roles', ['roles']),
+            getUsefulRoles() {
+                // Remove an unused user role
+                return this.roles.filter(({ name }) => name !== 'user');
+            },
         },
         methods: {
             ...mapActions({
@@ -70,9 +74,12 @@
             },
             updateRelation(roleId, projectIds) {
                 let selectedProjects = [];
-                Object.keys(this.relations).forEach(roleID => {
-                    selectedProjects = selectedProjects.concat(this.relations[roleID].project_ids);
-                });
+
+                Object.keys(this.relations)
+                    .filter(roleID => this.getUsefulRoles.map(role => Number(role.id)).includes(Number(roleID)))
+                    .forEach(roleID => {
+                        selectedProjects = selectedProjects.concat(this.relations[roleID].project_ids);
+                    });
 
                 let result = {};
                 let duplicatesCheck = new Set(selectedProjects).size !== selectedProjects.length;
@@ -113,15 +120,13 @@
 </script>
 
 <style lang="scss" scoped>
-    .projects-container {
-        align-self: center;
-    }
+    .project-roles {
+        &__role {
+            margin-bottom: $layout-01;
 
-    .role-container {
-        margin: 1em;
-    }
-
-    .role-name {
-        line-height: 2em;
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
     }
 </style>
