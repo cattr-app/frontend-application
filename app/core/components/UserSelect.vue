@@ -288,10 +288,13 @@
                 if (!this.selectedActiveUsers.length) {
                     this.userIDs = this.userIDs.concat(
                         this.activeUsers
-                            .filter(
-                                ({ full_name }) =>
-                                    full_name.toUpperCase().indexOf(this.searchActiveValue.toUpperCase()) !== -1,
-                            )
+                            .filter(({ full_name, type }) => {
+                                if (this.userType !== 'all' && this.userType !== type) {
+                                    return false;
+                                }
+
+                                return full_name.toUpperCase().indexOf(this.searchActiveValue.toUpperCase()) !== -1;
+                            })
                             .map(({ id }) => id)
                             .filter(id => !this.userIDs.includes(id)),
                     );
@@ -306,10 +309,13 @@
                 if (!this.selectedInactiveUsers.length) {
                     this.userIDs = this.userIDs.concat(
                         this.inactiveUsers
-                            .filter(
-                                ({ full_name }) =>
-                                    full_name.toUpperCase().indexOf(this.searchInactiveValue.toUpperCase()) !== -1,
-                            )
+                            .filter(({ full_name, type }) => {
+                                if (this.userType !== 'all' && this.userType !== type) {
+                                    return false;
+                                }
+
+                                return full_name.toUpperCase().indexOf(this.searchInactiveValue.toUpperCase()) !== -1;
+                            })
                             .map(({ id }) => id)
                             .filter(id => !this.userIDs.includes(id)),
                     );
