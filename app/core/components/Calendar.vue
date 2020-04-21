@@ -90,12 +90,13 @@
             },
         },
         data() {
+            const { query } = this.$route;
             const today = this.getDateToday();
 
             return {
-                tab: sessionStorage.getItem(this.sessionStorageKey + '.type') || this.initialTab,
-                start: sessionStorage.getItem(this.sessionStorageKey + '.start') || today,
-                end: sessionStorage.getItem(this.sessionStorageKey + '.end') || today,
+                tab: query['type'] || sessionStorage.getItem(this.sessionStorageKey + '.type') || this.initialTab,
+                start: query['start'] || sessionStorage.getItem(this.sessionStorageKey + '.start') || today,
+                end: query['end'] || sessionStorage.getItem(this.sessionStorageKey + '.end') || today,
                 showPopup: false,
                 lang: null,
                 datePickerLang: {},
@@ -340,6 +341,19 @@
                 sessionStorage.setItem(this.sessionStorageKey + '.type', type);
                 sessionStorage.setItem(this.sessionStorageKey + '.start', start);
                 sessionStorage.setItem(this.sessionStorageKey + '.end', end);
+
+                const { query } = this.$route;
+                if (!query.type || !query.start || !query.end) {
+                    this.$router.replace({
+                        name: this.$route.name,
+                        query: { ...query, type, start, end },
+                    });
+                } else {
+                    this.$router.push({
+                        name: this.$route.name,
+                        query: { ...query, type, start, end },
+                    });
+                }
             },
             emitChangeEvent() {
                 this.$emit('change', {
@@ -358,6 +372,19 @@
                 this.$refs.tabs.setNavByIndex(0);
                 this.setDate(new Date());
                 this.hidePopup();
+            },
+        },
+        watch: {
+            $route(to, from) {
+                this.tab = to.query['type'];
+                this.start = to.query['start'];
+                this.end = to.query['end'];
+
+                sessionStorage.setItem(this.sessionStorageKey + '.type', this.tab);
+                sessionStorage.setItem(this.sessionStorageKey + '.start', this.start);
+                sessionStorage.setItem(this.sessionStorageKey + '.end', this.end);
+
+                this.emitChangeEvent();
             },
         },
     };
