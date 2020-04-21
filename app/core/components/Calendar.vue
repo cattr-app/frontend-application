@@ -93,7 +93,7 @@
             const { query } = this.$route;
             const today = this.getDateToday();
 
-            return {
+            const data = {
                 tab: query['type'] || sessionStorage.getItem(this.sessionStorageKey + '.type') || this.initialTab,
                 start: query['start'] || sessionStorage.getItem(this.sessionStorageKey + '.start') || today,
                 end: query['end'] || sessionStorage.getItem(this.sessionStorageKey + '.end') || today,
@@ -101,6 +101,30 @@
                 lang: null,
                 datePickerLang: {},
             };
+
+            switch (data.tab) {
+                case 'day':
+                case 'date':
+                    data.start = moment(data.start).format('YYYY-MM-DD');
+                    data.end = data.start;
+                    break;
+
+                case 'week': {
+                    const date = moment(data.start);
+                    data.start = date.startOf('isoWeek').format('YYYY-MM-DD');
+                    data.end = date.endOf('isoWeek').format('YYYY-MM-DD');
+                    break;
+                }
+
+                case 'month': {
+                    const date = moment(data.start);
+                    data.start = date.startOf('month').format('YYYY-MM-DD');
+                    data.end = date.endOf('month').format('YYYY-MM-DD');
+                    break;
+                }
+            }
+
+            return data;
         },
         mounted() {
             window.addEventListener('click', this.hidePopup);
