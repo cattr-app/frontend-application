@@ -32,6 +32,7 @@
                 </div>
 
                 <date-picker
+                    :key="$i18n.locale"
                     class="datepicker"
                     :append-to-body="false"
                     :clearable="false"
@@ -96,12 +97,33 @@
                 start: sessionStorage.getItem(this.sessionStorageKey + '.start') || today,
                 end: sessionStorage.getItem(this.sessionStorageKey + '.end') || today,
                 showPopup: false,
+                lang: null,
+                datePickerLang: {},
             };
         },
         mounted() {
             window.addEventListener('click', this.hidePopup);
             this.saveData(this.tab, this.start, this.end);
             this.emitChangeEvent();
+            this.$nextTick(async () => {
+                try {
+                    const locale = await import(`vue2-datepicker/locale/${this.$i18n.locale}`);
+
+                    this.datePickerLang = {
+                        ...locale,
+                        formatLocale: {
+                            ...locale.formatLocale,
+                            firstDayOfWeek: 1,
+                        },
+                        monthFormat: 'MMMM',
+                    };
+                } catch {
+                    this.datePickerLang = {
+                        formatLocale: { firstDayOfWeek: 1 },
+                        monthFormat: 'MMMM',
+                    };
+                }
+            });
         },
         beforeDestroy() {
             window.removeEventListener('click', this.hidePopup);
@@ -146,12 +168,6 @@
                         }
                     }
                 }
-            },
-            datePickerLang() {
-                return {
-                    formatLocale: { firstDayOfWeek: 1 },
-                    monthFormat: 'MMMM',
-                };
             },
             datePickerType() {
                 switch (this.tab) {

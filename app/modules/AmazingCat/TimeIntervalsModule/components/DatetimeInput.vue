@@ -78,15 +78,10 @@
         data() {
             return {
                 showPopup: false,
+                datePickerLang: {},
             };
         },
         computed: {
-            datePickerLang() {
-                return {
-                    formatLocale: { firstDayOfWeek: 1 },
-                    monthFormat: 'MMMM',
-                };
-            },
             datePickerValue() {
                 return moment(this.value).toDate();
             },
@@ -124,6 +119,25 @@
                 .toISOString();
             this.inputHandler(dateTimeStr);
             this.$emit('change', dateTimeStr);
+            this.$nextTick(async () => {
+                try {
+                    const locale = await import(`vue2-datepicker/locale/${this.$i18n.locale}`);
+
+                    this.datePickerLang = {
+                        ...locale,
+                        formatLocale: {
+                            ...locale.formatLocale,
+                            firstDayOfWeek: 1,
+                        },
+                        monthFormat: 'MMMM',
+                    };
+                } catch {
+                    this.datePickerLang = {
+                        formatLocale: { firstDayOfWeek: 1 },
+                        monthFormat: 'MMMM',
+                    };
+                }
+            });
         },
         beforeDestroy() {
             window.removeEventListener('click', this.hidePopup);
