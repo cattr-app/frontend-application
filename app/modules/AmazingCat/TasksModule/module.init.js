@@ -88,7 +88,7 @@ export function init(context, router) {
                     return null;
                 }
 
-                return h('span', currentValue.name);
+                return h('span', i18n.t(`tasks.priority.${currentValue.name.toLowerCase()}`));
             },
         },
         {
@@ -226,15 +226,15 @@ export function init(context, router) {
             options: [
                 {
                     value: 1,
-                    label: 'Low',
+                    label: 'tasks.priority.low',
                 },
                 {
                     value: 2,
-                    label: 'Normal',
+                    label: 'tasks.priority.normal',
                 },
                 {
                     value: 3,
-                    label: 'High',
+                    label: 'tasks.priority.high',
                 },
             ],
             initialValue: 2,
