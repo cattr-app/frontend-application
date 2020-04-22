@@ -64,7 +64,7 @@
                             :key="optionKey"
                             :value="option.value"
                         >
-                            {{ option.label }}
+                            {{ $t(option.label) }}
                         </at-option>
                     </at-select>
 
@@ -117,57 +117,22 @@
         data() {
             const { gridData, sortable } = this.$route.meta;
 
-            const columns = gridData.columns.map(col => {
-                col.title = this.$t(col.title);
-                return col;
-            });
+            let orderBy = null;
+            if (sortable && gridData.columns.length) {
+                const col = gridData.columns[0];
 
-            if (gridData.actions.length > 0 && columns.filter(t => t.title === 'field.actions').length === 0) {
-                columns.push({
-                    title: this.$t('field.actions'),
-                    render: (h, params) => {
-                        return h(
-                            'div',
-                            {
-                                class: 'actions-column',
-                            },
-                            gridData.actions.map(item => {
-                                if (
-                                    typeof item.renderCondition !== 'undefined'
-                                        ? item.renderCondition(this, params.item)
-                                        : true
-                                ) {
-                                    return h(
-                                        'AtButton',
-                                        {
-                                            props: {
-                                                type: item.actionType || 'primary', // AT-ui button display type
-                                                icon: item.icon || undefined, // Prepend icon to button
-                                            },
-                                            on: {
-                                                click: () => {
-                                                    item.onClick(this.$router, params, this);
-                                                },
-                                            },
-                                            class: 'action-button',
-                                        },
-                                        this.$t(item.title),
-                                    );
-                                }
-                            }),
-                        );
-                    },
-                });
+                orderBy = {
+                    ...col,
+                    title: this.$t(col.title),
+                    direction: 'asc',
+                };
             }
-
-            const orderBy = sortable ? { ...columns[0], direction: 'asc' } : null;
 
             const withParam = gridData.with;
             const withCount = gridData.withCount;
 
             return {
                 title: gridData.title || '',
-                columns,
                 filters: gridData.filters || [],
                 filterFields: gridData.filterFields || [],
                 tableData: [],
@@ -404,6 +369,51 @@
             }
         },
         computed: {
+            columns() {
+                const { gridData, sortable } = this.$route.meta;
+
+                const columns = gridData.columns.map(col => ({ ...col, title: this.$t(col.title) }));
+
+                if (gridData.actions.length > 0 && columns.filter(t => t.title === 'field.actions').length === 0) {
+                    columns.push({
+                        title: this.$t('field.actions'),
+                        render: (h, params) => {
+                            return h(
+                                'div',
+                                {
+                                    class: 'actions-column',
+                                },
+                                gridData.actions.map(item => {
+                                    if (
+                                        typeof item.renderCondition !== 'undefined'
+                                            ? item.renderCondition(this, params.item)
+                                            : true
+                                    ) {
+                                        return h(
+                                            'AtButton',
+                                            {
+                                                props: {
+                                                    type: item.actionType || 'primary', // AT-ui button display type
+                                                    icon: item.icon || undefined, // Prepend icon to button
+                                                },
+                                                on: {
+                                                    click: () => {
+                                                        item.onClick(this.$router, params, this);
+                                                    },
+                                                },
+                                                class: 'action-button',
+                                            },
+                                            this.$t(item.title),
+                                        );
+                                    }
+                                }),
+                            );
+                        },
+                    });
+                }
+
+                return columns;
+            },
             displayableData() {
                 return this.tableData;
             },

@@ -304,15 +304,15 @@ export default (context, router) => {
                 options: [
                     {
                         value: '',
-                        label: i18n.t('field.statuses.any'),
+                        label: 'field.statuses.any',
                     },
                     {
                         value: 0,
-                        label: i18n.t('field.statuses.disabled'),
+                        label: 'field.statuses.disabled',
                     },
                     {
                         value: 1,
-                        label: i18n.t('field.statuses.active'),
+                        label: 'field.statuses.active',
                     },
                 ],
             },
@@ -325,19 +325,19 @@ export default (context, router) => {
                 options: [
                     {
                         value: '',
-                        label: i18n.t('field.roles.any'),
+                        label: 'field.roles.any',
                     },
                     {
                         value: 1,
-                        label: i18n.t('field.roles.manager'),
+                        label: 'field.roles.manager',
                     },
                     {
                         value: 2,
-                        label: i18n.t('field.roles.user'),
+                        label: 'field.roles.user',
                     },
                     {
                         value: 3,
-                        label: i18n.t('field.roles.auditor'),
+                        label: 'field.roles.auditor',
                     },
                 ],
             },
