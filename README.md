@@ -18,3 +18,15 @@ npm run compile
 # Run production build
 npm run build
 ```
+
+Note: if you want to work with the compiler or core use `npm link`
+
+## Modules configuration
+
+By default, will be loaded config from /app/etc/modules.*.json.
+
+`modules.config.json` will always be read and loaded and then merged with contents of
+
+`modules.<NODE_ENV>.json` if it exists, and then merged with contents of
+
+`modules.local.json` if it exists

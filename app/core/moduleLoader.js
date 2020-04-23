@@ -5,15 +5,23 @@ import kebabCase from 'lodash/kebabCase';
 import isObject from 'lodash/isObject';
 import sortBy from 'lodash/sortBy';
 import moduleRequire from '_app/generated/module.require';
+import merge from 'lodash/merge';
 
 export const moduleFilter = moduleName => true;
 export const config = { moduleFilter };
 
-let moduleCfg;
-if (process.env.NODE_ENV === 'development') {
-    moduleCfg = require('_app/etc/modules.dev.json');
-} else {
-    moduleCfg = require('_app/etc/modules.config.json');
+let moduleCfg = require('_app/etc/modules.config.json');
+
+try {
+    moduleCfg = merge(moduleCfg, require(`_app/etc/modules.${process.env.NODE_ENV}.json`));
+} catch (e) {
+    // Do nothing if node-env module config wasn't found
+}
+
+try {
+    moduleCfg = merge(moduleCfg, require('_app/etc/modules.local.json'));
+} catch (e) {
+    // Do nothing if local module config wasn't found
 }
 
 export const ModuleLoaderInterceptor = new EventEmitter();
@@ -31,23 +39,23 @@ export function localModuleLoader(router) {
         const fullModuleName = `${moduleVendor}_${moduleName}`;
 
         const md = requireModule(fn);
-        const moduleInitData = md.ModuleConfig || { enabled: true };
+        const moduleInitData = md.ModuleConfig || { enabled: false };
 
         const moduleEnabled =
-            (typeof moduleInitData.enabled !== 'undefined' ? moduleInitData.enabled : true) &&
+            (typeof moduleInitData.enabled !== 'undefined' ? moduleInitData.enabled : false) &&
             (moduleCfg.hasOwnProperty(fullModuleName)
                 ? isObject(moduleCfg[fullModuleName])
                     ? (moduleCfg[fullModuleName].hasOwnProperty('type')
                           ? moduleCfg[fullModuleName].type === 'local'
-                          : true) &&
+                          : false) &&
                       (moduleCfg[fullModuleName].hasOwnProperty('enabled')
                           ? moduleCfg[fullModuleName].enabled
-                          : true) &&
+                          : false) &&
                       (moduleCfg[fullModuleName].hasOwnProperty('ref')
                           ? moduleCfg[fullModuleName].ref === fullModuleName
-                          : true)
-                    : true
-                : true);
+                          : false)
+                    : false
+                : false);
 
         if (moduleEnabled) {
             moduleInitQueue.push({

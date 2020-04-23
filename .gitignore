@@ -2,7 +2,7 @@
 node_modules
 /dist
 /app/etc/env.js
-/app/etc/modules.config.json
+/app/etc/modules.local.json
 /app/generated
 output/*
 !output/500.html

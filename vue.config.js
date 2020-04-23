@@ -1,7 +1,7 @@
 const webpack = require('webpack');
 const env = require('./app/etc/env');
 const resolve = require('path').resolve;
-const isDevMod = process.env.NODE_ENV !== 'production';
+const isDevMod = process.env.NODE_ENV === 'development';
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const SentryPlugin = require('@sentry/webpack-plugin');

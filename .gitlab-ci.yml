@@ -60,7 +60,6 @@ staging_deploy:
   script:
     - ssh $STAGING_USER@$STAGING_HOST 'cd frontend && git pull'
     - ssh $STAGING_USER@$STAGING_HOST 'cp -f frontend/app/etc/env.staging.js frontend/app/etc/env.js'
-    - ssh $STAGING_USER@$STAGING_HOST 'cp -f frontend/app/etc/modules.staging.json frontend/app/etc/modules.config.json'
     - ssh $STAGING_USER@$STAGING_HOST 'source .zshrc && cd frontend && npm install'
     - ssh $STAGING_USER@$STAGING_HOST 'source .zshrc && cd frontend && npm run compile'
     - ssh $STAGING_USER@$STAGING_HOST 'source .zshrc && cd frontend && npm run build'
