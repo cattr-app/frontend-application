@@ -94,32 +94,62 @@
             const today = this.getDateToday();
 
             const data = {
-                tab: query['type'] || sessionStorage.getItem(this.sessionStorageKey + '.type') || this.initialTab,
-                start: query['start'] || sessionStorage.getItem(this.sessionStorageKey + '.start') || today,
-                end: query['end'] || sessionStorage.getItem(this.sessionStorageKey + '.end') || today,
                 showPopup: false,
                 lang: null,
                 datePickerLang: {},
             };
 
+            const sessionData = {
+                type: sessionStorage.getItem(this.sessionStorageKey + '.type'),
+                start: sessionStorage.getItem(this.sessionStorageKey + '.start'),
+                end: sessionStorage.getItem(this.sessionStorageKey + '.end'),
+            };
+
+            if (typeof query['type'] === 'string' && this.validateTab(query['type'])) {
+                data.tab = query['type'];
+            } else if (typeof sessionData.type === 'string' && this.validateTab(sessionData.type)) {
+                data.tab = sessionData.type;
+            } else {
+                data.tab = this.initialTab;
+            }
+
+            if (typeof query['start'] === 'string' && this.validateDate(query['start'])) {
+                data.start = query['start'];
+            } else if (typeof sessionData.start === 'string' && this.validateDate(sessionData.start)) {
+                data.start = sessionData.start;
+            } else {
+                data.start = today;
+            }
+
+            if (typeof query['end'] === 'string' && this.validateDate(query['end'])) {
+                data.end = query['end'];
+            } else if (typeof sessionData.end === 'string' && this.validateDate(sessionData.end)) {
+                data.end = sessionData.end;
+            } else {
+                data.end = today;
+            }
+
             switch (data.tab) {
                 case 'day':
                 case 'date':
-                    data.start = moment(data.start, 'YYYY-MM-DD').format('YYYY-MM-DD');
                     data.end = data.start;
                     break;
 
                 case 'week': {
-                    const date = moment(data.start, 'YYYY-MM-DD');
-                    data.start = date.startOf('isoWeek').format('YYYY-MM-DD');
-                    data.end = date.endOf('isoWeek').format('YYYY-MM-DD');
+                    const date = moment(data.start, 'YYYY-MM-DD', true);
+                    if (date.isValid()) {
+                        data.start = date.startOf('isoWeek').format('YYYY-MM-DD');
+                        data.end = date.endOf('isoWeek').format('YYYY-MM-DD');
+                    }
                     break;
                 }
 
                 case 'month': {
-                    const date = moment(data.start, 'YYYY-MM-DD');
-                    data.start = date.startOf('month').format('YYYY-MM-DD');
-                    data.end = date.endOf('month').format('YYYY-MM-DD');
+                    const date = moment(data.start, 'YYYY-MM-DD', true);
+                    if (date.isValid()) {
+                        data.start = date.startOf('month').format('YYYY-MM-DD');
+                        data.end = date.endOf('month').format('YYYY-MM-DD');
+                    }
                     break;
                 }
             }
@@ -221,7 +251,12 @@
         },
         methods: {
             getDateToday,
-
+            validateTab(tab) {
+                return ['day', 'date', 'week', 'month', 'range'].indexOf(tab) !== -1;
+            },
+            validateDate(date) {
+                return moment(date, 'YYYY-MM-DD', true).isValid();
+            },
             togglePopup() {
                 this.showPopup = !this.showPopup;
             },
@@ -358,7 +393,7 @@
                 this.emitChangeEvent();
             },
             saveData(type, start, end) {
-                this.type = type;
+                this.tab = type;
                 this.start = start;
                 this.end = end;
 
