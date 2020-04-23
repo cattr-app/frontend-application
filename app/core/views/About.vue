@@ -29,7 +29,7 @@
 
                     <h2>Cattr</h2>
                     <p class="about__version">
-                        <skeleton :loading="isLoading" width="80px">{{ appData.app_version || 'Undefined' }}</skeleton>
+                        <skeleton :loading="isLoading" width="80px">{{ appData.version || 'Undefined' }}</skeleton>
                     </p>
                     <p>
                         Instance ID:
@@ -65,15 +65,12 @@
             this.isLoading = true;
 
             const { data } = await axios.get('about');
-            this.appData = data.info;
+            this.appData = data.app;
 
-            if (data.info.known_vulnerable) {
-                this.knownVulnerableMsg = `${this.$i18n.t('message.vulnerable_version')} ${data.info.update_version}`;
-                return;
-            }
-
-            if (data.info.update_version) {
-                this.updateVersionMsg = `${this.$i18n.t('message.update_version')} ${data.info.update_version}`;
+            if (data.app.vulnerable) {
+                this.knownVulnerableMsg = `${this.$i18n.t('message.vulnerable_version')} ${data.app.last_version}`;
+            } else if (data.app.last_version) {
+                this.updateVersionMsg = `${this.$i18n.t('message.update_version')} ${data.app.last_version}`;
             }
 
             this.isLoading = false;
