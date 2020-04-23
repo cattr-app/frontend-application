@@ -435,13 +435,19 @@
         },
         watch: {
             $route(to, from) {
-                this.tab = to.query['type'];
-                this.start = to.query['start'];
-                this.end = to.query['end'];
+                const { query } = to;
 
-                sessionStorage.setItem(this.sessionStorageKey + '.type', this.tab);
-                sessionStorage.setItem(this.sessionStorageKey + '.start', this.start);
-                sessionStorage.setItem(this.sessionStorageKey + '.end', this.end);
+                if (typeof query['type'] === 'string' && this.validateTab(query['type'])) {
+                    sessionStorage.setItem(this.sessionStorageKey + '.type', (this.tab = query['type']));
+                }
+
+                if (typeof query['start'] === 'string' && this.validateDate(query['start'])) {
+                    sessionStorage.setItem(this.sessionStorageKey + '.start', (this.start = query['start']));
+                }
+
+                if (typeof query['end'] === 'string' && this.validateDate(query['end'])) {
+                    sessionStorage.setItem(this.sessionStorageKey + '.end', (this.end = query['end']));
+                }
 
                 this.emitChangeEvent();
             },
