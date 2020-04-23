@@ -1,7 +1,9 @@
 {
-  "name": "@amazingtime/core",
+  "name": "@amazingcat/cattr-frontend-core",
   "version": "0.2.1",
   "description": "The core package for Cattr frontend application",
+  "homepage": "https://cattr.app",
+  "license": "SSPL-1.0",
   "author": {
     "email": "to@amazingcat.net",
     "name": "AmazingCat LLC"

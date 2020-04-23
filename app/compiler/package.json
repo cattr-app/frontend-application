@@ -1,6 +1,9 @@
 {
-  "name": "@amazingtime/vue-cli-plugin-at-compiler",
+  "name": "@amazingcat/vue-cli-plugin-cattr-compiler",
   "version": "1.0.0",
+  "license": "SSPL-1.0",
+  "description": "Module compiler for Cattr",
+  "homepage": "https://cattr.app",
   "author": {
     "name": "AmazingCat LLC",
     "email": "to@amazingcat.net"

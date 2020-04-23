@@ -9,7 +9,7 @@ const SentryPlugin = require('@sentry/webpack-plugin');
 let coreAlias;
 
 if (!isDevMod) {
-    coreAlias = env.LOCAL_BUILD === true ? resolve(__dirname, 'app', 'core') : '@amazingtime/core';
+    coreAlias = env.LOCAL_BUILD === true ? resolve(__dirname, 'app', 'core') : '@amazingcat/cattr-frontend-core';
 } else {
     switch (env.DEVELOPER_MODE) {
         case 'local':
@@ -17,7 +17,7 @@ if (!isDevMod) {
             break;
         case 'package':
         default:
-            coreAlias = '@amazingtime/core';
+            coreAlias = '@amazingcat/cattr-frontend-core';
             break;
     }
 }
@@ -42,7 +42,7 @@ module.exports = {
             },
         },
     },
-    transpileDependencies: ['@amazingtime/core', /(.+)-cattr-module/gi],
+    transpileDependencies: ['@amazingcat/cattr-frontend-core', /(.+)-cattr-module/gi],
     configureWebpack: {
         devtool: isDevMod ? 'eval-source-maps' : '',
         entry: {

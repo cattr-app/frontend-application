@@ -1,5 +1,5 @@
 {
-  "name": "@amazingtime/cattr-frontend",
+  "name": "@amazingcat/cattr-frontend",
   "version": "2.4.0",
   "description": "Frontend application for Cattr",
   "homepage": "https://cattr.app",
@@ -16,8 +16,8 @@
     }
   },
   "dependencies": {
-    "@amazingtime/core": "./app/core",
-    "@amazingtime/vue-cli-plugin-at-compiler": "./app/compiler",
+    "@amazingcat/cattr-frontend-core": "./app/core",
+    "@amazingcat/vue-cli-plugin-cattr-compiler": "^1.0.0",
     "@sentry/browser": "^5.14.0",
     "@sentry/integrations": "^5.14.0",
     "at-ui": "^1.3.3",
