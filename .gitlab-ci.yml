@@ -3,7 +3,6 @@ build_test:
   stage: test
   before_script:
     - cp app/etc/env.production.js app/etc/env.js
-    - cp app/etc/modules.production.json app/etc/modules.config.json
   script:
     - npm install
     - npm run compile
