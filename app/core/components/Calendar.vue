@@ -105,19 +105,19 @@
             switch (data.tab) {
                 case 'day':
                 case 'date':
-                    data.start = moment(data.start).format('YYYY-MM-DD');
+                    data.start = moment(data.start, 'YYYY-MM-DD').format('YYYY-MM-DD');
                     data.end = data.start;
                     break;
 
                 case 'week': {
-                    const date = moment(data.start);
+                    const date = moment(data.start, 'YYYY-MM-DD');
                     data.start = date.startOf('isoWeek').format('YYYY-MM-DD');
                     data.end = date.endOf('isoWeek').format('YYYY-MM-DD');
                     break;
                 }
 
                 case 'month': {
-                    const date = moment(data.start);
+                    const date = moment(data.start, 'YYYY-MM-DD');
                     data.start = date.startOf('month').format('YYYY-MM-DD');
                     data.end = date.endOf('month').format('YYYY-MM-DD');
                     break;
