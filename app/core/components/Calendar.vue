@@ -135,7 +135,7 @@
                     default:
                         return moment(this.start, 'YYYY-MM-DD')
                             .locale(this.$i18n.locale)
-                            .format('MMM. DD, YYYY');
+                            .format('MMM DD, YYYY');
 
                     case 'week': {
                         const start = moment(this.start, 'YYYY-MM-DD')
@@ -145,17 +145,17 @@
                             .locale(this.$i18n.locale)
                             .endOf('isoWeek');
                         if (start.month() === end.month()) {
-                            return start.format('MMM. DD-') + end.format('DD, YYYY');
+                            return start.format('MMM DD-') + end.format('DD, YYYY');
                         }
 
-                        return start.format('MMM. DD — ') + end.format('MMM. DD, YYYY');
+                        return start.format('MMM DD — ') + end.format('MMM DD, YYYY');
                     }
 
                     case 'month':
                         return moment(this.start, 'YYYY-MM-DD')
                             .locale(this.$i18n.locale)
                             .startOf('month')
-                            .format('MMM., YYYY');
+                            .format('MMM, YYYY');
 
                     case 'range': {
                         const start = moment(this.start, 'YYYY-MM-DD').locale(this.$i18n.locale);
