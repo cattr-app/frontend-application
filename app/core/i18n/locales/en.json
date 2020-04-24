@@ -209,6 +209,13 @@
     "already_exists": "is already exists",
     "already_sent": "to these addresses is already sent"
   },
+  "about": {
+    "modules": {
+      "name": "Module",
+      "version": "Version",
+      "status": "Status"
+    }
+  },
   "notification": {
     "record": {
       "save": {

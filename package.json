@@ -31,6 +31,7 @@
     "js-md5": "^0.7.3",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.28",
+    "semver": "^7.3.2",
     "validator": "^12.1.0",
     "vee-validate": "^3.2.5",
     "vue": "^2.6.10",
