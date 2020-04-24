@@ -44,7 +44,7 @@
     "type": "local",
     "ref": "AmazingCat_TimeIntervalsModule"
   },
-  "AmazingCat_TimeUseReportsModule": {
+  "AmazingCat_TimeUseReportModule": {
     "enabled": true,
     "type": "local",
     "ref": "AmazingCat_TimeUseReportModule"
