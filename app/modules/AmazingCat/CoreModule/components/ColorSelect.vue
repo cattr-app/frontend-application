@@ -159,9 +159,9 @@
 
                 if (haveThisInterval.length > 0) {
                     this.$Notify({
-                        type: 'Error',
-                        title: 'Error',
-                        message: 'This interval is busy',
+                        type: 'error',
+                        title: this.$t('message.error'),
+                        message: this.$t('settings.color_interval.notification.interval_already_in_use'),
                     });
 
                     this.$forceUpdate();
@@ -178,12 +178,12 @@
                 }
 
                 if (newStart >= 100) {
-                    const haveOverTIme = this.colorsConfig.filter(el => el.start === 1).length;
-                    if (haveOverTIme > 0) {
+                    const haveOverTime = this.colorsConfig.filter(el => el.start === 1).length;
+                    if (haveOverTime > 0) {
                         this.$Notify({
-                            type: 'Error',
-                            title: 'Error',
-                            message: 'You are have one over time',
+                            type: 'error',
+                            title: this.$t('message.error'),
+                            message: this.$t('settings.color_interval.notification.gt_100'),
                         });
 
                         this.$forceUpdate();
@@ -200,9 +200,9 @@
 
                 if (haveThisInterval.length > 0) {
                     this.$Notify({
-                        type: 'Error',
-                        title: 'Error',
-                        message: 'This interval is busy',
+                        type: 'error',
+                        title: this.$t('message.error'),
+                        message: this.$t('settings.color_interval.notification.interval_already_in_use'),
                     });
 
                     this.$forceUpdate();

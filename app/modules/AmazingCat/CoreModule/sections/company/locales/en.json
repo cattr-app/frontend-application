@@ -16,19 +16,23 @@
     "gitlab": {
       "label": "Gitlab Integration",
       "url": "Gitlab URL",
-      "api_key": "Gitlab API Key"
+      "api_key": "API Key"
     },
     "redmine": {
       "label": "Redmine Integration",
       "url": "Redmine URL",
-      "api_key": "Redmine API Key",
+      "api_key": "API Key",
       "statuses": "Open Statuses",
       "priorities": "Priorities",
       "sync_time": "Sync time to Redmine",
       "notice": "Some settings may not be available. Wait for the synchronization to complete. This may take no more than 10 minutes."
     },
-    "dashboard": {
-      "interval-color": "Color intervals"
+    "color_interval": {
+      "label": "Progress of the working day",
+      "notification": {
+        "gt_100": "The value can't be greater than 100",
+        "interval_already_in_use": "This interval already in use"
+      }
     }
   }
 }

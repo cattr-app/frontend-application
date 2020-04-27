@@ -28,6 +28,7 @@ export default {
                     key: 'apikey',
                     fieldOptions: {
                         type: 'text',
+                        placeholder: 'settings.gitlab.api_key',
                         disableAutocomplete: false,
                     },
                 },

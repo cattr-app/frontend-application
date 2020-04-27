@@ -55,6 +55,7 @@ export function init(context, router) {
         with: ['users'],
         withCount: ['tasks'],
     });
+    grid.addToMetaProperties('navigation', navigation, grid.getRouterConfig());
 
     const fieldsToShow = [
         {
@@ -86,7 +87,7 @@ export function init(context, router) {
         },
         {
             key: 'workers',
-            label: 'field.workers',
+            label: 'field.users',
             render: (h, props) => {
                 const data = [];
                 Object.keys(props.currentValue).forEach(k => {
@@ -97,7 +98,7 @@ export function init(context, router) {
                     props: {
                         columns: [
                             {
-                                title: 'User',
+                                title: i18n.t('field.user'),
                                 render: (h, { item }) => {
                                     return h(
                                         'router-link',
@@ -114,7 +115,7 @@ export function init(context, router) {
                                 },
                             },
                             {
-                                title: 'Task Name',
+                                title: i18n.t('field.task'),
                                 render: (h, { item }) => {
                                     return h(
                                         'router-link',
@@ -132,11 +133,13 @@ export function init(context, router) {
                             },
                             {
                                 key: 'time',
-                                title: 'Time',
+                                title: i18n.t('field.time'),
                                 render(h, { item }) {
                                     return h('div', {
                                         domProps: {
-                                            textContent: !item ? '0h 0m' : item.time,
+                                            textContent: !item
+                                                ? `0${i18n.t('time.h')} 0${i18n.t('time.m')}`
+                                                : item.time,
                                         },
                                         styles: {
                                             'white-space': 'nowrap',
@@ -272,8 +275,8 @@ export function init(context, router) {
         {
             title: 'control.view',
             icon: 'icon-eye',
-            onClick: (router, params) => {
-                router.push({ name: crudViewRoute, params: { id: params.item.id } });
+            onClick: (router, { item }, context) => {
+                context.onView(item);
             },
             renderCondition({ $store }) {
                 // User always can view assigned projects
@@ -283,8 +286,8 @@ export function init(context, router) {
         {
             title: 'control.edit',
             icon: 'icon-edit',
-            onClick: (router, params) => {
-                router.push({ name: crudEditRoute, params: { id: params.item.id } });
+            onClick: (router, { item }, context) => {
+                context.onEdit(item);
             },
             renderCondition: ({ $store }, item) => {
                 return $store.getters['user/can']('projects/edit', item.id);
@@ -294,42 +297,8 @@ export function init(context, router) {
             title: 'control.delete',
             actionType: 'error', // AT-UI action type,
             icon: 'icon-trash-2',
-            onClick: async (router, params, context) => {
-                const res = await context.$CustomModal({
-                    title: 'Delete this Project?',
-                    content: 'After deletion this project cannot be restored',
-                    okText: 'Delete',
-                    cancelText: 'Cancel',
-                    showClose: false,
-                    styles: {
-                        'border-radius': '10px',
-                        'text-align': 'center',
-                        footer: {
-                            'text-align': 'center',
-                        },
-                        header: {
-                            padding: '16px 35px 4px 35px',
-                            color: 'red',
-                        },
-                        body: {
-                            padding: '16px 35px 4px 35px',
-                        },
-                    },
-                    width: 320,
-                    type: 'trash',
-                    typeButton: 'error',
-                });
-
-                if (res === 'confirm') {
-                    const projectService = new ProjectService();
-                    await projectService.deleteItem(params.item.id);
-                    context.tableData = context.tableData.filter(item => item.id !== params.item.id);
-                    context.$Notify({
-                        type: 'success',
-                        title: 'Success',
-                        message: 'Project deleted successfully',
-                    });
-                }
+            onClick: (router, { item }, context) => {
+                context.onDelete(item);
             },
             renderCondition: ({ $store }, item) => {
                 return $store.getters['user/can']('projects/remove', item.id);

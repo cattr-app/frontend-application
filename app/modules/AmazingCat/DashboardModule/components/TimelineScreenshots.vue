@@ -156,16 +156,16 @@
 
                     this.$Notify({
                         type: 'success',
-                        title: 'Deleted Successfully',
-                        message: 'Screenshot was deleted successfully',
+                        title: this.$t('notification.screenshot.delete.success.title'),
+                        message: this.$t('notification.screenshot.delete.success.message'),
                     });
 
                     this.modal.show = false;
                 } catch (e) {
                     this.$Notify({
                         type: 'error',
-                        title: 'Deletion Error',
-                        message: 'This screenshot can not be deleted OR something unusual happened during the request',
+                        title: this.$t('notification.screenshot.delete.error.title'),
+                        message: this.$t('notification.screenshot.delete.error.message'),
                     });
                 }
             },

@@ -209,8 +209,8 @@
                     await this.screenshotsService.deleteItem(id);
                     this.$Notify({
                         type: 'success',
-                        title: 'Deleted Successfully',
-                        message: 'Screenshot was deleted successfully',
+                        title: this.$t('notification.screenshot.save.success.title'),
+                        message: this.$t('notification.screenshot.save.success.message'),
                     });
 
                     this.screenshots = this.screenshots.filter(screen => screen.id !== id);
@@ -218,8 +218,8 @@
                 } catch (e) {
                     this.$Notify({
                         type: 'error',
-                        title: 'Deletion Error',
-                        message: 'This screenshot can not be deleted OR something unusual happened during the request',
+                        title: this.$t('notification.screenshot.save.success.title'),
+                        message: this.$t('notification.screenshot.save.success.message'),
                     });
                 }
             },

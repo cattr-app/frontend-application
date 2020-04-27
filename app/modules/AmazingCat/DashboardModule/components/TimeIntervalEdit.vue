@@ -83,7 +83,6 @@
         },
         computed: {
             ...mapGetters('user', ['user']),
-
             showAddNewTaskModal() {
                 return this.modal === 'addNewTask';
             },
@@ -113,11 +112,9 @@
                     })
                     .reduce((total, curr) => total + curr, 0);
             },
-
             getFormattedTotalTime() {
                 return moment.utc(this.totalTimeOfSelectedIntervals()).format('HH:mm:ss');
             },
-
             async saveTimeIntervals(data) {
                 try {
                     this.disabledButtons = true;
@@ -126,8 +123,8 @@
 
                     this.$Notify({
                         type: 'success',
-                        title: 'Saved Successfully',
-                        message: 'Screenshots was saved successfully',
+                        title: this.$t('notification.screenshot.save.success.title'),
+                        message: this.$t('notification.screenshot.save.success.message'),
                     });
 
                     this.$emit('edit');
@@ -137,14 +134,13 @@
                 } catch (e) {
                     this.$Notify({
                         type: 'error',
-                        title: 'Save error',
-                        message: 'These screenshots can not be saved',
+                        title: this.$t('notification.screenshot.save.error.title'),
+                        message: this.$t('notification.screenshot.save.error.message'),
                     });
 
                     this.disabledButtons = false;
                 }
             },
-
             async deleteTimeIntervals() {
                 try {
                     this.disabledButtons = true;
@@ -155,8 +151,8 @@
 
                     this.$Notify({
                         type: 'success',
-                        title: 'Deleted Successfully',
-                        message: 'Screenshots was deleted successfully',
+                        title: this.$t('notification.screenshot.delete.success.title'),
+                        message: this.$t('notification.screenshot.delete.success.message'),
                     });
 
                     this.$emit('remove', this.intervals);
@@ -165,15 +161,13 @@
                 } catch (e) {
                     this.$Notify({
                         type: 'error',
-                        title: 'Deletion error',
-                        message:
-                            'These screenshots can not be deleted OR something unusual happened during the request',
+                        title: this.$t('notification.screenshot.delete.error.title'),
+                        message: this.$t('notification.screenshot.delete.error.message'),
                     });
 
                     this.disabledButtons = false;
                 }
             },
-
             async createTask(projectId, taskName, taskDescription) {
                 try {
                     this.disabledButtons = true;
@@ -199,8 +193,8 @@
 
                     this.$Notify({
                         type: 'success',
-                        title: 'Saved Successfully',
-                        message: 'Screenshots was saved successfully',
+                        title: this.$t('notification.screenshot.save.success.title'),
+                        message: this.$t('notification.screenshot.save.success.message'),
                     });
 
                     this.$emit('edit');
@@ -210,35 +204,29 @@
                 } catch (e) {
                     this.$Notify({
                         type: 'error',
-                        title: 'Save error',
-                        message: 'These screenshots can not be saved',
+                        title: this.$t('notification.screenshot.save.error.title'),
+                        message: this.$t('notification.screenshot.save.error.message'),
                     });
 
                     this.disabledButtons = false;
                 }
             },
-
             openAddNewTaskModal() {
                 this.modal = 'addNewTask';
             },
-
             openChangeTaskModal() {
                 this.modal = 'changeTask';
             },
-
             onAddNewTaskModalConfirm({ projectId, taskName, taskDescription }) {
                 this.createTask(projectId, taskName, taskDescription);
             },
-
             onChangeTaskModalConfirm(taskId) {
                 const intervals = this.intervals.map(id => ({ id, task_id: taskId }));
                 this.saveTimeIntervals({ intervals });
             },
-
             onAddNewTaskModalCancel() {
                 this.modal = '';
             },
-
             onChangeTaskModalCancel() {
                 this.modal = '';
             },

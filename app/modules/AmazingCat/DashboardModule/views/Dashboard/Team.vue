@@ -242,7 +242,9 @@
             exportFilename() {
                 const days = moment(this.end).diff(this.start, 'days');
 
-                return days > 1 ? `AT Report from ${this.start} to ${this.end}` : `AT Report ${this.start}`;
+                return days > 1
+                    ? `Dashboard Report from ${this.start} to ${this.end}`
+                    : `Dashboard Report ${this.start}`;
             },
         },
         methods: {
@@ -434,6 +436,7 @@
     }
 
     .team__loader {
+        z-index: 0;
         border-radius: 20px;
 
         &::v-deep {

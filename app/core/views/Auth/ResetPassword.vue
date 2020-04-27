@@ -200,7 +200,7 @@
                     .catch(({ response }) => {
                         this.$Notify({
                             title: 'Error',
-                            message: response.data.message || 'Something went wrong',
+                            message: response.data.message || this.$t('message.something_went_wrong'),
                             type: 'error',
                         });
                     })
@@ -245,7 +245,7 @@
                     .catch(({ response }) => {
                         this.$Notify({
                             title: 'Error',
-                            message: response.data.message || 'Something went wrong',
+                            message: response.data.message || this.$t('message.something_went_wrong'),
                             type: 'error',
                         });
                     })

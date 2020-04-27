@@ -150,7 +150,7 @@ export default {
                     },
                 },
                 {
-                    label: 'settings.dashboard.interval-color',
+                    label: 'settings.color_interval.label',
                     key: 'color',
                     displayable: store =>
                         'work_time' in store.getters['user/companyData'] && store.getters['user/companyData'].work_time,

@@ -53,7 +53,7 @@
                                                 <at-input
                                                     v-model="values[field.key]"
                                                     :readonly="field.fieldOptions.disableAutocomplete || false"
-                                                    :placeholder="field.fieldOptions.placeholder || ''"
+                                                    :placeholder="$t(field.fieldOptions.placeholder) || ''"
                                                     :type="field.fieldOptions.frontendType || ''"
                                                     :status="errors.length > 0 ? 'error' : ''"
                                                     @focus="removeReadonly"
@@ -149,7 +149,9 @@
                     :key="index"
                     :parent="this"
                 ></component>
-                <at-button type="primary" @click="submit">{{ $t('control.save') }} </at-button>
+                <at-button type="primary" :loading="isLoading" :disabled="isLoading" @click="submit"
+                    >{{ $t('control.save') }}
+                </at-button>
             </validation-observer>
         </template>
     </div>
@@ -175,6 +177,7 @@
             return {
                 section: {},
                 values: {},
+                isLoading: false,
             };
         },
 
@@ -241,13 +244,11 @@
                     this.values = { ...this.values, ...this.section.data };
                 }
             },
-
             removeReadonly(el) {
                 if (el.target.getAttribute('readonly') === 'readonly') {
                     el.target.removeAttribute('readonly');
                 }
             },
-
             getSelectOptions(field, values) {
                 const { options } = field.fieldOptions;
 
@@ -257,20 +258,22 @@
 
                 return options;
             },
-
             async submit() {
-                await this.section.service
-                    .save(this.values)
-                    .then(() => {
-                        this.$Notify({
-                            type: 'success',
-                            title: 'Information Saved',
-                            message: 'Information successfully saved',
-                        });
-                    })
-                    .catch(({ response }) => {
-                        this.$refs.form.setErrors(response.data.info);
+                this.isLoading = true;
+
+                try {
+                    await this.section.service.save(this.values);
+
+                    this.$Notify({
+                        type: 'success',
+                        title: this.$t('notification.settings.save.success.title'),
+                        message: this.$t('notification.settings.save.success.message'),
                     });
+                } catch ({ response }) {
+                    this.$refs.form.setErrors(response.data.info);
+                }
+
+                this.isLoading = false;
                 this.$emit('onUpdate');
             },
         },
