@@ -35,15 +35,15 @@ live_deploy:
     - mkdir ~/.ssh
     - ssh-keyscan -H $CI_HOST >> ~/.ssh/known_hosts
   script:
-    - ssh $CI_USER@$CI_HOST 'cd cattr/core-vue-application && git pull'
-    - ssh $CI_USER@$CI_HOST 'source .zshrc && cd cattr/core-vue-application && npm install'
-    - ssh $CI_USER@$CI_HOST 'source .zshrc && cd cattr/core-vue-application && npm run compile'
-    - ssh $CI_USER@$CI_HOST 'source .zshrc && cd cattr/core-vue-application && npm run build'
-    - ssh $CI_USER@$CI_HOST 'test -f cattr/core-vue-application/dist/index.html || exit 1'
-    - ssh $CI_USER@$CI_HOST 'cd cattr/core-vue-application && git clean -Xf output/*'
-    - ssh $CI_USER@$CI_HOST 'cp -rf cattr/core-vue-application/dist/* cattr/core-vue-application/output'
-    - ssh $CI_USER@$CI_HOST 'cd cattr/core-vue-application && git clean -Xf dist'
-    - ssh $CI_USER@$CI_HOST 'cd cattr/core-vue-application && sentry-cli releases deploys `cat package.json | grep version | grep -o ":.*" | grep -o "\".*\"" | sed "s/\"//g"` new -e "production"'
+    - ssh $CI_USER@$CI_HOST 'cd cattr/frontend && git pull'
+    - ssh $CI_USER@$CI_HOST 'source .zshrc && cd cattr/frontend && npm install'
+    - ssh $CI_USER@$CI_HOST 'source .zshrc && cd cattr/frontend && npm run compile'
+    - ssh $CI_USER@$CI_HOST 'source .zshrc && cd cattr/frontend && npm run build'
+    - ssh $CI_USER@$CI_HOST 'test -f cattr/frontend/dist/index.html || exit 1'
+    - ssh $CI_USER@$CI_HOST 'cd cattr/frontend && git clean -Xf output/*'
+    - ssh $CI_USER@$CI_HOST 'cp -rf cattr/frontend/dist/* cattr/frontend/output'
+    - ssh $CI_USER@$CI_HOST 'cd cattr/frontend && git clean -Xf dist'
+    - ssh $CI_USER@$CI_HOST 'cd cattr/frontend && sentry-cli releases deploys `cat package.json | grep version | grep -o ":.*" | grep -o "\".*\"" | sed "s/\"//g"` new -e "production"'
 
 staging_deploy:
   image: alpine
