@@ -81,6 +81,27 @@
                     });
                 });
             }
+
+            this.lastQuery = '';
+            this.$watch(
+                () => {
+                    return {
+                        query: this.$refs.select.query,
+                        visible: this.$refs.select.visible,
+                    };
+                },
+                ({ query, visible }) => {
+                    if (visible) {
+                        if (query.length) {
+                            this.lastQuery = query;
+                        } else {
+                            this.$refs.select.query = this.lastQuery;
+                        }
+                    } else {
+                        this.lastQuery = query;
+                    }
+                },
+            );
         },
         watch: {
             selected() {
@@ -113,6 +134,8 @@
                 }
             },
             onClose() {
+                this.$refs.select.query = '';
+
                 if (!this.showCount) {
                     setTimeout(() => {
                         this.showCount = true;
