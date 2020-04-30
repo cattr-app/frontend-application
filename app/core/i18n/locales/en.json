@@ -213,7 +213,10 @@
     "modules": {
       "name": "Module",
       "version": "Version",
-      "status": "Status"
+      "status": "Status",
+      "vulnerable": "Vulnerable",
+      "ok": "Up to date",
+      "outdated": "Outdated"
     }
   },
   "notification": {
