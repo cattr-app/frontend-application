@@ -11,6 +11,7 @@
                             :screenshot="screenshot"
                             :task="getTask(screenshot)"
                             :user="user"
+                            :timezone="timezone"
                             @click="showPopup(screenshot)"
                         />
                         <at-checkbox class="screenshot__checkbox" :label="screenshot.time_interval_id" />
@@ -58,7 +59,7 @@
             };
         },
         computed: {
-            ...mapGetters('timeline', ['tasks', 'screenshots']),
+            ...mapGetters('timeline', ['tasks', 'screenshots', 'timezone']),
             ...mapGetters('user', ['user']),
             projects() {
                 return Object.keys(this.tasks)

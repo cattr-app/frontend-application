@@ -128,13 +128,11 @@
 
     export default {
         name: 'Project',
-
         components: {
             Screenshot,
             ScreenshotModal,
             UserAvatar,
         },
-
         data() {
             return {
                 apiPath: env.API_URL,
@@ -153,7 +151,6 @@
                 screenshotsPerRow: 6,
             };
         },
-
         props: {
             project: {
                 type: Object,
@@ -166,21 +163,17 @@
                 type: String,
             },
         },
-
         mounted() {
             window.addEventListener('keydown', this.onKeyDown);
         },
-
         beforeDestroy() {
             window.removeEventListener('keydown', this.onKeyDown);
         },
-
         methods: {
             moment,
             getStartDay,
             getEndDay,
             formatDurationString,
-
             onShow(dateScreenshots, screenshot, user, task) {
                 this.modal = {
                     ...this.modal,
@@ -191,7 +184,6 @@
                     task,
                 };
             },
-
             onHide(screenshot) {
                 this.modal = {
                     ...this.modal,
@@ -199,7 +191,6 @@
                     screenshot: null,
                 };
             },
-
             onKeyDown(e) {
                 if (e.key === 'ArrowLeft') {
                     e.preventDefault();
@@ -209,7 +200,6 @@
                     this.onShowNext();
                 }
             },
-
             onShowPrevious() {
                 const screenshots = Object.values(this.modal.dateScreenshots).reduce((total, current) => {
                     if (Array.isArray(current)) {
@@ -231,7 +221,6 @@
                     screenshot: screenshots[currentIndex - 1],
                 };
             },
-
             onShowNext() {
                 const screenshots = Object.values(this.modal.dateScreenshots).reduce((total, current) => {
                     if (Array.isArray(current)) {
@@ -253,15 +242,12 @@
                     screenshot: screenshots[currentIndex + 1],
                 };
             },
-
             isDateOpened(collapseId) {
                 return this.openedDates.findIndex(p => p === collapseId) > -1;
             },
-
             handleCollapseDate(data) {
                 this.openedDates = data;
             },
-
             handleCollapseTask(user, taskID) {
                 if (typeof taskID === 'object') {
                     taskID = taskID[0];
@@ -269,16 +255,13 @@
                 const key = `${user.id}:${taskID}`;
                 this.$set(this.taskDurations, key, user.tasks);
             },
-
             formatDate(value) {
                 return moment(value).format('DD.MM.YYYY HH:mm:ss');
             },
-
             getDateTime(task, date) {
                 date = moment(date).format('YYYY-MM-DD');
                 return this.formatDurationString(task.dates[date]);
             },
-
             getUserPercentage(seconds, totalTime) {
                 if (!totalTime) {
                     return 0;
@@ -286,7 +269,6 @@
 
                 return Math.floor((seconds * 100) / totalTime);
             },
-
             getHourRow(screenshots) {
                 let result = new Array(this.screenshotsPerRow).fill(null);
 

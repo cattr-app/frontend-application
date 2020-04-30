@@ -9,10 +9,10 @@
         />
 
         <div v-if="showText" class="screenshot-text">
-            <span v-if="task && showTask" class="screenshot-task">
+            <span v-if="task && showTask" class="screenshot-task" :title="task.task_name">
                 {{ task.task_name }}
             </span>
-            <span class="screenshot-time">{{ formatTime(screenshot.created_at) }}</span>
+            <span class="screenshot-time">{{ screenshotTime }}</span>
         </div>
 
         <ScreenshotModal
@@ -35,6 +35,7 @@
     import moment from 'moment';
     import AppImage from './AppImage';
     import ScreenshotModal from './ScreenshotModal';
+    import { mapGetters } from 'vuex';
 
     export function thumbnailPathProvider(screenshot) {
         return screenshot.path;
@@ -81,16 +82,30 @@
                 type: Boolean,
                 default: true,
             },
+            timezone: {
+                type: String,
+            },
         },
         data() {
             return {
                 showModal: false,
             };
         },
-        methods: {
-            formatTime(value) {
-                return moment(value).format('HH:mm');
+        computed: {
+            ...mapGetters('user', ['companyData']),
+            screenshotTime() {
+                const timezone = this.timezone || this.companyData['timezone'];
+
+                if (!timezone && !this.screenshot.time_interval.start_at) {
+                    return;
+                }
+
+                return moment(this.screenshot.time_interval.start_at)
+                    .tz(timezone)
+                    .format('HH:mm');
             },
+        },
+        methods: {
             onShow() {
                 if (this.disableModal) {
                     return;

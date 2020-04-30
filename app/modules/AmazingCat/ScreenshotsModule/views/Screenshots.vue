@@ -25,7 +25,7 @@
                                 class="screenshot"
                                 :disableModal="true"
                                 :screenshot="screenshot"
-                                :task="screenshot.timeinterval.task"
+                                :task="screenshot.time_interval.task"
                                 :user="modal.user"
                                 @click="showImage(screenshot)"
                             />
@@ -71,7 +71,7 @@
     import UserSelect from '@/components/UserSelect';
     import ProjectService from '@/service/resource/projectService';
     import ScreenshotService from '@/service/resource/screenshotService';
-    import { getDateToday, getEndDay, getStartDay } from '@/utils/time';
+    import { getStartOfDayInTimezone, getEndOfDayInTimezone } from '@/utils/time';
     import Preloader from '@/components/Preloader';
     import ProjectSelect from '@/components/ProjectSelect';
 
@@ -85,7 +85,6 @@
             Preloader,
             ProjectSelect,
         },
-
         data() {
             const limit = 30;
             const localStorageKey = 'user-select.users';
@@ -110,26 +109,26 @@
                 isDataLoading: false,
             };
         },
-
         computed: {
             ...mapGetters('timeline', ['service', 'users']),
-            ...mapGetters('user', ['user']),
+            ...mapGetters('user', ['user', 'companyData']),
         },
-
+        watch: {
+            companyData() {
+                this.getScreenshots();
+            },
+        },
         async mounted() {
             window.addEventListener('keydown', this.onKeyDown);
 
             await this.getScreenshots();
         },
-
         beforeDestroy() {
             window.removeEventListener('keydown', this.onKeyDown);
         },
-
         methods: {
-            getStartDay,
-            getEndDay,
-
+            getStartOfDayInTimezone,
+            getEndOfDayInTimezone,
             onHide() {
                 this.modal.show = false;
             },
@@ -159,9 +158,9 @@
             showImage(screenshot) {
                 this.modal = {
                     screenshot,
-                    user: screenshot.timeinterval.user,
-                    task: screenshot.timeinterval.task,
-                    project: screenshot.timeinterval.task?.project,
+                    user: screenshot.time_interval.user,
+                    task: screenshot.time_interval.task,
+                    project: screenshot.time_interval.task?.project,
                     show: true,
                 };
             },
@@ -192,12 +191,19 @@
                 let { data } = await this.screenshotsService.getWithFilters({
                     'timeInterval.user_id': ['in', this.userIDs],
                     'timeInterval.task.project_id': ['in', this.projectsList],
-                    'timeInterval.start_at': ['>=', this.getStartDay(this.datepickerDateStart)],
-                    'timeInterval.end_at': ['<=', this.getEndDay(this.datepickerDateEnd)],
+                    'timeInterval.start_at': [
+                        '>=',
+                        this.getStartOfDayInTimezone(this.datepickerDateStart, this.companyData.timezone),
+                    ],
+                    'timeInterval.end_at': [
+                        '<=',
+                        this.getEndOfDayInTimezone(this.datepickerDateEnd, this.companyData.timezone),
+                    ],
+
                     paginate: true,
                     perPage: this.limit,
                     page: this.page,
-                    with: 'timeinterval.task,timeinterval.task.project,timeinterval.user',
+                    with: 'timeInterval.task, timeInterval.task.project, timeInterval.user',
                 });
 
                 this.isDataLoading = false;
@@ -209,8 +215,8 @@
                     await this.screenshotsService.deleteItem(id);
                     this.$Notify({
                         type: 'success',
-                        title: this.$t('notification.screenshot.save.success.title'),
-                        message: this.$t('notification.screenshot.save.success.message'),
+                        title: this.$t('notification.screenshot.delete.success.title'),
+                        message: this.$t('notification.screenshot.delete.success.message'),
                     });
 
                     this.screenshots = this.screenshots.filter(screen => screen.id !== id);
@@ -218,8 +224,8 @@
                 } catch (e) {
                     this.$Notify({
                         type: 'error',
-                        title: this.$t('notification.screenshot.save.success.title'),
-                        message: this.$t('notification.screenshot.save.success.message'),
+                        title: this.$t('notification.screenshot.delete.error.title'),
+                        message: this.$t('notification.screenshot.delete.error.message'),
                     });
                 }
             },
