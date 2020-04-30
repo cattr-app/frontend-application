@@ -47,7 +47,7 @@
 
             <div v-if="screenshot" class="modal-field">
                 <span class="modal-label">{{ $t('field.created_at') }}:</span>
-                <span class="modal-value">{{ formatDate(screenshot.created_at) }}</span>
+                <span class="modal-value">{{ formatDate(screenshot.time_interval.start_at) }}</span>
             </div>
         </template>
     </at-modal>
@@ -57,6 +57,7 @@
     import moment from 'moment';
     import AppImage from './AppImage';
     import env from '_app/etc/env';
+    import { mapGetters } from 'vuex';
 
     export function screenshotPathProvider(screenshot) {
         return screenshot.path;
@@ -92,6 +93,7 @@
             },
         },
         computed: {
+            ...mapGetters('user', ['companyData']),
             baseURL() {
                 return (env.API_URL || `${window.location.origin}/api`) + '/';
             },
@@ -99,8 +101,9 @@
         methods: {
             formatDate(value) {
                 return moment(value)
+                    .tz(this.companyData.timezone)
                     .locale(this.$i18n.locale)
-                    .format('MMMM D, YYYY — HH:mm:ss');
+                    .format('MMMM D, YYYY — HH:mm:ss (Z)');
             },
             onClose() {
                 this.$emit('close');

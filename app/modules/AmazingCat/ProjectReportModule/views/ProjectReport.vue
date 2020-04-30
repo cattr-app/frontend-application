@@ -57,8 +57,10 @@
     import moment from 'moment';
     import ExportDropdown from '@/components/ExportDropdown';
     import { getMimeType, downloadBlob } from '@/utils/file';
+    import { mapGetters } from 'vuex';
 
     export default {
+        name: 'ProjectReport',
         components: {
             UserSelect,
             Calendar,
@@ -67,8 +69,6 @@
             Preloader,
             ExportDropdown,
         },
-        name: 'ProjectReport',
-
         data() {
             const today = this.getDateToday();
             const sessionStorageKey = 'amazingcat.session.storage.project_report';
@@ -89,6 +89,7 @@
             };
         },
         computed: {
+            ...mapGetters('user', ['companyData']),
             exportFilename() {
                 const days = moment(this.datepickerDateEnd).diff(this.datepickerDateStart, 'days');
                 return days > 1
@@ -97,6 +98,11 @@
             },
             totalTime() {
                 return this.projects.reduce((total, current) => total + current.project_time, 0);
+            },
+        },
+        watch: {
+            companyData() {
+                this.fetchData();
             },
         },
         methods: {
@@ -121,7 +127,7 @@
             },
             async fetchData() {
                 this.isDataLoading = true;
-                const timezone = this.$store.getters['timeline/timezone'];
+                const timezone = this.companyData.timezone;
                 const { data } = await this.reportService.getProjects({
                     uids: this.userIds,
                     start_at: moment
