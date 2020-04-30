@@ -19,11 +19,7 @@
 
                 <div v-if="userSelectTab == 'active'">
                     <div class="user-search">
-                        <at-input
-                            v-model="searchActiveValue"
-                            class="user-search-input"
-                            :placeholder="$t('control.search')"
-                        />
+                        <at-input v-model="searchValue" class="user-search-input" :placeholder="$t('control.search')" />
                     </div>
 
                     <div>
@@ -74,11 +70,7 @@
 
                 <div v-if="userSelectTab == 'inactive'">
                     <div class="user-search">
-                        <at-input
-                            v-model="searchInactiveValue"
-                            class="user-search-input"
-                            :placeholder="$t('control.search')"
-                        />
+                        <at-input v-model="searchValue" class="user-search-input" :placeholder="$t('control.search')" />
                     </div>
 
                     <div>
@@ -163,8 +155,7 @@
                 userSelectTab: 'active',
                 userIDs,
                 usersService: new UsersService(),
-                searchActiveValue: '',
-                searchInactiveValue: '',
+                searchValue: '',
                 changed: false,
                 users: [],
                 userType: 'all',
@@ -221,7 +212,7 @@
                     }
 
                     const name = user.full_name.toUpperCase();
-                    const value = this.searchActiveValue.toUpperCase();
+                    const value = this.searchValue.toUpperCase();
 
                     return name.indexOf(value) !== -1;
                 });
@@ -233,7 +224,7 @@
                     }
 
                     const name = user.full_name.toUpperCase();
-                    const value = this.searchInactiveValue.toUpperCase();
+                    const value = this.searchValue.toUpperCase();
 
                     return name.indexOf(value) !== -1;
                 });
@@ -293,7 +284,7 @@
                                     return false;
                                 }
 
-                                return full_name.toUpperCase().indexOf(this.searchActiveValue.toUpperCase()) !== -1;
+                                return full_name.toUpperCase().indexOf(this.searchValue.toUpperCase()) !== -1;
                             })
                             .map(({ id }) => id)
                             .filter(id => !this.userIDs.includes(id)),
@@ -314,7 +305,7 @@
                                     return false;
                                 }
 
-                                return full_name.toUpperCase().indexOf(this.searchInactiveValue.toUpperCase()) !== -1;
+                                return full_name.toUpperCase().indexOf(this.searchValue.toUpperCase()) !== -1;
                             })
                             .map(({ id }) => id)
                             .filter(id => !this.userIDs.includes(id)),
