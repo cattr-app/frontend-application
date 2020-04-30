@@ -103,10 +103,10 @@
                                     message: semverGt(params.item.version, params.item.lastVersion)
                                         ? params.item.flashMessage
                                         : params.item.version === params.item.lastVersion
-                                        ? 'Up to date'
+                                        ? this.$i18n.t('about.modules.ok')
                                         : params.item.vulnerable
-                                        ? 'Vulnerable'
-                                        : 'Outdated',
+                                        ? this.$i18n.t('about.modules.vulnerable')
+                                        : this.$i18n.t('about.modules.outdated'),
                                     type: semverGt(params.item.version, params.item.lastVersion)
                                         ? 'info'
                                         : params.item.version === params.item.lastVersion
