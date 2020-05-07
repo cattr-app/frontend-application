@@ -28,7 +28,6 @@ export default class AccountService extends SettingsService {
                 return {
                     data: {
                         id: user.id,
-                        active: user.active,
                         password: user.password,
                         email: user.email,
                         full_name: user.full_name,
@@ -42,7 +41,6 @@ export default class AccountService extends SettingsService {
             return {
                 data: {
                     id: data.user.id,
-                    active: data.user.active, // TODO UserController Validation Rule is required -- should be removed on Backend (i guess)
                     password: data.user.password,
                     email: data.user.email,
                     full_name: data.user.full_name,
