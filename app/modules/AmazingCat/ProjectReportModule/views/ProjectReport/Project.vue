@@ -21,8 +21,7 @@
                             status="success"
                             :stroke-width="15"
                             :percent="getUserPercentage(user.tasks_time, project.project_time)"
-                        >
-                        </at-progress>
+                        />
                     </div>
                 </div>
 
@@ -40,8 +39,7 @@
                                     status="success"
                                     :stroke-width="15"
                                     :percent="getUserPercentage(task.duration, user.tasks_time)"
-                                >
-                                </at-progress>
+                                />
                             </div>
                         </div>
                         <at-collapse class="project__screenshots screenshots" accordion @on-change="handleCollapseDate">
@@ -70,28 +68,33 @@
                                     <template v-for="(hourScreens, idx) in dateScreens">
                                         <div :key="`screen-${task.id}-${date}-${idx}`" class="row">
                                             <div
-                                                v-for="(interval, index) in getHourRow(hourScreens)"
+                                                v-for="(screenshot, index) in getHourRow(hourScreens)"
                                                 :key="index"
                                                 class="col-12 col-md-6 col-lg-4"
                                             >
                                                 <Screenshot
-                                                    v-if="interval"
+                                                    v-if="screenshot"
                                                     :key="index"
                                                     class="screenshots__item"
-                                                    :screenshot="interval"
+                                                    :screenshot="screenshot"
                                                     :user="user"
                                                     :task="task"
                                                     :disableModal="true"
                                                     :showNavigation="true"
                                                     :showTask="false"
-                                                    @click="onShow(dateScreens, interval, user, task)"
-                                                ></Screenshot>
+                                                    @click="
+                                                        onShow(dateScreens, screenshot, user, task, project, {
+                                                            date,
+                                                            hours: idx,
+                                                        })
+                                                    "
+                                                />
 
                                                 <div
                                                     v-else
                                                     :key="index"
                                                     class="screenshots__item screenshots__placeholder"
-                                                ></div>
+                                                />
                                             </div>
                                         </div>
                                     </template>
@@ -113,6 +116,7 @@
             @close="onHide"
             @showPrevious="onShowPrevious"
             @showNext="onShowNext"
+            @remove="onRemove"
         />
     </div>
 </template>
@@ -124,6 +128,7 @@
     import ScreenshotModal from '@/components/ScreenshotModal';
     import UserAvatar from '@/components/UserAvatar';
     import ProjectReportService from '@/service/reports/ProjectReportService';
+    import ScreenshotService from '@/service/resource/screenshotService';
     import { getEndDay, getStartDay, formatDurationString } from '@/utils/time';
 
     export default {
@@ -147,6 +152,7 @@
                 openedDates: [],
                 avatarSize: 35,
                 reportService: new ProjectReportService(),
+                screenshotsService: new ScreenshotService(),
                 taskDurations: {},
                 screenshotsPerRow: 6,
             };
@@ -174,7 +180,25 @@
             getStartDay,
             getEndDay,
             formatDurationString,
-            onShow(dateScreenshots, screenshot, user, task) {
+            async onRemove(id) {
+                try {
+                    await this.screenshotsService.deleteItem(id);
+                    this.$Notify({
+                        type: 'success',
+                        title: this.$t('notification.screenshot.delete.success.title'),
+                        message: this.$t('notification.screenshot.delete.success.message'),
+                    });
+                    this.$emit('handUpdateProp', this.modal);
+                    this.onHide(id);
+                } catch (e) {
+                    this.$Notify({
+                        type: 'error',
+                        title: this.$t('notification.screenshot.delete.error.title'),
+                        message: this.$t('notification.screenshot.delete.error.message'),
+                    });
+                }
+            },
+            onShow(dateScreenshots, screenshot, user, task, project, keys) {
                 this.modal = {
                     ...this.modal,
                     show: true,
@@ -182,14 +206,12 @@
                     screenshot,
                     user,
                     task,
+                    project,
+                    keys,
                 };
             },
-            onHide(screenshot) {
-                this.modal = {
-                    ...this.modal,
-                    show: false,
-                    screenshot: null,
-                };
+            onHide() {
+                this.modal.show = false;
             },
             onKeyDown(e) {
                 if (e.key === 'ArrowLeft') {

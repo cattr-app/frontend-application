@@ -494,6 +494,7 @@
                         title: this.$t('notification.screenshot.delete.success.title'),
                         message: this.$t('notification.screenshot.delete.success.message'),
                     });
+                    this.onHide();
                 } catch (e) {
                     this.$Notify({
                         type: 'error',
