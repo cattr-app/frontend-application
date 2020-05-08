@@ -1,4 +1,4 @@
-import ResourceService from '@/service/resource/resouceService';
+import ResourceService from '@/service/resource/resourceService';
 import axios from 'axios';
 import { serialize } from '../../utils/url';
 

@@ -271,9 +271,10 @@
                     });
                 } catch ({ response }) {
                     this.$refs.form.setErrors(response.data.info);
+                } finally {
+                    this.isLoading = false;
                 }
 
-                this.isLoading = false;
                 this.$emit('onUpdate');
             },
         },

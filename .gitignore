@@ -4,6 +4,8 @@ node_modules
 /app/etc/env.js
 /app/etc/modules.local.json
 /app/generated
+/app/modules/*
+!/app/modules/.gitkeep
 output/*
 !output/500.html
 !output/fallback-fonts

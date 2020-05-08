@@ -34,6 +34,7 @@
                     :project="project"
                     :start="datepickerDateStart"
                     :end="datepickerDateEnd"
+                    @handUpdateProp="handUpdateProp"
                 ></project>
             </div>
             <div v-else class="at-container__inner no-data">
@@ -110,7 +111,14 @@
             getEndDate,
             getDateToday,
             formatDurationString,
-
+            handUpdateProp(data) {
+                const project = this.projects.find(project => project.id === data.project.id);
+                const user = project.users.find(user => user.id === data.user.id);
+                const task = user.tasks.find(task => task.id === data.task.id);
+                const screenshots = task.screenshots?.[data.keys.date]?.[data.keys.hours];
+                for (const screenshotIndex in screenshots)
+                    if (screenshots[screenshotIndex].id === data.screenshot.id) screenshots[screenshotIndex] = null;
+            },
             onUsersSelect(uids) {
                 this.userIds = uids;
                 this.fetchData();

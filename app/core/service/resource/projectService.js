@@ -1,4 +1,4 @@
-import ResourceService from './resouceService';
+import ResourceService from './resourceService';
 import axios from 'axios';
 import difference from 'lodash/difference';
 import { serialize } from '../../utils/url';
@@ -29,13 +29,7 @@ export default class ProjectService extends ResourceService {
      * @returns {Promise<AxiosResponse<T>>}
      */
     getAll() {
-        return axios.get('projects/list?' + serialize(this.params)).catch(error => {
-            if (!('message' in error) || error.message !== 'Page switch') {
-                console.error(error);
-            } else {
-                return { data: [] };
-            }
-        });
+        return axios.get('projects/list?' + serialize(this.params));
     }
 
     /**

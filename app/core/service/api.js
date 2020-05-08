@@ -1,41 +1,11 @@
 import StoreService from './storeService';
 import axios from 'axios';
-import has from 'lodash/has';
 
 export default class ApiService extends StoreService {
     storeNs = 'user';
 
     constructor(context) {
         super(context);
-
-        axios.interceptors.response.use(
-            response => response,
-            error => {
-                if (has(error, 'response.status')) {
-                    const { status } = error.response;
-                    if (status === 401) {
-                        if (this.isLoggedIn()) {
-                            this.context.dispatch('forceUserExit', error.response.data.message);
-                        }
-                    }
-                }
-                return Promise.reject(error);
-            },
-            response => response,
-            error => {
-                if (error.hasOwnProperty('response')) {
-                    if (error.response.hasOwnProperty('status')) {
-                        const { status } = error.response;
-                        if (status === 401) {
-                            if (this.isLoggedIn()) {
-                                this.context.dispatch('forceUserExit', error.response.data.message);
-                            }
-                        }
-                    }
-                }
-                return Promise.reject(error);
-            },
-        );
     }
 
     token() {
@@ -44,7 +14,7 @@ export default class ApiService extends StoreService {
 
     checkApiAuth() {
         return axios
-            .get('/auth/me')
+            .get('/auth/me', { ignoreCancel: true })
             .then(({ data }) => {
                 const { user } = data;
 
@@ -73,8 +43,6 @@ export default class ApiService extends StoreService {
         }
 
         this.context.dispatch('setToken', token);
-
-        axios.defaults.headers['Authorization'] = `Bearer ${token}`;
     }
 
     setLoggedInStatus(status = true) {
@@ -87,7 +55,7 @@ export default class ApiService extends StoreService {
 
     attemptLogin(credentials) {
         return axios
-            .post('/auth/login', credentials)
+            .post('/auth/login', credentials, { ignoreCancel: true })
             .then(({ data }) => {
                 this.setUserToken(data.access_token);
                 this.setUserData(data.user);
@@ -107,7 +75,7 @@ export default class ApiService extends StoreService {
     }
 
     async getAllowedRules() {
-        const { data } = await axios.get('/roles/allowed-rules');
+        const { data } = await axios.get('/roles/allowed-rules', { ignoreCancel: true });
 
         this.context.dispatch('setAllowedRules', data.res);
 
@@ -115,7 +83,7 @@ export default class ApiService extends StoreService {
     }
 
     async getProjectRules() {
-        const { data } = await axios.get('/roles/project-rules');
+        const { data } = await axios.get('/roles/project-rules', { ignoreCancel: true });
 
         this.context.dispatch('setProjectRules', data.res);
 
@@ -123,7 +91,7 @@ export default class ApiService extends StoreService {
     }
 
     async getCompanyData() {
-        const { data } = await axios.get('/companymanagement/getData');
+        const { data } = await axios.get('/companymanagement/getData', { ignoreCancel: true });
 
         this.context.dispatch('setCompanyData', data);
 

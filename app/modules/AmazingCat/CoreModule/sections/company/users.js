@@ -293,6 +293,7 @@ export default (context, router) => {
     grid.addFilterField([
         {
             key: 'full_name',
+            label: 'field.full_name',
             placeholder: 'field.full_name',
             fieldOptions: { type: 'text' },
         },

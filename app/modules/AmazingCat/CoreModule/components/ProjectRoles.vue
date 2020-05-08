@@ -12,6 +12,7 @@
                     <validation-provider :ref="'provider' + '_' + role.id" v-slot="{ errors }" vid="relation_provider">
                         <multi-select
                             :key="role.id"
+                            placeholder="control.project_selected"
                             :service="service"
                             :selected="getProjectsForRole(role.id)"
                             :inputHandler="projectIds => updateRelation(role.id, projectIds)"

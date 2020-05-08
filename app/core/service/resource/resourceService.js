@@ -36,21 +36,13 @@ export default class ResourceService {
     }
 
     getOptionList() {
-        return this.getAll()
-            .then(({ data }) => {
-                return data.map(option => {
-                    return {
-                        value: option.id,
-                        label: option[this.getOptionLabelKey()],
-                    };
-                });
-            })
-            .catch(error => {
-                if (!('message' in error) || error.message !== 'Page switch') {
-                    console.error(error);
-                } else {
-                    return { data: [] };
-                }
+        return this.getAll().then(({ data }) => {
+            return data.map(option => {
+                return {
+                    value: option.id,
+                    label: option[this.getOptionLabelKey()],
+                };
             });
+        });
     }
 }

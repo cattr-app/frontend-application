@@ -402,17 +402,12 @@
                 sessionStorage.setItem(this.sessionStorageKey + '.end', end);
 
                 const { query } = this.$route;
-                if (!query.type || !query.start || !query.end) {
-                    this.$router.replace({
-                        name: this.$route.name,
-                        query: { ...query, type, start, end },
-                    });
-                } else {
-                    this.$router.push({
-                        name: this.$route.name,
-                        query: { ...query, type, start, end },
-                    });
-                }
+
+                const searchParams = new URLSearchParams({ type, start, end }).toString();
+
+                // HACK: The native history is used because changing
+                // params via Vue Router closes all pending requests
+                history.pushState(null, null, `?${searchParams}`);
             },
             emitChangeEvent() {
                 this.$emit('change', {
