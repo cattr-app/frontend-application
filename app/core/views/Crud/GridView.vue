@@ -175,7 +175,12 @@
                         query: this.filterModel,
                         fields: this.filters.map(filter => filter.referenceKey),
                     };
-
+                    if (this.filterModel) {
+                        this.$router.push({
+                            name: this.$router.history.current.name,
+                            query: { query: this.filterModel },
+                        });
+                    }
                     const firstPage = 1;
                     this.loadPage(firstPage);
                 }, 500);
@@ -233,18 +238,19 @@
                     queryParams['orderBy'] = [orderBy.key, orderBy.direction];
                 }
 
-                let { data, total, current_page } = await this.service
-                    .getWithFilters(queryParams, config)
-                    .then(({ data }) => {
-                        this.isDataLoading = false;
-                        return data;
-                    });
+                try {
+                    let { data, total, current_page } = (await this.service.getWithFilters(queryParams, config)).data;
 
-                this.totalItems = total;
-                this.page = current_page;
+                    this.totalItems = total;
+                    this.page = current_page;
 
-                this.tableData = data;
-                this.initialData = data;
+                    this.tableData = data;
+                    this.initialData = data;
+                } catch ({ response }) {
+                    // manipulations with error
+                }
+
+                this.isDataLoading = false;
             },
             handleResize() {
                 const { table } = this.$refs;
@@ -327,16 +333,18 @@
                     typeButton: 'error',
                 });
 
-                if (isConfirm === 'confirm') {
-                    await this.service.deleteItem(id);
-                    this.$Notify({
-                        type: 'success',
-                        title: this.$t('notification.record.delete.success.title'),
-                        message: this.$t('notification.record.delete.success.message'),
-                    });
-
-                    this.fetchData();
+                if (isConfirm !== 'confirm') {
+                    return;
                 }
+
+                await this.service.deleteItem(id);
+                this.$Notify({
+                    type: 'success',
+                    title: this.$t('notification.record.delete.success.title'),
+                    message: this.$t('notification.record.delete.success.message'),
+                });
+
+                await this.fetchData();
             },
         },
         updated() {
@@ -447,14 +455,25 @@
             },
         },
         async beforeRouteUpdate(from, to, next) {
-            this.fetchData();
+            await this.fetchData();
             next();
+        },
+        beforeRouteEnter(to, from, next) {
+            if (!('query' in to.query) || !to.query.query) {
+                next();
+            }
+
+            const queryUser = to.query.query;
+
+            next(vm => {
+                vm.filterModel = queryUser;
+                vm.filterData();
+            });
         },
         async mounted() {
             if (!this.initialData.length) {
                 await this.fetchData();
             }
-
             window.addEventListener('resize', this.handleResize);
             this.handleResize();
 
