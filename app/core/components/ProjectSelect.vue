@@ -1,15 +1,20 @@
 <template>
-    <div>
-        <multi-select :inputHandler="selectedProjects" :selected="projectsId" :service="projectService" name="projects">
-        </multi-select>
-    </div>
+    <multi-select
+        placeholder="control.project_selected"
+        :inputHandler="selectedProjects"
+        :selected="selectedProjectIds"
+        :service="projectService"
+        name="projects"
+        @onOptionsLoad="onLoad"
+    >
+    </multi-select>
 </template>
 
 <script>
     import MultiSelect from './MultiSelect';
     import ProjectService from '../service/resource/projectService';
 
-    const localStorageKey = 'project-select.projects';
+    const localStorageKey = 'amazingcat.local.storage.project_select';
 
     export default {
         name: 'ProjectSelect',
@@ -17,46 +22,37 @@
             MultiSelect,
         },
         data() {
-            let projectsId = [];
-            if (localStorage.getItem(localStorageKey)) {
-                projectsId = JSON.parse(localStorage.getItem(localStorageKey));
-            }
-
             return {
                 projectService: new ProjectService(),
-                projects: [],
-                projectsId,
+                selectedProjectIds: JSON.parse(localStorage.getItem(localStorageKey)),
             };
         },
-        async mounted() {
-            if (typeof localStorage[localStorageKey] === 'undefined') {
-                this.projectsId = await this.projectService.getAll().then(({ data }) => {
-                    return data.map(project => project.id);
-                });
-                localStorage[localStorageKey] = JSON.stringify(this.projects);
-            }
+        methods: {
+            onLoad(allSelectOptions) {
+                const allProjectIds = allSelectOptions.map(option => option.value);
 
-            if (this.projectsId.length) {
-                this.$emit('change', this.projectsId);
-            }
-
-            this.projects = await this.projectService.getAll().then(({ data }) => {
-                const existingProjectIDs = data
-                    .filter(project => this.projectsId.includes(project.id))
-                    .map(project => project.id);
-
-                if (this.projectsId.length > existingProjectIDs.length) {
-                    this.projectsId = existingProjectIDs;
-                    localStorage[localStorageKey] = JSON.stringify(this.projectsId);
+                // Select all options if storage is empty
+                if (!localStorage.getItem(localStorageKey)) {
+                    this.selectedProjectIds = allProjectIds;
+                    localStorage.setItem(localStorageKey, JSON.stringify(this.selectedProjectIds));
+                    return this.$emit('change', this.selectedProjectIds);
                 }
 
-                return data;
-            });
-        },
-        methods: {
+                // Remove options that no longer exists
+                const existingProjectIds = this.selectedProjectIds.filter(projectId =>
+                    allProjectIds.includes(projectId),
+                );
+
+                if (this.selectedProjectIds.length > existingProjectIds.length) {
+                    this.selectedProjectIds = existingProjectIds;
+                    localStorage.setItem(localStorageKey, JSON.stringify(this.selectedProjectIds));
+                }
+
+                this.$emit('change', this.selectedProjectIds);
+            },
             selectedProjects(values) {
-                this.projectsId = values;
-                localStorage[localStorageKey] = JSON.stringify(this.projectsId);
+                this.selectedProjectIds = values;
+                localStorage.setItem(localStorageKey, JSON.stringify(this.selectedProjectIds));
                 this.$emit('change', values);
             },
         },

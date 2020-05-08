@@ -1,4 +1,4 @@
-import ResourceService from './resouceService';
+import ResourceService from './resourceService';
 import axios from 'axios';
 import moment from 'moment';
 

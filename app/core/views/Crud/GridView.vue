@@ -106,8 +106,6 @@
     import axios from 'axios';
 
     const defaultItemsPerPage = 10;
-    const CancelToken = axios.CancelToken;
-    let cancel;
 
     export default {
         name: 'GridView',
@@ -216,22 +214,15 @@
                 callback(this);
             },
             async loadPage(page) {
-                history.pushState({}, null, `?page=${page}`);
+                this.$router.replace({
+                    name: this.$route.name,
+                    query: { page },
+                });
                 this.queryParams.page = page;
                 await this.fetchData();
             },
             async fetchData() {
                 this.isDataLoading = true;
-
-                if (cancel !== undefined) {
-                    cancel();
-                }
-
-                const config = {
-                    cancelToken: new CancelToken(function executor(c) {
-                        cancel = c;
-                    }),
-                };
 
                 const { queryParams, sortable, orderBy } = this;
                 if (sortable && orderBy) {
@@ -239,18 +230,21 @@
                 }
 
                 try {
-                    let { data, total, current_page } = (await this.service.getWithFilters(queryParams, config)).data;
+                    let { data, total, current_page } = await this.service
+                        .getWithFilters(queryParams)
+                        .then(({ data }) => {
+                            this.isDataLoading = false;
+                            return data;
+                        });
 
                     this.totalItems = total;
                     this.page = current_page;
 
                     this.tableData = data;
                     this.initialData = data;
-                } catch ({ response }) {
-                    // manipulations with error
+                } catch (e) {
+                    // Ignore exception
                 }
-
-                this.isDataLoading = false;
             },
             handleResize() {
                 const { table } = this.$refs;

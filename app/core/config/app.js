@@ -1,5 +1,6 @@
 import axios from 'axios';
 import env from '_app/etc/env';
+import httpInterceptor from '@/helpers/httpInterceptor';
 
 if (process.env.NODE_ENV === 'development') {
     console.log(env);
@@ -8,9 +9,6 @@ if (process.env.NODE_ENV === 'development') {
 axios.defaults.baseURL = (env.API_URL || `${window.location.origin}/api`) + '/' + (env.API_VERSION || '');
 axios.defaults.headers.common['X-REQUESTED-WITH'] = 'XMLHttpRequest';
 
-const token = localStorage.getItem('access_token');
-if (token) {
-    axios.defaults.headers['Authorization'] = `Bearer ${token}`;
-}
+httpInterceptor.setup();
 
 export default axios;

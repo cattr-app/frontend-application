@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import Store from '../store/index';
+import Store from '@/store';
 
 // Fixing new issue with VueRouter caused by new Promise API
 const originalPush = VueRouter.prototype.push;
@@ -74,6 +74,9 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
+    // Close pending requests when switching pages
+    Store.dispatch('httpRequest/cancelPendingRequests');
+
     if (to.matched.some(record => record.meta.auth || typeof record.meta.auth === 'undefined')) {
         if (!Store.getters['user/loggedIn']) {
             return next({ name: 'auth.login' });

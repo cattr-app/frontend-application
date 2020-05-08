@@ -1,4 +1,4 @@
-import ResourceService from './resouceService';
+import ResourceService from './resourceService';
 import axios from 'axios';
 import { serialize } from '../../utils/url';
 
@@ -8,13 +8,7 @@ export default class UsersService extends ResourceService {
      * @returns {Promise<AxiosResponse<T>>}
      */
     getAll(config = {}) {
-        return axios.get('users/list', config).catch(error => {
-            if (!('message' in error) || error.message !== 'Page switch') {
-                console.error(error);
-            } else {
-                return { data: [] };
-            }
-        });
+        return axios.get('users/list', config);
     }
 
     /**
