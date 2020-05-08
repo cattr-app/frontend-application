@@ -1,45 +1,52 @@
 <template>
     <div class="login row at-row no-gutter">
-        <div class="col-8">
-            <validation-observer ref="observer" v-slot="{ invalid }" class="box" tag="div" @submit.prevent="submit">
-                <div class="top">
-                    <div class="static-message">
-                        <div class="logo"></div>
+        <div class="login__wrap">
+            <div class="login__form">
+                <validation-observer ref="observer" class="box" tag="div" @submit.prevent="submit">
+                    <div class="top">
+                        <div class="static-message">
+                            <div class="logo"></div>
+                        </div>
+                        <h1 class="login__title">Cattr</h1>
                     </div>
-                    <h1 class="login__title">Cattr</h1>
-                </div>
-                <div>
-                    <at-alert
-                        v-if="error"
-                        type="error"
-                        class="login__error"
-                        closable
-                        :message="error"
-                        @on-close="error = null"
-                    />
+                    <div>
+                        <at-alert
+                            v-if="error"
+                            type="error"
+                            class="login__error"
+                            closable
+                            :message="error"
+                            @on-close="error = null"
+                        />
 
-                    <component :is="config.authInput" @change="change" @submit="submit" />
+                        <component :is="config.authInput" @change="change" @submit="submit" />
 
-                    <vue-recaptcha
-                        v-if="recaptchaKey"
-                        ref="recaptcha"
-                        :loadRecaptchaScript="true"
-                        :sitekey="recaptchaKey"
-                        class="recaptcha"
-                        @verify="onCaptchaVerify"
-                        @expired="onCaptchaExpired"
-                    ></vue-recaptcha>
-                </div>
-                <at-button
-                    class="login__btn"
-                    native-type="submit"
-                    type="primary"
-                    :loading="isLoading"
-                    @click="submit"
-                    >{{ $t('auth.submit') }}</at-button
-                >
-                <router-link class="link" to="/auth/password/reset">{{ $t('auth.forgot_password') }}</router-link>
-            </validation-observer>
+                        <vue-recaptcha
+                            v-if="recaptchaKey"
+                            ref="recaptcha"
+                            :loadRecaptchaScript="true"
+                            :sitekey="recaptchaKey"
+                            class="recaptcha"
+                            @verify="onCaptchaVerify"
+                            @expired="onCaptchaExpired"
+                        ></vue-recaptcha>
+                    </div>
+                    <at-button
+                        class="login__btn"
+                        native-type="submit"
+                        type="primary"
+                        :loading="isLoading"
+                        @click="submit"
+                        >{{ $t('auth.submit') }}</at-button
+                    >
+                    <router-link class="link" to="/auth/password/reset">{{ $t('auth.forgot_password') }}</router-link>
+                </validation-observer>
+            </div>
+            <div class="row login__slogan">
+                <a href="https://cattr.app">
+                    <h4>{{ slogan() }}</h4>
+                </a>
+            </div>
         </div>
         <div class="hero col-16"></div>
     </div>
@@ -72,6 +79,7 @@
                 recaptchaKey: null,
                 error: null,
                 isLoading: false,
+                slogans: ['Cattr - a free open source time tracker'],
             };
         },
 
@@ -88,6 +96,18 @@
         },
 
         methods: {
+            slogan() {
+                const countSlogans = this.slogans.length - 1;
+                const indexSlogan = this.getRandomIntInclusive(0, countSlogans);
+                return this.slogans[indexSlogan];
+            },
+
+            getRandomIntInclusive(min, max) {
+                min = Math.ceil(min);
+                max = Math.floor(max);
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            },
+
             onCaptchaVerify(response) {
                 this.user.recaptcha = response;
             },
@@ -161,6 +181,31 @@
         position: relative;
         width: 100%;
 
+        &__wrap {
+            align-items: center;
+            display: flex;
+            width: 100%;
+            flex-direction: column;
+            justify-content: center;
+        }
+        &__form {
+            width: 100%;
+            flex: 8;
+        }
+
+        &__slogan {
+            flex: 1;
+            margin: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-content: flex-start;
+
+            h4 {
+                opacity: 0.4;
+            }
+        }
+
         &__title {
             color: $black-900;
             font-size: 1.8rem;
@@ -182,6 +227,7 @@
             height: 100%;
             justify-content: center;
             padding: 0 $spacing-08;
+            width: 100%;
 
             .top {
                 display: flex;
@@ -229,6 +275,7 @@
             background: url('../../assets/login.svg') #6159e6;
             background-repeat: no-repeat;
             background-size: 100%;
+            display: flex;
         }
     }
 </style>
