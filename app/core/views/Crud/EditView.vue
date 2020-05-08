@@ -59,7 +59,7 @@
                                         v-if="isDataLoading && pageData.type === 'edit'"
                                         class="col-18"
                                         disabled
-                                    ></at-input>
+                                    />
                                     <div v-else class="col-18">
                                         <validation-provider
                                             v-if="typeof field.render !== 'undefined'"
@@ -83,7 +83,7 @@
                                                 :class="{
                                                     'at-select--error at-input--error has-error': errors.length > 0,
                                                 }"
-                                            ></renderable-field>
+                                            />
                                             <small>{{ errors[0] }}</small>
                                         </validation-provider>
 
@@ -107,7 +107,7 @@
                                             v-else-if="field.type === 'input' || field.type === 'text'"
                                             v-slot="{ errors }"
                                             :rules="field.required ? 'required' : ''"
-                                            :name="field.key"
+                                            :name="$t(field.label)"
                                             :vid="field.key"
                                         >
                                             <at-input
@@ -182,7 +182,7 @@
                                                 :class="{
                                                     'at-select--error': errors.length > 0,
                                                 }"
-                                            ></resource-select>
+                                            />
                                             <small>{{ errors[0] }}</small>
                                         </validation-provider>
 
@@ -201,7 +201,7 @@
                                                     'at-textarea--error': errors.length > 0,
                                                 }"
                                                 :placeholder="$t(field.placeholder) || ''"
-                                            ></at-textarea>
+                                            />
                                             <small>{{ errors[0] }}</small>
                                         </validation-provider>
                                     </div>
@@ -215,7 +215,7 @@
                     v-for="(component, index) of pageData.bottomComponents"
                     :key="index"
                     :parent="this"
-                ></component>
+                />
                 <at-button type="primary" :disabled="invalid || isLoading" :loading="isLoading" @click="submit">{{
                     $t('control.save')
                 }}</at-button>
