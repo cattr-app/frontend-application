@@ -15,7 +15,7 @@
         </at-select>
         <span v-if="showCount" class="at-select__placeholder">
             {{
-                $tc('control.project_selected', selectionAmount, {
+                $tc(placeholder, selectionAmount, {
                     count: selectionAmount,
                 })
             }}
@@ -25,7 +25,7 @@
 </template>
 
 <script>
-    import ResourceService from '../service/resource/resouceService';
+    import ResourceService from '../service/resource/resourceService';
 
     export default {
         props: {
@@ -47,6 +47,10 @@
                 type: Boolean,
                 default: true,
             },
+            placeholder: {
+                type: String,
+                required: true,
+            },
         },
         data() {
             return {
@@ -55,16 +59,21 @@
                 options: [],
             };
         },
-        async created() {
-            await this.service.getAll().then(({ data }) => {
-                const all = data.map(project => {
+        async mounted() {
+            try {
+                const { data } = await this.service.getAll();
+                const all = data.map(option => {
                     return {
-                        value: project.id,
-                        label: project.name,
+                        value: option.id,
+                        label: option[this.service.getOptionLabelKey()],
                     };
                 });
                 this.options.push(...all);
-            });
+
+                this.$emit('onOptionsLoad', this.options);
+            } catch (e) {
+                return;
+            }
 
             if (this.selected) {
                 this.model = this.selected;

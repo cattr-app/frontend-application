@@ -15,10 +15,6 @@
 
 <script>
     import vSelect from 'vue-select';
-    import axios from '@/config/app';
-
-    const CancelToken = axios.CancelToken;
-    let cancel;
 
     export default {
         name: 'LazySelect',
@@ -55,7 +51,6 @@
                 }
             },
             async fetchTasks(query, loading) {
-                cancel && cancel();
                 loading(true);
 
                 const filters = { task_name: ['like', `%${query}%`], with: 'project' };
@@ -63,24 +58,18 @@
                     filters['user_id'] = this.userID;
                 }
 
-                this.options = await this.service
-                    .getWithFilters(filters, {
-                        cancelToken: new CancelToken(function executor(c) {
-                            cancel = c;
-                        }),
-                    })
-                    .then(({ data }) => {
-                        loading(false);
+                this.options = await this.service.getWithFilters(filters).then(({ data }) => {
+                    loading(false);
 
-                        return data.map(task => {
-                            const label =
-                                typeof task.project !== 'undefined'
-                                    ? `${task.project.name} - ${task.task_name}`
-                                    : task.task_name;
+                    return data.map(task => {
+                        const label =
+                            typeof task.project !== 'undefined'
+                                ? `${task.project.name} - ${task.task_name}`
+                                : task.task_name;
 
-                            return { ...task, label };
-                        });
+                        return { ...task, label };
                     });
+                });
             },
         },
     };
