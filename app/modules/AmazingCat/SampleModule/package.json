@@ -1,9 +1,0 @@
-{
-  "name": "@amazingcat/cattr-sample-module",
-  "version": "1.0.0",
-  "main": "module.init.js",
-  "author": {
-    "email": "to@amazincat.net",
-    "name": "AmazingCat LLC"
-  }
-}

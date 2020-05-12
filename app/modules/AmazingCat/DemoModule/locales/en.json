@@ -1,6 +1,0 @@
-{
-  "demo": {
-    "warning": "This is only a demo application / All the data will be erased in {timer}",
-    "auth_message": "Please select user that you want to test from the list"
-  }
-}

@@ -8,9 +8,6 @@
   "AmazingCat_JiraIntegrationModule": {
     "enabled": false
   },
-  "AmazingCat_SampleModule": {
-    "enabled": false
-  },
   "AmazingCat_InvoicesModule": {
     "enabled": false
   },
