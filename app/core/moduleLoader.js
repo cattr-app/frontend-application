@@ -15,13 +15,17 @@ let moduleCfg = require('_app/etc/modules.config.json');
 try {
     moduleCfg = merge(moduleCfg, require(`_app/etc/modules.${process.env.NODE_ENV}.json`));
 } catch (e) {
-    // Do nothing if node-env module config wasn't found
+    if (process.env.NODE_ENV === 'development') {
+        console.log(`Skip load of modules.${process.env.NODE_ENV}.json`);
+    }
 }
 
 try {
     moduleCfg = merge(moduleCfg, require('_app/etc/modules.local.json'));
 } catch (e) {
-    // Do nothing if local module config wasn't found
+    if (process.env.NODE_ENV === 'development') {
+        console.log('Skip load of modules.local.json');
+    }
 }
 
 export const ModuleLoaderInterceptor = new EventEmitter();

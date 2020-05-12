@@ -1,52 +1,57 @@
 {
-  "AmazingCat_SampleModule": {
-    "enabled": false,
-    "type": "local",
-    "ref": "AmazingCat_SampleModule"
-  },
   "AmazingCat_DemoModule": {
     "enabled": false,
-    "type": "local",
-    "ref": "AmazingCat_DemoModule"
+    "type": "package",
+    "ref": "@amazingcat/cattr-frontend-module-demo"
   },
   "AmazingCat_CoreModule": {
     "enabled": true,
-    "type": "local",
-    "ref": "AmazingCat_CoreModule"
+    "type": "package",
+    "ref": "@amazingcat/cattr-frontend-module-core"
   },
   "AmazingCat_DashboardModule": {
     "enabled": true,
-    "type": "local",
-    "ref": "AmazingCat_DashboardModule"
+    "type": "package",
+    "ref": "@amazingcat/cattr-frontend-module-dashboard"
   },
   "AmazingCat_ProjectReportModule": {
     "enabled": true,
-    "type": "local",
-    "ref": "AmazingCat_ProjectReportModule"
+    "type": "package",
+    "ref": "@amazingcat/cattr-frontend-module-project-report"
   },
   "AmazingCat_ProjectsModule": {
     "enabled": true,
-    "type": "local",
-    "ref": "AmazingCat_ProjectsModule"
+    "type": "package",
+    "ref": "@amazingcat/cattr-frontend-module-projects"
   },
   "AmazingCat_ScreenshotsModule": {
     "enabled": true,
-    "type": "local",
-    "ref": "AmazingCat_ScreenshotsModule"
+    "type": "package",
+    "ref": "@amazingcat/cattr-frontend-module-screenshots"
   },
   "AmazingCat_TasksModule": {
     "enabled": true,
-    "type": "local",
-    "ref": "AmazingCat_TasksModule"
+    "type": "package",
+    "ref": "@amazingcat/cattr-frontend-module-tasks"
   },
   "AmazingCat_TimeIntervalsModule": {
     "enabled": true,
-    "type": "local",
-    "ref": "AmazingCat_TimeIntervalsModule"
+    "type": "package",
+    "ref": "@amazingcat/cattr-frontend-module-time-intervals"
   },
   "AmazingCat_TimeUseReportModule": {
     "enabled": true,
-    "type": "local",
-    "ref": "AmazingCat_TimeUseReportModule"
+    "type": "package",
+    "ref": "@amazingcat/cattr-frontend-module-time-use-report"
+  },
+  "AmazingCat_GitlabIntegration": {
+    "enabled": true,
+    "type": "package",
+    "ref": "@amazingcat/cattr-frontend-module-gitlab-integration"
+  },
+  "AmazingCat_RedmineIntegration": {
+    "enabled": true,
+    "type": "package",
+    "ref": "@amazingcat/cattr-frontend-module-redmine-integration"
   }
 }

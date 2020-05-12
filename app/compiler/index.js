@@ -20,7 +20,15 @@ module.exports = (api, options) => {
             console.error('modules.config.json was not found in [app/etc] folder');
             return undefined;
         }
-        const moduleList = require(p);
+        let moduleList = require(p);
+
+        const { merge } = require('lodash');
+
+        if (fs.existsSync(api.resolve(`app/etc/modules.${process.env.NODE_ENV}.json`)))
+            moduleList = merge(moduleList, require(api.resolve(`app/etc/modules.${process.env.NODE_ENV}.json`)));
+
+        if (fs.existsSync(api.resolve('app/etc/modules.local.json')))
+            moduleList = merge(moduleList, require(api.resolve('app/etc/modules.local.json')));
 
         const fdArray = ['export default ['];
         Object.keys(moduleList).forEach(moduleName => {
