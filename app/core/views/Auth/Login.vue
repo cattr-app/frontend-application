@@ -42,11 +42,9 @@
                     <router-link class="link" to="/auth/password/reset">{{ $t('auth.forgot_password') }}</router-link>
                 </validation-observer>
             </div>
-            <div class="row login__slogan">
-                <a href="https://cattr.app">
-                    <h4>{{ slogan() }}</h4>
-                </a>
-            </div>
+            <a class="login__slogan" href="https://cattr.app">
+                {{ slogan() }}
+            </a>
         </div>
         <div class="hero col-16"></div>
     </div>
@@ -200,10 +198,7 @@
             display: flex;
             justify-content: center;
             align-content: flex-start;
-
-            h4 {
-                opacity: 0.4;
-            }
+            color: $gray-3;
         }
 
         &__title {
