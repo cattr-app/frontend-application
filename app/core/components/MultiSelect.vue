@@ -94,6 +94,10 @@
             this.lastQuery = '';
             this.$watch(
                 () => {
+                    if (this.$refs.select === undefined) {
+                        return;
+                    }
+
                     return {
                         query: this.$refs.select.query,
                         visible: this.$refs.select.visible,
