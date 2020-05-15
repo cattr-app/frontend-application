@@ -12,7 +12,7 @@
                 type="text"
                 :placeholder="filterPlaceholder"
                 class="col-6 crud__filter"
-                @input="filterData"
+                @input="handleSearchInput"
             >
                 <template slot="prepend">
                     <i class="icon icon-search"></i>
@@ -96,14 +96,13 @@
             :current="page"
             :page-size="itemsPerPage"
             class="crud__pagination"
-            @page-change="loadPage"
+            @page-change="handlePageChange"
         />
     </div>
 </template>
 
 <script>
     import Preloader from '@/components/Preloader';
-    import axios from 'axios';
 
     const defaultItemsPerPage = 10;
 
@@ -134,9 +133,8 @@
                 filters: gridData.filters || [],
                 filterFields: gridData.filterFields || [],
                 tableData: [],
-                initialData: [],
 
-                filterModel: '',
+                filterModel: this.$route.query.search,
                 filterTimeout: null,
                 filterFieldsTimeout: null,
                 orderBy,
@@ -157,30 +155,23 @@
                     paginate: true,
                     perPage: this.$route.meta.itemsPerPage || defaultItemsPerPage,
                     page: this.$route.query.page,
+                    search: {
+                        query: this.$route.query.search,
+                        fields: gridData.filters.map(filter => filter.referenceKey),
+                    },
                 },
 
                 isDataLoading: false,
             };
         },
-
         methods: {
-            filterData() {
+            handleSearchInput() {
                 clearTimeout(this.filterTimeout);
 
                 this.filterTimeout = setTimeout(() => {
-                    // TODO Refactor when TypeScript will be here
-                    this.queryParams['search'] = {
-                        query: this.filterModel,
-                        fields: this.filters.map(filter => filter.referenceKey),
-                    };
-                    if (this.filterModel) {
-                        this.$router.push({
-                            name: this.$router.history.current.name,
-                            query: { query: this.filterModel },
-                        });
-                    }
+                    this.queryParams.search.query = this.filterModel;
                     const firstPage = 1;
-                    this.loadPage(firstPage);
+                    this.handlePageChange(firstPage);
                 }, 500);
             },
             filterFieldsData() {
@@ -204,7 +195,7 @@
                     });
 
                     const firstPage = 1;
-                    this.loadPage(firstPage);
+                    this.handlePageChange(firstPage);
                 }, 500);
             },
             checkWithCtx(callback) {
@@ -213,11 +204,7 @@
             handleWithCtx(callback) {
                 callback(this);
             },
-            async loadPage(page) {
-                this.$router.replace({
-                    name: this.$route.name,
-                    query: { page },
-                });
+            async handlePageChange(page) {
                 this.queryParams.page = page;
                 await this.fetchData();
             },
@@ -230,21 +217,18 @@
                 }
 
                 try {
-                    let { data, total, current_page } = await this.service
-                        .getWithFilters(queryParams)
-                        .then(({ data }) => {
-                            this.isDataLoading = false;
-                            return data;
-                        });
+                    const response = await this.service.getWithFilters(queryParams);
+                    const { data, total, current_page } = response.data;
 
                     this.totalItems = total;
                     this.page = current_page;
 
                     this.tableData = data;
-                    this.initialData = data;
                 } catch (e) {
                     // Ignore exception
                 }
+
+                this.isDataLoading = false;
             },
             handleResize() {
                 const { table } = this.$refs;
@@ -340,6 +324,12 @@
 
                 await this.fetchData();
             },
+            updateRoute() {
+                this.$router.push({
+                    name: this.$route.name,
+                    query: { page: this.queryParams.page, search: this.queryParams.search.query },
+                });
+            },
         },
         updated() {
             const { sortable, orderBy } = this;
@@ -348,6 +338,11 @@
             }
 
             const { tableWrapper } = this.$refs;
+
+            if (tableWrapper === undefined) {
+                return;
+            }
+
             const chevrons = tableWrapper.querySelectorAll('.at-table__cell.at-table__column > .chevron');
             chevrons.forEach(chevron => chevron.remove());
 
@@ -448,30 +443,27 @@
                 return !!this.$route.meta.sortable;
             },
         },
-        async beforeRouteUpdate(from, to, next) {
-            await this.fetchData();
-            next();
-        },
-        beforeRouteEnter(to, from, next) {
-            if (!('query' in to.query) || !to.query.query) {
-                next();
-            }
-
-            const queryUser = to.query.query;
-
-            next(vm => {
-                vm.filterModel = queryUser;
-                vm.filterData();
-            });
-        },
         async mounted() {
-            if (!this.initialData.length) {
-                await this.fetchData();
-            }
+            await this.fetchData();
+
             window.addEventListener('resize', this.handleResize);
             this.handleResize();
 
             this.$refs.tableWrapper.addEventListener('click', this.handleTableClick);
+        },
+        watch: {
+            $route(to) {
+                this.queryParams.page = to.query.page;
+                this.queryParams.search.query = to.query.search;
+                this.filterModel = to.query.search;
+                this.fetchData();
+            },
+            queryParams: {
+                handler() {
+                    this.updateRoute();
+                },
+                deep: true,
+            },
         },
         beforeDestory() {
             window.removeEventListener('resize', this.handleResize);
