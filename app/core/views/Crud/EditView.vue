@@ -6,9 +6,6 @@
                     {{ $route.params.id ? `${$t(pageData.title)} #${$route.params.id}` : `${$t(pageData.title)}` }}
                 </h1>
                 <div class="control-items">
-                    <at-button size="large" class="control-item" @click="$router.go(-1)"
-                        >{{ $t('control.back') }}
-                    </at-button>
                     <template v-if="pageData.pageControls && pageData.pageControls.length > 0">
                         <template v-for="(button, key) of pageData.pageControls">
                             <at-button
@@ -24,6 +21,9 @@
                             </at-button>
                         </template>
                     </template>
+                    <at-button size="large" class="control-item" @click="$router.go(-1)"
+                        >{{ $t('control.back') }}
+                    </at-button>
                 </div>
             </div>
 

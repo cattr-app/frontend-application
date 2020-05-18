@@ -176,8 +176,9 @@
     "page_not_found": "Looks like the page you're looking for doesn't exist :(",
     "page_forbidden": "Access forbidden",
     "field_is_required": "This field is required",
-    "something_went_wrong": "Что то пошло не так",
-    "error": "Ошибка",
+    "something_went_wrong": "Something went wrong",
+    "success": "Success",
+    "error": "Error",
     "vulnerable_version": "You are using a vulnerable version of the app, please update to the latest available version",
     "update_version": "A new version is available"
   },
@@ -197,17 +198,7 @@
     "work_time": "Minimum working hours/day"
   },
   "invite": {
-    "label": "Invite users",
-    "content": "Please add the emails you'd like to send the invitations to your company's Cattr instance. Emails are separated by comma.",
-    "message": {
-      "error": "Please input your emails",
-      "success": "Success",
-      "valid": "These emails not valid:"
-    },
-    "users_exist": "Users with this emails is already exists",
-    "these_emails": "These emails:",
-    "already_exists": "is already exists",
-    "already_sent": "to these addresses is already sent"
+    "resend": "Resend invite"
   },
   "about": {
     "modules": {
