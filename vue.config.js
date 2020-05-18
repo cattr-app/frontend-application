@@ -1,15 +1,22 @@
+if (process.env.NODE_ENV === undefined) {
+    process.env.NODE_ENV = 'development';
+}
+
 const webpack = require('webpack');
 const env = require('./app/etc/env');
 const resolve = require('path').resolve;
 const isDevMod = process.env.NODE_ENV === 'development';
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const BundleAnalyzerPlugin = require(
+  'webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const SentryPlugin = require('@sentry/webpack-plugin');
 
 let coreAlias;
 
 if (!isDevMod) {
-    coreAlias = env.LOCAL_BUILD === true ? resolve(__dirname, 'app', 'core') : '@amazingcat/cattr-frontend-core';
+    coreAlias = env.LOCAL_BUILD === true
+      ? resolve(__dirname, 'app', 'core')
+      : '@amazingcat/cattr-frontend-core';
 } else {
     switch (env.DEVELOPER_MODE) {
         case 'local':
@@ -42,7 +49,9 @@ module.exports = {
             },
         },
     },
-    transpileDependencies: ['@amazingcat/cattr-frontend-core', /(.+)-cattr-module/gi],
+    transpileDependencies: [
+        '@amazingcat/cattr-frontend-core',
+        /(.+)-cattr-module/gi],
     configureWebpack: {
         devtool: isDevMod ? 'eval-source-maps' : '',
         entry: {
@@ -87,17 +96,18 @@ module.exports = {
                     'dist',
                 ],
                 setCommits: require('fs').existsSync('.git')
-                    ? {
-                          auto: true,
-                      }
-                    : undefined,
+                  ? {
+                      auto: true,
+                  }
+                  : undefined,
             }),
             new BundleAnalyzerPlugin({
                 analyzerMode: isDevMod ? 'server' : 'disabled',
                 openAnalyzer: false,
             }),
             // eslint-disable-next-line no-useless-escape
-            new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en|ru|da/),
+            new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/,
+              /en|ru|da/),
         ],
         module: {
             rules: [
