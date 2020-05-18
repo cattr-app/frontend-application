@@ -102,7 +102,7 @@ module.exports = {
                   : undefined,
             }),
             new BundleAnalyzerPlugin({
-                analyzerMode: isDevMod ? 'server' : 'disabled',
+                analyzerMode: isDevMod && process.env.npm_lifecycle_event !== 'build' ? 'server' : 'disabled',
                 openAnalyzer: false,
             }),
             // eslint-disable-next-line no-useless-escape
