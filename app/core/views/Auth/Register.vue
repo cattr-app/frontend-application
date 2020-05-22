@@ -42,6 +42,7 @@
                                             placeholder="E-Mail"
                                             icon="mail"
                                             type="text"
+                                            disabled="true"
                                         >
                                         </at-input>
                                         <p class="error-message">
@@ -162,11 +163,12 @@
         methods: {
             async validateToken() {
                 try {
-                    await axios.get(`/auth/register/${this.token}`);
+                    const { data } = await axios.get(`/auth/register/${this.token}`);
+                    this.email = data.email;
                     this.isTokenValid = true;
                 } catch ({ response }) {
                     if (response.status === 404) {
-                        this.$router.push({ name: 'not-found' });
+                        this.$router.replace({ name: 'not-found' });
                     }
                 }
             },
