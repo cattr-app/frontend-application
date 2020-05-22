@@ -77,15 +77,7 @@
                 recaptchaKey: null,
                 error: null,
                 isLoading: false,
-                slogans: [
-                  'Cattr - a free open source time tracker',
-                  'Free. Safe. Effectively.',
-                  'Manage your time with ease',
-                  'Work and track',
-                  'Catrrrrrrrr',
-                  'This is Caaaaattrrrrr',
-                  'Stay tracked'
-                ],
+                slogans: ['Cattr - a free open source time tracker', 'Manage your time with ease'],
             };
         },
 
