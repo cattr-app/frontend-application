@@ -63,7 +63,7 @@
         },
 
         watch: {
-            'user.email'() {
+            'user.email'(value) {
                 // Trim space
                 this.user.email = value.replace(/\s/, '');
                 this.$emit('change', this.user);
