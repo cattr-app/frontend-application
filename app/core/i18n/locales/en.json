@@ -127,6 +127,7 @@
     "actions": "Actions",
     "start_at": "Start at",
     "end_at": "End at",
+    "expires_at": "Expires at",
     "role": "Role",
     "user_language": "User Language",
     "send_invite": "Send invite",
