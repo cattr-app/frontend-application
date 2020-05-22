@@ -4,6 +4,24 @@ const fs = require('fs'),
     path = require('path'),
     isObject = require('lodash/isObject');
 
+const iterator = (moduleList, fdArray) => {
+    Object.keys(moduleList).forEach(moduleName => {
+        if (isObject(moduleList[moduleName])) {
+            const moduleConfig = moduleList[moduleName];
+
+            if (
+              moduleConfig.type === 'package' &&
+              (moduleConfig.hasOwnProperty('enabled') ? moduleConfig.enabled : true)
+            ) {
+                fdArray.push(`    () => require('${moduleConfig.ref}'),`);
+                console.log(`${moduleName} => added package as static require dependency`);
+            }
+        }
+    });
+
+    return fdArray;
+};
+
 /**
  *
  * @param {PluginAPI} api
@@ -22,28 +40,20 @@ module.exports = (api, options) => {
         }
         let moduleList = require(p);
 
-        const { merge } = require('lodash');
+        let fdArray = ['export default ['];
 
-        if (fs.existsSync(api.resolve(`app/etc/modules.${process.env.NODE_ENV}.json`)))
-            moduleList = merge(moduleList, require(api.resolve(`app/etc/modules.${process.env.NODE_ENV}.json`)));
+        fdArray = iterator(moduleList, fdArray);
 
-        if (fs.existsSync(api.resolve('app/etc/modules.local.json')))
-            moduleList = merge(moduleList, require(api.resolve('app/etc/modules.local.json')));
+        if (fs.existsSync(api.resolve(`app/etc/modules.${process.env.NODE_ENV}.json`))){
+            moduleList = require(api.resolve(`app/etc/modules.${process.env.NODE_ENV}.json`));
+            fdArray = iterator(moduleList, fdArray);
+        }
 
-        const fdArray = ['export default ['];
-        Object.keys(moduleList).forEach(moduleName => {
-            if (isObject(moduleList[moduleName])) {
-                const moduleConfig = moduleList[moduleName];
+        if (fs.existsSync(api.resolve('app/etc/modules.local.json'))){
+            moduleList = require(api.resolve('app/etc/modules.local.json'));
+            fdArray = iterator(moduleList, fdArray);
+        }
 
-                if (
-                    moduleConfig.type === 'package' &&
-                    (moduleConfig.hasOwnProperty('enabled') ? moduleConfig.enabled : true)
-                ) {
-                    fdArray.push(`    () => require('${moduleConfig.ref}'),`);
-                    console.log(`${moduleName} => added package as static require dependency`);
-                }
-            }
-        });
         fdArray.push('];');
 
         fs.writeFileSync(api.resolve('app/generated/module.require.js'), fdArray.join('\n'));
