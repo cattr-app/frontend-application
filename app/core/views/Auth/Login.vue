@@ -36,6 +36,7 @@
                         native-type="submit"
                         type="primary"
                         :loading="isLoading"
+                        :disabled="isLoading"
                         @click="submit"
                         >{{ $t('auth.submit') }}</at-button
                     >
