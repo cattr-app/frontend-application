@@ -158,7 +158,7 @@
 
 <script>
     import { ValidationObserver, ValidationProvider } from 'vee-validate';
-    import axios from 'axios';
+    import AuthService from '@/service/authService';
 
     export default {
         name: 'ResetPassword',
@@ -180,78 +180,67 @@
                 currentStep: 0,
                 disabledForm: false,
                 isValidToken: true,
+                authService: new AuthService(),
             };
         },
         methods: {
-            resetPassword() {
+            async resetPassword() {
                 this.disabledForm = true;
 
-                const data = {
+                const payload = {
                     email: this.email,
                 };
 
-                axios
-                    .post('auth/password/reset/request', data)
-                    .then(({ data }) => {
-                        if (data.success) {
-                            this.currentStep = 1;
-                        }
-                    })
-                    .catch(({ response }) => {
-                        this.$Notify({
-                            title: 'Error',
-                            message: response.data.message || this.$t('message.something_went_wrong'),
-                            type: 'error',
-                        });
-                    })
-                    .finally(() => {
-                        this.disabledForm = false;
-                    });
+                try {
+                    const { data } = await this.authService.resetPasswordRequest(payload);
+
+                    if (data.success) {
+                        this.currentStep = 1;
+                    }
+                } catch (e) {
+                    //
+                } finally {
+                    this.disabledForm = false;
+                }
             },
-            validateToken() {
-                const data = {
+            async validateToken() {
+                const payload = {
                     email: this.$route.query.email,
                     token: this.$route.query.token,
                 };
 
-                axios
-                    .post('auth/password/reset/validate', data)
-                    .then(({ data }) => {
-                        if (data.success) {
-                            this.isValidToken = true;
-                        }
-                    })
-                    .catch(() => {
-                        this.isValidToken = false;
-                    });
+                try {
+                    const { data } = await this.authService.resetPasswordValidateToken(payload);
+
+                    if (data.success) {
+                        this.isValidToken = true;
+                    }
+                } catch (e) {
+                    this.isValidToken = false;
+                }
             },
-            submitNewPassword() {
+            async submitNewPassword() {
                 this.disabledForm = true;
 
-                const data = {
+                const payload = {
                     email: this.$route.query.email,
                     token: this.$route.query.token,
                     password: this.password,
                     password_confirmation: this.passwordConfirmation,
                 };
 
-                axios
-                    .post('auth/password/reset/process', data)
-                    .then(({ data }) => {
-                        if (data.success) {
-                            this.currentStep = 3;
-                        }
-                    })
-                    .catch(({ response }) => {
-                        this.$Notify({
-                            title: 'Error',
-                            message: response.data.message || this.$t('message.something_went_wrong'),
-                            type: 'error',
-                        });
-                    })
-                    .finally(() => {
+                try {
+                    const { data } = await this.authService.resetPasswordProcess(payload);
+
+                    if (data.success) {
+                        this.currentStep = 3;
                         this.disabledForm = false;
-                    });
+                    }
+                } catch (e) {
+                    //
+                } finally {
+                    this.disabledForm = false;
+                }
             },
         },
     };
