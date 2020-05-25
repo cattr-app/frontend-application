@@ -68,6 +68,7 @@ export function localModuleLoader(router) {
                 moduleInitData,
                 fullModuleName,
                 fn,
+                type: 'local',
             });
         }
     });
@@ -96,12 +97,19 @@ export function localModuleLoader(router) {
                 );
             }
 
-            moduleInitQueue.push({
-                module: md,
-                order: moduleConfig.hasOwnProperty('loadOrder') ? moduleConfig.loadOrder : 999,
-                moduleInitData: moduleConfig,
-                fullModuleName: moduleConfig.moduleName,
-            });
+            if (
+                moduleInitQueue.findIndex(el => {
+                    return el.fullModuleName === moduleConfig.moduleName;
+                }) === -1
+            ) {
+                moduleInitQueue.push({
+                    module: md,
+                    order: moduleConfig.hasOwnProperty('loadOrder') ? moduleConfig.loadOrder : 999,
+                    moduleInitData: moduleConfig,
+                    fullModuleName: moduleConfig.moduleName,
+                    type: 'package',
+                });
+            }
         });
     }
 
@@ -109,13 +117,13 @@ export function localModuleLoader(router) {
     moduleInitQueue = sortBy(moduleInitQueue, 'order');
 
     // Initializing modules sync
-    moduleInitQueue.forEach(({ module, moduleInitData, fullModuleName, fn = undefined }) => {
+    moduleInitQueue.forEach(({ module, moduleInitData, fullModuleName, fn = undefined, type = 'unknown' }) => {
         if (!config.moduleFilter(fullModuleName)) {
             return;
         }
 
         if (process.env.NODE_ENV === 'development') {
-            console.log(`Initializing module ${fullModuleName}...`);
+            console.log(`Initializing ${type} module ${fullModuleName}...`);
         }
 
         const moduleInstance = module.init(

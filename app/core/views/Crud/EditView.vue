@@ -152,7 +152,7 @@
                                                     v-for="(option, optionKey) of field.options"
                                                     :key="optionKey"
                                                     :value="option.value"
-                                                    >{{ $t(option.label) }}
+                                                    >{{ ucfirst($t(option.label)) }}
                                                 </at-option>
                                             </at-select>
                                             <small>{{ errors[0] }}</small>
@@ -228,6 +228,7 @@
     import RenderableField from '../../components/RenderableField';
     import ResourceSelect from '../../components/ResourceSelect';
     import { ValidationObserver, ValidationProvider } from 'vee-validate';
+    import { ucfirst } from '@/utils/string';
 
     export default {
         name: 'EditView',
@@ -283,6 +284,7 @@
         },
 
         methods: {
+            ucfirst,
             async fetchData() {
                 this.isDataLoading = true;
 

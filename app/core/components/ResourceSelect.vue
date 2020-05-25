@@ -1,7 +1,12 @@
 <template>
     <div>
         <at-select v-if="options" ref="select" v-model="model" :placeholder="$t('control.select')" filterable>
-            <at-option v-for="option of options" :key="option.value" :label="option.label" :value="option.value">
+            <at-option
+                v-for="option of options"
+                :key="option.value"
+                :label="ucfirst(option.label)"
+                :value="option.value"
+            >
             </at-option>
         </at-select>
         <at-input v-else disabled></at-input>
@@ -9,6 +14,8 @@
 </template>
 
 <script>
+    import { ucfirst } from '@/utils/string';
+
     export default {
         name: 'ResourceSelect',
         props: {
@@ -33,6 +40,9 @@
             return {
                 options: null,
             };
+        },
+        methods: {
+            ucfirst,
         },
         computed: {
             model: {

@@ -1,4 +1,6 @@
-# Cattr Frontend Applicaton
+# Cattr Frontend Application
+
+Here is an official development repository: https://git.amazingcat.net/AmazingTime/core/cattr-frontend
 
 ## Build
 ```

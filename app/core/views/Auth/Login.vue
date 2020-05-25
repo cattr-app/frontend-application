@@ -36,6 +36,7 @@
                         native-type="submit"
                         type="primary"
                         :loading="isLoading"
+                        :disabled="isLoading"
                         @click="submit"
                         >{{ $t('auth.submit') }}</at-button
                     >
@@ -77,7 +78,7 @@
                 recaptchaKey: null,
                 error: null,
                 isLoading: false,
-                slogans: ['Cattr - a free open source time tracker'],
+                slogans: ['Cattr - a free open source time tracker', 'Manage your time with ease'],
             };
         },
 

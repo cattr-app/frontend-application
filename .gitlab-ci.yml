@@ -12,7 +12,7 @@ demo_deploy:
   image: alpine
   stage: deploy
   only:
-    - demo
+    - release
   before_script:
     - 'which ssh-agent || ( apk add --update openssh )'
     - eval $(ssh-agent -s)
@@ -36,6 +36,7 @@ live_deploy:
     - ssh-keyscan -H $CI_HOST >> ~/.ssh/known_hosts
   script:
     - ssh $CI_USER@$CI_HOST 'cd cattr/frontend && git pull'
+    - ssh $CI_USER@$CI_HOST 'cd cattr/frontend && git submodule update --init --force'
     - ssh $CI_USER@$CI_HOST 'source .zshrc && cd cattr/frontend && npm install'
     - ssh $CI_USER@$CI_HOST 'source .zshrc && cd cattr/frontend && npm run compile'
     - ssh $CI_USER@$CI_HOST 'source .zshrc && cd cattr/frontend && npm run build'
@@ -58,6 +59,7 @@ staging_deploy:
     - ssh-keyscan -H $STAGING_HOST >> ~/.ssh/known_hosts
   script:
     - ssh $STAGING_USER@$STAGING_HOST 'cd frontend && git pull'
+    - ssh $STAGING_USER@$STAGING_HOST 'cd frontend && git submodule update --init --force'
     - ssh $STAGING_USER@$STAGING_HOST 'cp -f frontend/app/etc/env.staging.js frontend/app/etc/env.js'
     - ssh $STAGING_USER@$STAGING_HOST 'source .zshrc && cd frontend && npm install'
     - ssh $STAGING_USER@$STAGING_HOST 'source .zshrc && cd frontend && npm run compile'

@@ -86,7 +86,7 @@
             </div>
 
             <div ref="tableWrapper" class="crud__table">
-                <at-table ref="table" size="large" :columns="columns" :data="displayableData" />
+                <at-table ref="table" :key="columnsKey" size="large" :columns="columns" :data="displayableData" />
                 <preloader v-if="isDataLoading" :is-transparent="true" />
             </div>
         </div>
@@ -366,6 +366,10 @@
             }
         },
         computed: {
+            columnsKey() {
+                // Used to forced update table when columns changed
+                return this.columns.map(col => col.title).join(',');
+            },
             columns() {
                 const { gridData, sortable } = this.$route.meta;
 
@@ -409,7 +413,7 @@
                     });
                 }
 
-                return columns;
+                return columns.filter(column => this.checkWithCtx(column.renderCondition));
             },
             displayableData() {
                 return this.tableData;
