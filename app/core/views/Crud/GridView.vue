@@ -217,15 +217,17 @@
                 }
 
                 try {
-                    const response = await this.service.getWithFilters(queryParams);
-                    const { data, total, current_page } = response.data;
+                    const res = await this.service.getWithFilters(queryParams);
+                    const { data, total, current_page } = res.data;
 
                     this.totalItems = total;
                     this.page = current_page;
 
                     this.tableData = data;
-                } catch (e) {
-                    // Ignore exception
+                } catch ({ response }) {
+                    if (process.env.NODE_ENV === 'development') {
+                        console.warn(response ? response : 'request is canceled');
+                    }
                 }
 
                 this.isDataLoading = false;
@@ -453,7 +455,9 @@
             window.addEventListener('resize', this.handleResize);
             this.handleResize();
 
-            this.$refs.tableWrapper.addEventListener('click', this.handleTableClick);
+            if (this.$refs.tableWrapper) {
+                this.$refs.tableWrapper.addEventListener('click', this.handleTableClick);
+            }
         },
         watch: {
             $route(to) {

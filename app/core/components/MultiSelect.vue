@@ -59,7 +59,7 @@
                 options: [],
             };
         },
-        async mounted() {
+        async created() {
             try {
                 const { data } = await this.service.getAll();
                 const all = data.map(option => {
@@ -69,52 +69,56 @@
                     };
                 });
                 this.options.push(...all);
-
-                this.$emit('onOptionsLoad', this.options);
-            } catch (e) {
-                return;
+            } catch ({ response }) {
+                if (process.env.NODE_ENV === 'development') {
+                    console.warn(response ? response : 'request to projects is canceled');
+                }
             }
+
+            this.$emit('onOptionsLoad', this.options);
 
             if (this.selected) {
                 this.model = this.selected;
             }
 
-            if (this.model.length && this.model.length === Object.keys(this.options).length) {
-                this.$refs.select.$children.forEach(option => (option.selected = true));
-            } else {
-                this.model.forEach(modelValue => {
-                    this.$refs.select.$children.forEach(option => {
-                        if (option.value === modelValue) {
-                            option.selected = true;
-                        }
+            if (this.$refs.select) {
+                if (this.model.length && this.model.length === Object.keys(this.options).length) {
+                    this.$refs.select.$children.forEach(option => (option.selected = true));
+                } else {
+                    this.model.forEach(modelValue => {
+                        this.$refs.select.$children.forEach(option => {
+                            if (option.value === modelValue) {
+                                option.selected = true;
+                            }
+                        });
                     });
-                });
-            }
+                }
 
-            this.lastQuery = '';
-            this.$watch(
-                () => {
-                    if (this.$refs.select === undefined) {
-                        return;
-                    }
-
-                    return {
-                        query: this.$refs.select.query,
-                        visible: this.$refs.select.visible,
-                    };
-                },
-                ({ query, visible }) => {
-                    if (visible) {
-                        if (query.length) {
-                            this.lastQuery = query;
-                        } else {
-                            this.$refs.select.query = this.lastQuery;
+                this.lastQuery = '';
+                this.$watch(
+                    () => {
+                        if (this.$refs.select === undefined) {
+                            return;
                         }
-                    } else {
-                        this.lastQuery = query;
-                    }
-                },
-            );
+
+                        return {
+                            query: this.$refs.select.query,
+                            visible: this.$refs.select.visible,
+                        };
+                    },
+                    ({ query, visible }) => {
+                        if (visible) {
+                            if (query.length) {
+                                this.lastQuery = query;
+                            } else {
+                                this.$refs.select.query = this.lastQuery;
+                            }
+                        } else {
+                            this.lastQuery = query;
+                        }
+                    },
+                );
+            }
         },
         watch: {
             selected() {
