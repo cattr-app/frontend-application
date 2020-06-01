@@ -82,11 +82,13 @@
             if (this.model.length && this.model.length === Object.keys(this.options).length) {
                 this.$refs.select.$children.forEach(option => (option.selected = true));
             } else {
-                this.model.forEach(modelValue => {
-                    this.$refs.select.$children.forEach(option => {
-                        if (option.value === modelValue) {
-                            option.selected = true;
-                        }
+                this.$nextTick(function() {
+                    this.model.forEach(modelValue => {
+                        this.$refs.select.$children.forEach(option => {
+                            if (option.value === modelValue) {
+                                option.selected = true;
+                            }
+                        });
                     });
                 });
             }
