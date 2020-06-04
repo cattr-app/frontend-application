@@ -162,15 +162,18 @@
                 isLoading: false,
             };
         },
-        async mounted() {
+        async created() {
             window.addEventListener('click', this.hidePopup);
 
             this.isLoading = true;
-
-            const { data } = await this.usersService.getAll();
-            this.users = data;
-
-            this.isLoading = false;
+            try {
+                const { data } = await this.usersService.getAll();
+                this.users = data;
+            } catch ({ response }) {
+                if (process.env.NODE_ENV === 'development') {
+                    console.warn(response ? response : 'request to users is canceled');
+                }
+            }
 
             if (!localStorage.getItem(localStorageKey)) {
                 this.userIDs = this.users.filter(user => user.active).map(user => user.id);
@@ -188,6 +191,7 @@
             if (this.userIDs.length) {
                 this.$emit('change', this.userIDs);
             }
+            this.isLoading = false;
         },
         beforeDestroy() {
             window.removeEventListener('click', this.hidePopup);

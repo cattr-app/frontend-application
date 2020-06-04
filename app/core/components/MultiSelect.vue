@@ -59,38 +59,38 @@
                 options: [],
             };
         },
-        async mounted() {
+        async created() {
             try {
                 const { data } = await this.service.getAll();
-                const all = data.map(option => {
-                    return {
-                        value: option.id,
-                        label: option[this.service.getOptionLabelKey()],
-                    };
-                });
+                const all = data.map(option => ({
+                    value: option.id,
+                    label: option[this.service.getOptionLabelKey()],
+                }));
                 this.options.push(...all);
-
                 this.$emit('onOptionsLoad', this.options);
-            } catch (e) {
-                return;
+            } catch ({ response }) {
+                if (process.env.NODE_ENV === 'development') {
+                    console.warn(response ? response : 'request to projects is canceled');
+                }
             }
 
             if (this.selected) {
                 this.model = this.selected;
             }
-
-            if (this.model.length && this.model.length === Object.keys(this.options).length) {
-                this.$refs.select.$children.forEach(option => (option.selected = true));
-            } else {
-                this.$nextTick(function() {
-                    this.model.forEach(modelValue => {
-                        this.$refs.select.$children.forEach(option => {
-                            if (option.value === modelValue) {
-                                option.selected = true;
-                            }
+            if (this.$refs.select) {
+                if (this.model.length && this.model.length === Object.keys(this.options).length) {
+                    this.$refs.select.$children.forEach(option => (option.selected = true));
+                } else {
+                    this.$nextTick(function() {
+                        this.model.forEach(modelValue => {
+                            this.$refs.select.$children.forEach(option => {
+                                if (option.value === modelValue) {
+                                    option.selected = true;
+                                }
+                            });
                         });
                     });
-                });
+                }
             }
 
             this.lastQuery = '';
