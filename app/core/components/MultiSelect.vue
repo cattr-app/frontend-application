@@ -96,31 +96,30 @@
                 }
             }
 
-                this.lastQuery = '';
-                this.$watch(
-                    () => {
-                        if (this.$refs.select === undefined) {
-                            return;
-                        }
+            this.lastQuery = '';
+            this.$watch(
+                () => {
+                    if (this.$refs.select === undefined) {
+                        return;
+                    }
 
-                        return {
-                            query: this.$refs.select.query,
-                            visible: this.$refs.select.visible,
-                        };
-                    },
-                    ({ query, visible }) => {
-                        if (visible) {
-                            if (query.length) {
-                                this.lastQuery = query;
-                            } else {
-                                this.$refs.select.query = this.lastQuery;
-                            }
-                        } else {
+                    return {
+                        query: this.$refs.select.query,
+                        visible: this.$refs.select.visible,
+                    };
+                },
+                ({ query, visible }) => {
+                    if (visible) {
+                        if (query.length) {
                             this.lastQuery = query;
+                        } else {
+                            this.$refs.select.query = this.lastQuery;
                         }
-                    },
-                );
-            }
+                    } else {
+                        this.lastQuery = query;
+                    }
+                },
+            );
         },
         watch: {
             selected() {
