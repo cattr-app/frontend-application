@@ -62,20 +62,17 @@
         async created() {
             try {
                 const { data } = await this.service.getAll();
-                const all = data.map(option => {
-                    return {
-                        value: option.id,
-                        label: option[this.service.getOptionLabelKey()],
-                    };
-                });
+                const all = data.map(option => ({
+                    value: option.id,
+                    label: option[this.service.getOptionLabelKey()],
+                }));
                 this.options.push(...all);
+                this.$emit('onOptionsLoad', this.options);
             } catch ({ response }) {
                 if (process.env.NODE_ENV === 'development') {
                     console.warn(response ? response : 'request to projects is canceled');
                 }
             }
-
-            this.$emit('onOptionsLoad', this.options);
 
             if (this.selected) {
                 this.model = this.selected;
