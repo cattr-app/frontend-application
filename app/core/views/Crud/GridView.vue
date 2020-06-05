@@ -47,8 +47,8 @@
         </div>
 
         <div class="at-container">
-            <div v-if="filterFields && filterFields.length" class="crud__column-filters">
-                <template v-for="filter of filterFields">
+            <div v-if="visibleFilterFields && visibleFilterFields.length" class="crud__column-filters">
+                <template v-for="filter of visibleFilterFields">
                     <at-select
                         v-if="filter.fieldOptions && filter.fieldOptions.type === 'select'"
                         :key="filter.key"
@@ -416,6 +416,12 @@
                 }
 
                 return columns.filter(column => this.checkWithCtx(column.renderCondition));
+            },
+            visibleFilterFields() {
+                return this.filterFields.filter(filter => {
+                    const column = this.columns.find(column => column.key === filter.key);
+                    return !!column;
+                });
             },
             displayableData() {
                 return this.tableData;
