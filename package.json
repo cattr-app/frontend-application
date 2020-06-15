@@ -20,7 +20,7 @@
     "@amazingcat/cattr-frontend-module-core": "^1.0.0",
     "@amazingcat/cattr-frontend-module-dashboard": "^1.0.0",
     "@amazingcat/cattr-frontend-module-demo": "^1.1.0",
-    "@amazingcat/cattr-frontend-module-gitlab-integration": "^1.0.0",
+    "@amazingcat/cattr-frontend-module-gitlab-integration": "^1.1.0",
     "@amazingcat/cattr-frontend-module-project-report": "^1.0.0",
     "@amazingcat/cattr-frontend-module-projects": "^1.0.0",
     "@amazingcat/cattr-frontend-module-redmine-integration": "^1.0.0",
