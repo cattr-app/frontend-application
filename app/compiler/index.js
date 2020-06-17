@@ -1,7 +1,6 @@
 /** @typedef {import('@vue/cli-service/lib/PluginAPI')} PluginAPI */
 
 const fs = require('fs'),
-    path = require('path'),
     isObject = require('lodash/isObject');
 
 const iterator = (moduleList, fdArray) => {

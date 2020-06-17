@@ -113,6 +113,26 @@ export function localModuleLoader(router) {
         });
     }
 
+    const internalModule = require.context('_internal', true, /module.init.js$/);
+
+    internalModule.keys().forEach(fn => {
+        const pathData = fn.split('/');
+        const moduleName = pathData[1];
+        const fullModuleName = moduleName;
+
+        const md = internalModule(fn);
+        const moduleInitData = md.ModuleConfig || { fullModuleName: moduleName };
+
+        moduleInitQueue.push({
+            module: md,
+            order: moduleInitData.hasOwnProperty('loadOrder') ? moduleInitData.loadOrder : 999,
+            moduleInitData,
+            fullModuleName,
+            fn,
+            type: 'internal',
+        });
+    });
+
     // Sort modules load order
     moduleInitQueue = sortBy(moduleInitQueue, 'order');
 
@@ -127,7 +147,10 @@ export function localModuleLoader(router) {
         }
 
         const moduleInstance = module.init(
-            new Module(moduleInitData.routerPrefix || kebabCase(fullModuleName), fullModuleName),
+            new Module(
+                moduleInitData.routerPrefix || kebabCase(fullModuleName),
+                moduleInitData.moduleName || fullModuleName,
+            ),
             router,
         );
 

@@ -2,16 +2,4 @@
   "AmazingCat_DemoModule": {
     "enabled": true
   },
-  "AmazingCat_EmailReportsModule": {
-    "enabled": false
-  },
-  "AmazingCat_JiraIntegrationModule": {
-    "enabled": false
-  },
-  "AmazingCat_InvoicesModule": {
-    "enabled": false
-  },
-  "AmazingCat_TrelloIntegrationModule": {
-    "enabled": false
-  }
 }

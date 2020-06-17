@@ -1,0 +1,38 @@
+{
+  "navigation": {
+    "users": "Пользователи",
+    "invitations": "Приглашения"
+  },
+  "users": {
+    "grid-title": "Пользователи",
+    "crud-title": "Пользователь",
+    "role": {
+      "name": "Роль",
+      "manager": "Менеджер",
+      "auditor": "Аудитор",
+      "user": "Пользователь"
+    }
+  },
+  "invitations": {
+    "grid-title": "Приглашения",
+    "crud-title": "Приглашение"
+  },
+  "settings": {
+    "color_interval": {
+      "label": "Прогресс рабочего дня",
+      "notification" : {
+        "gt_100": "Значение не может быть больше 100",
+        "interval_already_in_use": "Этот интервал уже используется"
+      }
+    }
+  },
+  "field": {
+    "minutes": "{value} минут"
+  },
+  "languages": {
+    "default": "По-умолчанию",
+    "en": "English",
+    "ru": "Русский",
+    "dk": "Danish"
+  }
+}

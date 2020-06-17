@@ -1,0 +1,20 @@
+{
+  "navigation": {
+    "tasks": "Задачи"
+  },
+  "tasks": {
+    "grid-title": "Задачи",
+    "crud-title": "Задача",
+    "source": {
+      "internal": "Внутренняя"
+    },
+    "priority": {
+      "low": "Низкий",
+      "normal": "Нормальный",
+      "high": "Высокий"
+    }
+  },
+  "field": {
+    "source": "Источник"
+  }
+}

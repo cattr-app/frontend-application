@@ -10,22 +10,6 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const SentryPlugin = require('@sentry/webpack-plugin');
 
-let coreAlias;
-
-if (!isDevMod) {
-    coreAlias = env.LOCAL_BUILD === true ? resolve(__dirname, 'app', 'core') : '@amazingcat/cattr-frontend-core';
-} else {
-    switch (env.DEVELOPER_MODE) {
-        case 'local':
-            coreAlias = resolve(__dirname, 'app', 'core');
-            break;
-        case 'package':
-        default:
-            coreAlias = '@amazingcat/cattr-frontend-core';
-            break;
-    }
-}
-
 Object.keys(env).forEach(p => {
     process.env[`VUE_APP_${p}`] = env[p];
 });
@@ -46,7 +30,7 @@ module.exports = {
             },
         },
     },
-    transpileDependencies: ['@amazingcat/cattr-frontend-core', /(.+)-cattr-module/gi],
+    transpileDependencies: [/(.+)-cattr-module/gi],
     configureWebpack: {
         devtool: isDevMod ? 'eval-source-maps' : '',
         entry: {
@@ -55,8 +39,9 @@ module.exports = {
         resolve: {
             alias: {
                 _app: resolve(__dirname, 'app'),
-                '@': coreAlias,
-                _modules: resolve(__dirname, 'app', 'modules'),
+                '@': resolve(__dirname, 'app', 'core'),
+                _modules: resolve(__dirname, 'modules'),
+                _internal: resolve(__dirname, 'app', 'internal'),
                 _vendor_modules: resolve(__dirname, 'node_modules'),
             },
         },
