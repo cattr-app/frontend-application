@@ -26,6 +26,23 @@ const mutations = {
         s.sections.push(section);
     },
 
+    updateSection(s, { section, data }) {
+        s.sections = s.sections.map(item => {
+            if (item.pathName !== section.pathName) {
+                return item;
+            }
+
+            return {
+                ...item,
+                data: {
+                    ...item.data,
+                    ...data,
+                },
+            };
+        });
+        console.log(s.sections);
+    },
+
     clearSections(s) {
         s.sections = [];
     },
@@ -45,14 +62,19 @@ const actions = {
      */
     async setSettingSection(store, section) {
         // We need this if when navigating from Settings to Company because store already have values and will not fire action
-        if (Object.keys(this.getters['user/companyData']).length) {
+        if (Object.keys(this.getters['user/user']).length) {
             await addSectionToStore(store, section);
         }
 
         this.watch(
-            () => this.getters['user/companyData'],
+            () => this.getters['user/user'],
             async () => await addSectionToStore(store, section),
         );
+    },
+
+    async updateSection({ commit, state }, { pathName, data }) {
+        const section = state.sections.find(section => section.pathName === pathName);
+        commit('updateSection', { section, data });
     },
 
     /**
@@ -81,7 +103,7 @@ const addSectionToStore = async (store, section) => {
     if (!access || store.state.sections.findIndex(s => s.pathName === section.name) >= 0) {
         return;
     }
-    section.meta.service.getItem().then(({ data }) => {
+    section.meta.service.getAll().then(({ data }) => {
         section = {
             label: section.meta.label,
             fields: section.meta.fields,
@@ -89,6 +111,7 @@ const addSectionToStore = async (store, section) => {
             service: section.meta.service,
             access: access,
             scope: section.scope,
+            order: section.order,
             data,
         };
         store.commit('setSection', section);
