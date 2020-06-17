@@ -130,9 +130,9 @@ export default class Module {
      * Create new section with provided params
      */
     addSettingsSection() {
-        Array.from(arguments).forEach(({ route, accessCheck, scope, component }) => {
+        Array.from(arguments).forEach(({ route, accessCheck, scope, order, component }) => {
             const { path, name, meta, children } = route;
-            const section = new SettingsSection(path, name, meta, accessCheck, scope, component, children);
+            const section = new SettingsSection(path, name, meta, accessCheck, scope, order, component, children);
             this.settingsSections.push(section);
         });
     }
@@ -141,9 +141,9 @@ export default class Module {
      * Create new section with provided params
      */
     addCompanySection() {
-        Array.from(arguments).forEach(({ route, accessCheck, scope, component }) => {
+        Array.from(arguments).forEach(({ route, accessCheck, scope, order, component }) => {
             const { path, name, meta, children } = route;
-            const section = new SettingsSection(path, name, meta, accessCheck, scope, component, children);
+            const section = new SettingsSection(path, name, meta, accessCheck, scope, order, component, children);
             this.companySections.push(section);
         });
     }

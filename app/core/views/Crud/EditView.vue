@@ -297,7 +297,7 @@
                         })
                         .catch(({ response }) => {
                             if (response.data.error_type === 'query.item_not_found') {
-                                this.$router.push({ name: 'forbidden' });
+                                this.$router.replace({ name: 'forbidden' });
                             }
                         });
 
