@@ -284,7 +284,6 @@
 
                 try {
                     const { data } = await this.section.service.save(this.values);
-                    console.log(1, data);
                     await this.$store.dispatch('settings/updateSection', { pathName: this.$route.name, data });
 
                     this.$Notify({

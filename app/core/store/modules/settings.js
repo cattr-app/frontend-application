@@ -40,7 +40,6 @@ const mutations = {
                 },
             };
         });
-        console.log(s.sections);
     },
 
     clearSections(s) {
