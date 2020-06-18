@@ -59,6 +59,7 @@ export function getEndOfDayInTimezone(date, timezone) {
 }
 
 const zones = {
+    UTC: ['UTC'],
     AD: ['Europe/Andorra'],
     AE: ['Asia/Dubai'],
     AF: ['Asia/Kabul'],

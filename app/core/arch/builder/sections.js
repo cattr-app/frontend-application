@@ -18,18 +18,25 @@ export default class SettingsSection {
     section = {};
     scope = 'settings';
 
-    nameDelimiter = '.';
-    pathDelimiter = '/';
-
-    constructor(path, name, meta, accessCheck = () => true, scope = 'settings', component = null, children = []) {
-        this.path = this.pathDelimiter + scope + this.pathDelimiter + path;
-        this.name = scope + this.nameDelimiter + name;
+    constructor(
+        path,
+        name,
+        meta,
+        accessCheck = () => true,
+        scope = 'settings',
+        order = 99,
+        component = null,
+        children = [],
+    ) {
+        this.path = path;
+        this.name = name;
         this.meta = meta;
         this.component =
             component || (() => import(/* webpackChunkName: "settings" */ '@/views/Settings/DynamicSettings.vue'));
         this.children = children;
         this.accessCheck = accessCheck;
         this.scope = scope;
+        this.order = order;
 
         this.section = {
             path: this.path,
@@ -39,6 +46,7 @@ export default class SettingsSection {
             children: this.children,
             accessCheck: this.accessCheck,
             scope: this.scope,
+            order: this.order,
         };
     }
 
