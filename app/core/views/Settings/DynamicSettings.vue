@@ -20,10 +20,10 @@
                                                 :content="$t(field.tooltipValue)"
                                                 placement="top-right"
                                             >
-                                                <p class="label label-tooltip">
+                                                <u class="label label-tooltip">
                                                     {{ $t(field.label) }}
                                                     <span v-if="field.required">*</span>
-                                                </p>
+                                                </u>
                                             </at-tooltip>
                                             <p v-else class="label">
                                                 {{ $t(field.label) }}
@@ -317,11 +317,6 @@
 
         .label {
             font-weight: bold;
-        }
-
-        .label-tooltip {
-            border-bottom: 1.5px dashed;
-            cursor: pointer;
         }
     }
 
