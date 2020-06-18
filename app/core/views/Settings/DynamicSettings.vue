@@ -31,14 +31,24 @@
                                             </p>
                                         </div>
                                         <div class="col">
-                                            <validation-provider v-if="typeof field.render === 'function'">
+                                            <validation-provider
+                                                v-if="typeof field.render === 'function'"
+                                                v-slot="{ errors }"
+                                                :rules="field.rules || ''"
+                                                :name="$t(field.label)"
+                                                :vid="field.key"
+                                            >
                                                 <renderable-field
                                                     v-model="values[field.key]"
                                                     :render="field.render"
                                                     :field="field"
                                                     :values="values"
                                                     class="with-margin"
+                                                    :class="{
+                                                        'at-select--error at-input--error has-error': errors.length > 0,
+                                                    }"
                                                 ></renderable-field>
+                                                <small>{{ errors[0] }}</small>
                                             </validation-provider>
 
                                             <validation-provider
@@ -47,6 +57,7 @@
                                                         field.fieldOptions.type === 'text'
                                                 "
                                                 v-slot="{ errors }"
+                                                :rules="field.rules || ''"
                                                 :name="$t(field.label)"
                                                 :vid="field.key"
                                             >
@@ -64,6 +75,7 @@
                                             <validation-provider
                                                 v-else-if="field.fieldOptions.type === 'number'"
                                                 v-slot="{ errors }"
+                                                :rules="field.rules || ''"
                                                 :name="$t(field.label)"
                                                 :vid="field.key"
                                             >
@@ -80,6 +92,7 @@
                                             <validation-provider
                                                 v-else-if="field.fieldOptions.type === 'select'"
                                                 v-slot="{ errors }"
+                                                :rules="field.rules || ''"
                                                 :name="$t(field.label)"
                                                 :vid="field.key"
                                             >
@@ -97,6 +110,7 @@
                                             <validation-provider
                                                 v-else-if="field.fieldOptions.type === 'textarea'"
                                                 v-slot="{ errors }"
+                                                :rules="field.rules || ''"
                                                 :name="$t(field.label)"
                                                 :vid="field.key"
                                             >
@@ -114,6 +128,7 @@
                                             <validation-provider
                                                 v-else-if="field.fieldOptions.type === 'listbox'"
                                                 v-slot="{ errors }"
+                                                :rules="field.rules || ''"
                                                 :name="$t(field.label)"
                                                 :vid="field.key"
                                             >
@@ -129,6 +144,8 @@
                                             <validation-provider
                                                 v-else-if="field.fieldOptions.type === 'checkbox'"
                                                 v-slot="{ errors }"
+                                                :rules="field.rules || ''"
+                                                :name="$t(field.label)"
                                                 :vid="field.key"
                                             >
                                                 <at-checkbox v-model="values[field.key]" label="" />
@@ -158,7 +175,6 @@
 </template>
 
 <script>
-    import cloneDeep from 'lodash/cloneDeep';
     import ListBox from '@/components/ListBox';
     import RenderableField from '@/components/RenderableField';
     import { ValidationObserver, ValidationProvider } from 'vee-validate';
@@ -259,10 +275,16 @@
                 return options;
             },
             async submit() {
+                const valid = await this.$refs.form.validate();
+                if (!valid) {
+                    return;
+                }
+
                 this.isLoading = true;
 
                 try {
-                    await this.section.service.save(this.values);
+                    const { data } = await this.section.service.save(this.values);
+                    await this.$store.dispatch('settings/updateSection', { pathName: this.$route.name, data });
 
                     this.$Notify({
                         type: 'success',
@@ -270,12 +292,16 @@
                         message: this.$t('notification.settings.save.success.message'),
                     });
                 } catch ({ response }) {
-                    this.$refs.form.setErrors(response.data.info);
+                    if (
+                        typeof response !== 'undefined' &&
+                        response.hasOwnProperty('data') &&
+                        response.data.hasOwnProperty('info')
+                    ) {
+                        this.$refs.form.setErrors(response.data.info);
+                    }
                 } finally {
                     this.isLoading = false;
                 }
-
-                this.$emit('onUpdate');
             },
         },
     };
