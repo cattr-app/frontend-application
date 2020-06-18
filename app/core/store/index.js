@@ -6,7 +6,7 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
     modules,
-    strict: true,
+    strict: process.env.NODE_ENV !== 'production',
 });
 
 for (const moduleName of Object.keys(modules)) {
