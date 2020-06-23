@@ -1,12 +1,12 @@
 <template>
     <div class="calendar" @click.stop="togglePopup">
         <at-input class="input" :readonly="true" :value="inputValue">
-            <template v-slot:prepend>
-                <div class="previous" @click.stop.prevent="selectPrevious">&lt;</div>
+            <template #prepend>
+                <i class="icon icon-chevron-left previous" @click.stop.prevent="selectPrevious"></i>
             </template>
 
-            <template v-slot:append>
-                <div class="next" @click.stop.prevent="selectNext">&gt;</div>
+            <template #append>
+                <i class="icon icon-chevron-right next" @click.stop.prevent="selectNext"></i>
             </template>
         </at-input>
 
