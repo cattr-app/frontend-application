@@ -7,7 +7,6 @@ const originalPush = VueRouter.prototype.push;
 VueRouter.prototype.push = function push(location) {
     return originalPush.call(this, location).catch(err => err);
 };
-//
 
 Vue.use(VueRouter);
 
@@ -65,6 +64,14 @@ const routes = [
         name: 'about',
         component: () => import(/* webpackChunkName: "About" */ '../views/About.vue'),
     },
+    {
+        path: '/setup',
+        name: 'setup',
+        meta: {
+            auth: false,
+        },
+        component: () => import(/* webpackChunkName: "Setup" */ '../views/Setup/Setup.vue'),
+    },
 ];
 
 const router = new VueRouter({
@@ -76,8 +83,12 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
     // Close pending requests when switching pages
     Store.dispatch('httpRequest/cancelPendingRequests');
+    const a = true;
 
     if (to.matched.some(record => record.meta.auth || typeof record.meta.auth === 'undefined')) {
+        if (a) {
+            return next({ name: 'setup' }); // проверка на первый запуск сайта
+        }
         if (!Store.getters['user/loggedIn']) {
             return next({ name: 'auth.login' });
         }

@@ -8,27 +8,31 @@ export default class ApiService extends StoreService {
         super(context);
     }
 
+    async chechStatusBackend() {
+        return axios.get('/status/backend', { ignoreCancel: true });
+    }
+
+    async chechConnectionDatabase(params) {
+        return axios.post('/status/database', params);
+    }
+
     token() {
         return this.context.getters['token'];
     }
 
-    checkApiAuth() {
-        return axios
-            .get('/auth/me', { ignoreCancel: true })
-            .then(({ data }) => {
-                const { user } = data;
+    async checkApiAuth() {
+        try {
+            const { data } = await axios.get('/auth/me', { ignoreCancel: true });
+            const { user } = data;
 
-                this.context.dispatch('setLoggedInStatus', true);
-                this.context.dispatch('setUser', user);
-
-                return Promise.resolve();
-            })
-            .catch(() => {
-                localStorage.removeItem('access_token');
-                this.context.dispatch('forceUserExit');
-
-                return Promise.reject();
-            });
+            this.context.dispatch('setLoggedInStatus', true);
+            this.context.dispatch('setUser', user);
+            return Promise.resolve();
+        } catch (e) {
+            localStorage.removeItem('access_token');
+            this.context.dispatch('forceUserExit');
+            return Promise.reject();
+        }
     }
 
     setUserData(user) {

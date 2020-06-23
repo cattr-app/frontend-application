@@ -8,6 +8,45 @@
       "reports": "Reports"
     }
   },
+  "setup": {
+    "step_description": {
+      "database": "Setting of database",
+      "company": "Settings of company",
+      "account": "Create account",
+      "permission": "Permission",
+      "backend-connect": "Backend Connect",
+      "recapcha": "Setting of recapcha"
+    },
+    "header": {
+      "backend-connect": {
+        "title": "Backend connect",
+        "subtitle": "Check connection with backend",
+        "success": "Success",
+        "error": "Connection refused",
+        "process": "Wait process",
+        "status": "Backend status"
+      },
+      "database": {
+        "title": "Setting of database",
+        "subtitle": "Set MySQL setting",
+        "success": "Success",
+        "error": "Wrong params",
+        "process": "Wait process"
+      },
+      "company": {
+        "title": "Settings of company",
+        "subtitle": "Set company settings"
+      },
+      "account": {
+        "title": "Settings of account",
+        "subtitle": "Set account settings"
+      },
+      "permission": {
+        "title": "Permission",
+        "subtitle": "Get permission"
+      }
+    }
+  },
   "auth": {
     "submit": "Login",
     "forgot_password": "Forgot password?",
