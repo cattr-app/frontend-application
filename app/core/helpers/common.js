@@ -8,15 +8,15 @@ export function getParentElement(child, search) {
 
 export function loadSections(context, router, requireSection) {
     const sections = requireSection
-      .keys()
-      .map(fn => requireSection(fn).default)
-      .map(section => {
-          if (typeof section === 'function') {
-              return section(context, router);
-          }
+        .keys()
+        .map(fn => requireSection(fn).default)
+        .map(section => {
+            if (typeof section === 'function') {
+                return section(context, router);
+            }
 
-          return section;
-      });
+            return section;
+        });
 
     sections.forEach(section => {
         if (section.hasOwnProperty('scope') && section.scope === 'company') {
