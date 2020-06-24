@@ -99,7 +99,7 @@
                     },
                     {
                         to: {
-                            name: 'AmazingCat_CoreModule.settings.account',
+                            name: 'Users.settings.account',
                         },
                         title: `<i class="icon icon-settings"></i> ${this.$t('navigation.settings')}`,
                     },
@@ -108,7 +108,7 @@
                 if (this.user && this.user.is_admin) {
                     items.push({
                         to: {
-                            name: 'AmazingCat_CoreModule.company.general',
+                            name: 'Settings.company.general',
                         },
                         title: `<i class="icon icon-settings"></i> ${this.$t('navigation.company_settings')}`,
                     });

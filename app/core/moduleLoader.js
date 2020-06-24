@@ -160,6 +160,8 @@ export function localModuleLoader(router) {
             );
         }
 
+        console.log(moduleInstance);
+
         modules[fullModuleName] = {
             path: typeof fn !== 'undefined' ? path.resolve(__dirname, '..', 'modules', fn) : 'NODE_PACKAGE',
             moduleInstance: moduleInstance,

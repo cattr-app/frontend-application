@@ -17,7 +17,6 @@
                         :service="projectsService"
                         :class="{ 'at-select--error': errors.length > 0 }"
                     />
-
                     <p>{{ errors[0] }}</p>
                 </div>
             </validation-provider>
@@ -45,7 +44,14 @@
                             :key="option.value"
                             :value="option.value"
                             :label="option.label"
-                        />
+                        >
+                            <div class="input__select-wrap">
+                                <at-tooltip :content="option.user.full_name" placement="right-top">
+                                    <user-avatar :key="option.value" :user="option.user" />
+                                </at-tooltip>
+                                <span>{{ option.label }}</span>
+                            </div>
+                        </at-option>
                     </at-select>
                     <at-input v-else class="input" disabled />
 
@@ -66,6 +72,7 @@
     import ProjectService from '@/service/resource/projectService';
     import TasksService from '@/service/resource/tasksService';
     import { ValidationObserver, ValidationProvider } from 'vee-validate';
+    import UserAvatar from '@/components/UserAvatar';
 
     export default {
         name: 'ChangeTaskModal',
@@ -73,6 +80,7 @@
             ResourceSelect,
             ValidationObserver,
             ValidationProvider,
+            UserAvatar,
         },
         props: {
             showModal: {
@@ -97,7 +105,7 @@
                 projectsService: new ProjectService(),
                 tasksService: new TasksService(),
 
-                tasksOptionList: null,
+                tasksOptionList: [],
             };
         },
         methods: {
@@ -126,18 +134,19 @@
         },
         watch: {
             async projectId(projectId) {
-                this.tasksOptionList = [];
-
-                this.tasksOptionList = await this.tasksService
-                    .getWithFilters({ project_id: projectId })
-                    .then(({ data }) => {
-                        return data.map(option => {
-                            return {
-                                value: option.id,
-                                label: option['task_name'],
-                            };
-                        });
-                    });
+                try {
+                    const taskList = (await this.tasksService.getWithFilters({ project_id: projectId, with: 'user' }))
+                        .data;
+                    this.tasksOptionList = taskList.map(option => ({
+                        value: option.id,
+                        label: option['task_name'],
+                        user: option.user,
+                    }));
+                } catch ({ response }) {
+                    if (process.env.NODE_ENV === 'development') {
+                        console.warn(response ? response : 'Request to tasks is canceled');
+                    }
+                }
 
                 requestAnimationFrame(() => {
                     this.$refs.project.reset();
@@ -155,5 +164,16 @@
 
     .input {
         margin-bottom: $spacing-02;
+
+        &__select-wrap {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+
+            span {
+                padding-left: 10px;
+            }
+        }
     }
 </style>

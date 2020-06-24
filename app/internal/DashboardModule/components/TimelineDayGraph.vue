@@ -423,7 +423,7 @@
                     e.target &&
                     !e.target.parentElement.classList.contains(this.canvas.wrapperEl.classList) &&
                     !e.target.closest('.time-interval-edit-panel') &&
-                    !e.target.closest('.screenshot-wrap') &&
+                    !e.target.closest('.screenshot') &&
                     !e.target.closest('.modal') &&
                     !e.target.closest('.at-modal') &&
                     !e.target.closest('.popup')

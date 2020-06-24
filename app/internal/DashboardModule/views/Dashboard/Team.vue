@@ -258,7 +258,7 @@
             }),
             load: debounce(async function(withLoadingIndicator = true) {
                 this.isDataLoading = withLoadingIndicator;
-                if (!this.userIDs.length) {
+                if (!this.userIDs.length || !this.projectIDs.length) {
                     this.isDataLoading = false;
 
                     return;
@@ -324,8 +324,11 @@
                 if (this.sort === 'worked') sortBy = 'time_worked';
 
                 const params = {
-                    start_at: this.getStartOfDayInTimezone(this.start, this.timezone),
-                    end_at: this.getEndOfDayInTimezone(this.end, this.timezone),
+                    start_at: this.start,
+                    end_at: moment
+                        .utc(this.end)
+                        .add(1, 'day')
+                        .format('YYYY-MM-DD'),
                     user_ids: this.userIDs,
                     project_ids: this.projectIDs,
                     order_by: sortBy,

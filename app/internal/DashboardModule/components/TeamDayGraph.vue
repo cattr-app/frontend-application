@@ -358,6 +358,10 @@
                     }
                 }
 
+                if (!this.$refs.canvasWrapper) {
+                    return;
+                }
+
                 const { width: canvasWidth } = this.$refs.canvasWrapper.getBoundingClientRect();
                 const maxLeftOffset = canvasWidth - popupWidth + 2 * canvasPadding;
 
@@ -471,6 +475,9 @@
                 this.canvas.requestRenderAll();
             }, 100),
             onResize: debounce(function() {
+                if (!this.$refs.canvasWrapper) {
+                    return;
+                }
                 const { width } = this.$refs.canvasWrapper.getBoundingClientRect();
                 this.canvas.setWidth(width);
                 this.canvas.setHeight(this.height);

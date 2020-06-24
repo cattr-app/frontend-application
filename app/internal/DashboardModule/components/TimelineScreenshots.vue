@@ -2,9 +2,9 @@
     <div class="screenshots">
         <h3 class="screenshots__title">{{ $t('field.screenshots') }}</h3>
         <at-checkbox-group v-model="selectedIntervalIds">
-            <div ref="timelineScreenshots" class="row">
+            <div class="row">
                 <div v-for="screenshot in screenshots" :key="screenshot.id" class="col-4 screenshots__item">
-                    <div class="screenshot-wrap" :intervalId="screenshot.time_interval_id">
+                    <div class="screenshot">
                         <Screenshot
                             :disableModal="true"
                             :project="getProject(screenshot)"
@@ -12,9 +12,9 @@
                             :task="getTask(screenshot)"
                             :user="user"
                             :timezone="timezone"
-                            @click="showPopup(screenshot, $event)"
+                            @click="showPopup(screenshot)"
                         />
-                        <at-checkbox class="screenshot-wrap__checkbox" :label="screenshot.time_interval_id" />
+                        <at-checkbox class="screenshot__checkbox" :label="screenshot.time_interval_id" />
                     </div>
                 </div>
                 <ScreenshotModal
@@ -39,7 +39,6 @@
     import Screenshot from '@/components/Screenshot';
     import ScreenshotModal from '@/components/ScreenshotModal';
     import ScreenshotService from '@/service/resource/screenshotService';
-    import { getParentElement } from '@/helpers/common.js';
 
     export default {
         name: 'TimelineScreenshots',
@@ -57,8 +56,6 @@
                     task: null,
                     show: false,
                 },
-                firstSelectInterval: null,
-                lastSelectInterval: null,
             };
         },
         computed: {
@@ -72,47 +69,11 @@
         },
         mounted() {
             window.addEventListener('keydown', this.onKeyDown);
-
-            if (this.$refs.timelineScreenshots) {
-                this.$refs.timelineScreenshots.addEventListener('click', this.multipleSelect);
-            }
         },
         beforeDestroy() {
             window.removeEventListener('keydown', this.onKeyDown);
         },
         methods: {
-            multipleSelect(e) {
-                if (!e.shiftKey || e.target.tagName !== 'IMG') {
-                    return;
-                }
-                if (this.firstSelectInterval && this.lastSelectInterval) {
-                    this.firstSelectInterval = null;
-                    this.lastSelectInterval = null;
-                }
-
-                const item = getParentElement(e.target, 'screenshot-wrap');
-                const intervalId = Number(item.getAttribute('intervalId'));
-
-                if (!this.firstSelectInterval) {
-                    this.firstSelectInterval = intervalId;
-                    this.selectedIntervalIds.push(intervalId);
-
-                    return;
-                } else {
-                    this.screenshots.forEach(el => {
-                        if (
-                            (el.id > this.firstSelectInterval && el.id <= intervalId) ||
-                            (this.firstSelectInterval > el.id && intervalId <= el.id)
-                        ) {
-                            if (!this.selectedIntervalIds.includes(el.id)) {
-                                this.selectedIntervalIds.push(el.id);
-                            }
-                        }
-                    });
-
-                    this.lastSelectInterval = this.selectedIntervalIds[this.selectedIntervalIds.length - 1];
-                }
-            },
             onKeyDown(e) {
                 if (e.key === 'ArrowLeft') {
                     e.preventDefault();
@@ -122,8 +83,8 @@
                     this.showNext();
                 }
             },
-            showPopup(screenshot, e) {
-                if (typeof screenshot !== 'object' || e.shiftKey) {
+            showPopup(screenshot) {
+                if (typeof screenshot !== 'object' || screenshot.id === null) {
                     return;
                 }
 
@@ -137,14 +98,14 @@
                 this.modal.show = false;
             },
             showPrevious() {
-                const currentIndex = this.screenshots.findIndex(x => x.id === this.modal.screenshot.id);
+                const currentIndex = this.screenshots.findIndex(el => el.id === this.modal.screenshot.id);
 
                 if (currentIndex !== 0) {
                     this.updateDataModal(currentIndex - 1);
                 }
             },
             showNext() {
-                const currentIndex = this.screenshots.findIndex(x => x.id === this.modal.screenshot.id);
+                const currentIndex = this.screenshots.findIndex(el => el.id === this.modal.screenshot.id);
 
                 if (currentIndex + 1 !== this.screenshots.length) {
                     this.updateDataModal(currentIndex + 1);
@@ -211,8 +172,6 @@
             },
             clearSelectedIntervals() {
                 this.selectedIntervalIds = [];
-                this.firstSelectInterval = null;
-                this.lastSelectInterval = null;
             },
         },
         watch: {
@@ -238,7 +197,7 @@
         }
     }
 
-    .screenshot-wrap {
+    .screenshot {
         height: 100px;
         position: relative;
         margin-bottom: $layout-01;

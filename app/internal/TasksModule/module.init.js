@@ -4,7 +4,7 @@ import UsersService from '@/service/resource/usersService';
 import { ModuleLoaderInterceptor } from '@/moduleLoader';
 import UserAvatar from '@/components/UserAvatar';
 import i18n from '@/i18n';
-import { formatDurationString } from '@/utils/time';
+import { formatDate, formatDurationString } from '@/utils/time';
 
 export const ModuleConfig = {
     routerPrefix: 'tasks',
@@ -15,7 +15,7 @@ export const ModuleConfig = {
 export function init(context, router) {
     let routes = {};
 
-    ModuleLoaderInterceptor.on('AmazingCat_CoreModule', m => {
+    ModuleLoaderInterceptor.on('Core', m => {
         m.routes.forEach(route => {
             if (route.name.search('users.view') > 0) {
                 routes.usersView = route.name;
@@ -23,7 +23,7 @@ export function init(context, router) {
         });
     });
 
-    ModuleLoaderInterceptor.on('AmazingCat_ProjectsModule', m => {
+    ModuleLoaderInterceptor.on('Projects', m => {
         m.routes.forEach(route => {
             if (route.name.search('view') > 0) {
                 routes.projectsView = route.name;
@@ -140,6 +140,11 @@ export function init(context, router) {
                     return h('span', {}, i18n.t('tasks.source.internal'));
                 }
             },
+        },
+        {
+            key: 'created_at',
+            label: 'field.created_at',
+            render: (h, props) => h('span', formatDate(props.currentValue)),
         },
         {
             key: 'total_spent_time',

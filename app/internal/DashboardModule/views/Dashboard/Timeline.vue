@@ -238,9 +238,13 @@
 
                 const params = {
                     start_at: this.start,
-                    end_at: this.end,
+                    end_at: moment
+                        .utc(this.end)
+                        .add(1, 'day')
+                        .format('YYYY-MM-DD'),
                     user_ids: [this.user.id],
                     project_ids: this.projectIDs,
+                    timezone: this.timezone,
                 };
 
                 const response = await this.reportService.getReport(params, config);
