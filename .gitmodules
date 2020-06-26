@@ -1,12 +1,12 @@
 [submodule "Redmine"]
-	path = modules/AmazingCat/RedmineIntegration
+	path = app/vendor_modules/AmazingCat/RedmineIntegration
 	url = https://git.amazingcat.net/AmazingTime/core/modules/redmine/frontend.git
 	branch = master
 [submodule "Gitlab"]
-	path = modules/AmazingCat/GitlabIntegration
+	path = app/vendor_modules/AmazingCat/GitlabIntegration
 	url = https://git.amazingcat.net/AmazingTime/core/modules/gitlab/frontend.git
 	branch = master
 [submodule "Demo"]
-	path = modules/AmazingCat/Demo
+	path = app/vendor_modules/AmazingCat/Demo
 	url = https://git.amazingcat.net/AmazingTime/core/modules/frontend/demo.git
 	branch = master

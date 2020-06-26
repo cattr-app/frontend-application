@@ -40,7 +40,10 @@ export function localModuleLoader(router) {
         const pathData = fn.split('/');
         const moduleVendor = pathData[1];
         const moduleName = pathData[2];
-        const fullModuleName = `${moduleVendor}_${moduleName}`;
+        const fullModuleName =
+            moduleName.search(/integration/) !== -1 && moduleName.search(/module/) !== -1
+                ? `${moduleVendor}_${moduleName}Module`
+                : `${moduleVendor}_${moduleName}`;
 
         const md = requireModule(fn);
         const moduleInitData = md.ModuleConfig || { enabled: false };
@@ -118,7 +121,10 @@ export function localModuleLoader(router) {
     internalModule.keys().forEach(fn => {
         const pathData = fn.split('/');
         const moduleName = pathData[1];
-        const fullModuleName = moduleName;
+        const fullModuleName =
+            moduleName.search(/integration/) !== -1 && moduleName.search(/module/) !== -1
+                ? `${moduleName}Module`
+                : `${moduleName}`;
 
         const md = internalModule(fn);
         const moduleInitData = md.ModuleConfig || { fullModuleName: moduleName };

@@ -40,8 +40,8 @@ module.exports = {
             alias: {
                 _app: resolve(__dirname, 'app'),
                 '@': resolve(__dirname, 'app', 'core'),
-                _modules: resolve(__dirname, 'modules'),
-                _internal: resolve(__dirname, 'app', 'internal'),
+                _modules: resolve(__dirname, 'app', 'vendor_modules'),
+                _internal: resolve(__dirname, 'app', 'core', 'modules'),
                 _vendor_modules: resolve(__dirname, 'node_modules'),
             },
         },
