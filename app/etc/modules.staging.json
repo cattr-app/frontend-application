@@ -1,36 +1,4 @@
 {
-  "AmazingCat_CoreModule": {
-    "type": "local",
-    "ref": "AmazingCat_CoreModule"
-  },
-  "AmazingCat_DashboardModule": {
-    "type": "local",
-    "ref": "AmazingCat_DashboardModule"
-  },
-  "AmazingCat_ProjectReportModule": {
-    "type": "local",
-    "ref": "AmazingCat_ProjectReportModule"
-  },
-  "AmazingCat_ProjectsModule": {
-    "type": "local",
-    "ref": "AmazingCat_ProjectsModule"
-  },
-  "AmazingCat_ScreenshotsModule": {
-    "type": "local",
-    "ref": "AmazingCat_ScreenshotsModule"
-  },
-  "AmazingCat_TasksModule": {
-    "type": "local",
-    "ref": "AmazingCat_TasksModule"
-  },
-  "AmazingCat_TimeIntervalsModule": {
-    "type": "local",
-    "ref": "AmazingCat_TimeIntervalsModule"
-  },
-  "AmazingCat_TimeUseReportModule": {
-    "type": "local",
-    "ref": "AmazingCat_TimeUseReportModule"
-  },
   "AmazingCat_GitlabIntegration": {
     "type": "local",
     "ref": "AmazingCat_GitlabIntegration"

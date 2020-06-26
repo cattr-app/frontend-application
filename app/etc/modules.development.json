@@ -1,52 +1,14 @@
 {
-  "AmazingCat_CoreModule": {
-    "enabled": true,
-    "type": "local",
-    "ref": "AmazingCat_CoreModule"
-  },
-  "AmazingCat_DashboardModule": {
-    "enabled": true,
-    "type": "local",
-    "ref": "AmazingCat_DashboardModule"
-  },
-  "AmazingCat_ProjectReportModule": {
-    "enabled": true,
-    "type": "local",
-    "ref": "AmazingCat_ProjectReportModule"
-  },
-  "AmazingCat_ProjectsModule": {
-    "enabled": true,
-    "type": "local",
-    "ref": "AmazingCat_ProjectsModule"
-  },
-  "AmazingCat_ScreenshotsModule": {
-    "enabled": true,
-    "type": "local",
-    "ref": "AmazingCat_ScreenshotsModule"
-  },
-  "AmazingCat_TasksModule": {
-    "enabled": true,
-    "type": "local",
-    "ref": "AmazingCat_TasksModule"
-  },
-  "AmazingCat_TimeIntervalsModule": {
-    "enabled": true,
-    "type": "local",
-    "ref": "AmazingCat_TimeIntervalsModule"
-  },
-  "AmazingCat_TimeUseReportModule": {
-    "enabled": true,
-    "type": "local",
-    "ref": "AmazingCat_TimeUseReportModule"
-  },
   "AmazingCat_GitlabIntegration": {
-    "enabled": true,
     "type": "local",
     "ref": "AmazingCat_GitlabIntegration"
   },
   "AmazingCat_RedmineIntegration": {
-    "enabled": true,
     "type": "local",
     "ref": "AmazingCat_RedmineIntegration"
+  },
+  "AmazingCat_JiraIntegration": {
+    "type": "local",
+    "ref": "AmazingCat_JiraIntegration"
   }
 }

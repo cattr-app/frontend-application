@@ -4,46 +4,6 @@
     "type": "package",
     "ref": "@amazingcat/cattr-frontend-module-demo"
   },
-  "AmazingCat_CoreModule": {
-    "enabled": true,
-    "type": "package",
-    "ref": "@amazingcat/cattr-frontend-module-core"
-  },
-  "AmazingCat_DashboardModule": {
-    "enabled": true,
-    "type": "package",
-    "ref": "@amazingcat/cattr-frontend-module-dashboard"
-  },
-  "AmazingCat_ProjectReportModule": {
-    "enabled": true,
-    "type": "package",
-    "ref": "@amazingcat/cattr-frontend-module-project-report"
-  },
-  "AmazingCat_ProjectsModule": {
-    "enabled": true,
-    "type": "package",
-    "ref": "@amazingcat/cattr-frontend-module-projects"
-  },
-  "AmazingCat_ScreenshotsModule": {
-    "enabled": true,
-    "type": "package",
-    "ref": "@amazingcat/cattr-frontend-module-screenshots"
-  },
-  "AmazingCat_TasksModule": {
-    "enabled": true,
-    "type": "package",
-    "ref": "@amazingcat/cattr-frontend-module-tasks"
-  },
-  "AmazingCat_TimeIntervalsModule": {
-    "enabled": true,
-    "type": "package",
-    "ref": "@amazingcat/cattr-frontend-module-time-intervals"
-  },
-  "AmazingCat_TimeUseReportModule": {
-    "enabled": true,
-    "type": "package",
-    "ref": "@amazingcat/cattr-frontend-module-time-use-report"
-  },
   "AmazingCat_GitlabIntegration": {
     "enabled": true,
     "type": "package",
