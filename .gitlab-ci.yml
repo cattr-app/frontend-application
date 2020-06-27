@@ -1,6 +1,6 @@
 build_test:
   image: node:lts-alpine
-  stage: test
+  stage: build
   before_script:
     - cp app/etc/env.production.js app/etc/env.js
   script:
@@ -69,3 +69,16 @@ staging_deploy:
     - ssh $STAGING_USER@$STAGING_HOST 'cp -rf frontend/dist/* frontend/output'
     - ssh $STAGING_USER@$STAGING_HOST 'cd frontend && git clean -Xf dist'
     - ssh $STAGING_USER@$STAGING_HOST 'cd frontend && sentry-cli releases deploys `cat package.json | grep version | grep -o ":.*" | grep -o "\".*\"" | sed "s/\"//g"` new -e "staging"'
+
+npm_publish:
+  image: node:lts-alpine
+  stage: publish
+  only:
+    - tags
+  script:
+    - npm publish --access=public
+
+stages:
+  - build
+  - deploy
+  - publish
