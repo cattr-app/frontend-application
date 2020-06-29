@@ -9,13 +9,39 @@
     }
   },
   "setup": {
+    "process": {
+      "account": "Acccount creating",
+      "database": "Backend setup",
+      "permission": "Magic",
+      "status":{
+        "title": "Process status",
+        "success":"Success",
+        "error": "Error"
+      },
+      "info_without_docker": "Пожалуйста внесите изменения в конфиг файлов для корректной работы сервиса. Обратите внимание, что пути нужно заменить на ваши существующие.",
+      "important_information": "Important information",
+      "title_supervisor": "Config of Supervisor",
+      "title_cron": "Config of Cron",
+      "end_install": "Start use Cattr",
+      "end_message": "Installation completed"
+    },
     "step_description": {
       "database": "Setting of database",
       "company": "Settings of company",
       "account": "Create account",
       "permission": "Permission",
       "backend-connect": "Backend Connect",
-      "recapcha": "Setting of recapcha"
+      "recaptcha": "Setting of reCAPTCHA",
+      "congratulation": "Congratulation"
+    },
+    "buttons": {
+      "next": "Next",
+      "back": "Back",
+      "complete": "Complete",
+      "update": "Update",
+      "connect": "Connect to database",
+      "checked": "Enabled",
+      "unchecked": "Disabled"
     },
     "header": {
       "backend-connect": {
@@ -26,24 +52,44 @@
         "process": "Wait process",
         "status": "Backend status"
       },
+      "congratulation": {
+        "title": "Congratulation",
+        "subtitle": "Apply settings",
+        "get_statistic": "Allow sending anonymous of a statistic"
+      },
       "database": {
         "title": "Setting of database",
         "subtitle": "Set MySQL setting",
         "success": "Success",
         "error": "Wrong params",
-        "process": "Wait process"
+        "process": "Wait process",
+        "host": "Host",
+        "database": "Database name",
+        "username":"User name",
+        "password":"Password",
+        "status": "Database status"
       },
       "company": {
         "title": "Settings of company",
-        "subtitle": "Set company settings"
+        "subtitle": "Set company settings",
+        "language": "Language",
+        "timezone": "Timezone"
       },
       "account": {
         "title": "Settings of account",
-        "subtitle": "Set account settings"
+        "subtitle": "Create admin account",
+        "email": "E-mail",
+        "password": "Password"
       },
       "permission": {
         "title": "Permission",
-        "subtitle": "Get permission"
+        "subtitle": "Give permission",
+        "registration_process": "Wait for process registration",
+        "registration": "Registration"
+      },
+      "recaptcha": {
+        "title": "Settings of reCAPTCHA",
+        "subtitle": "Enable a recaptcha?"
       }
     }
   },

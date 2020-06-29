@@ -80,15 +80,18 @@ const router = new VueRouter({
     routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
     // Close pending requests when switching pages
     Store.dispatch('httpRequest/cancelPendingRequests');
-    const a = true;
+    if (!Store.getters['httpRequest/getStatusOfInstalling']) {
+        await Store.dispatch('httpRequest/checkInstalled');
+    }
+
+    if (!Store.getters['httpRequest/getStatusOfInstalling'] && to.name !== 'setup') {
+        return next({ name: 'setup' });
+    }
 
     if (to.matched.some(record => record.meta.auth || typeof record.meta.auth === 'undefined')) {
-        if (a) {
-            return next({ name: 'setup' }); // проверка на первый запуск сайта
-        }
         if (!Store.getters['user/loggedIn']) {
             return next({ name: 'auth.login' });
         }
@@ -98,6 +101,14 @@ router.beforeEach((to, from, next) => {
         .map(record => record.meta.permissions)
         .filter(permissions => permissions)
         .reduce((total, permissions) => total.concat(permissions), []);
+
+    if (to.name === 'setup') {
+        if (Store.getters['httpRequest/getStatusOfInstalling']) {
+            next({ name: 'forbidden' });
+        }
+
+        return next();
+    }
 
     if (!requiredPermissions.length) {
         return next();

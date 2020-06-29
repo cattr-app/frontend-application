@@ -9,30 +9,54 @@ export default class ApiService extends StoreService {
     }
 
     async chechStatusBackend() {
-        return axios.get('/status/backend', { ignoreCancel: true });
+        return await axios.get('installation/status/backend', { ignoreCancel: true });
     }
 
-    async chechConnectionDatabase(params) {
-        return axios.post('/status/database', params);
+    /**
+     * @param params
+     * @returns {Promise<AxiosResponse<T>>}
+     */
+    async checkConnectionDatabase(params) {
+        return await axios.post('installation/status/database', params);
+    }
+
+    async setEnvFile(params) {
+        return await axios.post('installation/change/env', params);
+    }
+
+    async getStatusOfInstalling() {
+        return await axios.get('installation/status');
+    }
+
+    async registrationInCollector(params) {
+        return await axios.post('installation/registration/collector', params);
+    }
+
+    async registrationAdmin(params) {
+        return await axios.post('installation/registration/admin', params);
     }
 
     token() {
         return this.context.getters['token'];
     }
 
-    async checkApiAuth() {
-        try {
-            const { data } = await axios.get('/auth/me', { ignoreCancel: true });
-            const { user } = data;
+    checkApiAuth() {
+        return axios
+            .get('/auth/me', { ignoreCancel: true })
+            .then(({ data }) => {
+                const { user } = data;
 
-            this.context.dispatch('setLoggedInStatus', true);
-            this.context.dispatch('setUser', user);
-            return Promise.resolve();
-        } catch (e) {
-            localStorage.removeItem('access_token');
-            this.context.dispatch('forceUserExit');
-            return Promise.reject();
-        }
+                this.context.dispatch('setLoggedInStatus', true);
+                this.context.dispatch('setUser', user);
+
+                return Promise.resolve();
+            })
+            .catch(() => {
+                localStorage.removeItem('access_token');
+                this.context.dispatch('forceUserExit');
+
+                return Promise.reject();
+            });
     }
 
     setUserData(user) {

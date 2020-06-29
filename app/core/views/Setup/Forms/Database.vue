@@ -1,53 +1,53 @@
 <template>
-    <validation-observer ref="validate">
-        <validation-provider v-slot="{ errors }" rules="required" name="Host name">
-            <small>Host</small>
+    <validation-observer ref="validate" class="database">
+        <validation-provider v-slot="{ errors }" rules="required" :name="$t(`setup.header.database.host`)">
+            <h6>{{ $t(`setup.header.database.host`) }}</h6>
             <at-input
                 v-model="databaseForm.host_name"
                 :status="errors.length > 0 ? 'error' : ''"
-                placeholder="Host name"
+                :placeholder="$t(`setup.header.database.host`)"
                 type="text"
-                :disabled="disabledForm"
             />
             <p>{{ errors[0] }}</p>
         </validation-provider>
 
-        <validation-provider v-slot="{ errors }" rules="required" name="Database Name">
-            <small>Database</small>
+        <validation-provider v-slot="{ errors }" rules="required" :name="$t(`setup.header.database.database`)">
+            <h6>{{ $t(`setup.header.database.database`) }}</h6>
             <at-input
                 v-model="databaseForm.database_name"
                 :status="errors.length > 0 ? 'error' : ''"
-                placeholder="Database Name"
+                :placeholder="$t(`setup.header.database.database`)"
                 type="text"
-                :disabled="disabledForm"
             />
             <p>{{ errors[0] }}</p>
         </validation-provider>
 
-        <validation-provider v-slot="{ errors }" rules="required" name="User Name">
-            <small>User</small>
+        <validation-provider v-slot="{ errors }" rules="required" :name="$t(`setup.header.database.username`)">
+            <h6>{{ $t(`setup.header.database.username`) }}</h6>
             <at-input
                 v-model="databaseForm.user_name"
                 :status="errors.length > 0 ? 'error' : ''"
-                placeholder="User Name"
+                :placeholder="$t(`setup.header.database.username`)"
                 type="text"
             />
             <p>{{ errors[0] }}</p>
         </validation-provider>
 
-        <validation-provider v-slot="{ errors }" rules="required" name="Password">
-            <small>Password</small>
+        <validation-provider v-slot="{ errors }" rules="required" :name="$t(`setup.header.database.password`)">
+            <h6>{{ $t(`setup.header.database.password`) }}</h6>
             <at-input
                 v-model="databaseForm.password"
                 :status="errors.length > 0 ? 'error' : ''"
-                placeholder="Password"
+                :placeholder="$t(`setup.header.database.password`)"
                 type="text"
             />
             <p>{{ errors[0] }}</p>
         </validation-provider>
         <div class="status">
             <at-alert v-if="message" class="status__alert" :type="typeStatus" :message="message" show-icon />
-            <at-button :disabled="isDisabled" type="info" @click="checkConnection">Connect to database</at-button>
+            <at-button :disabled="isDisabled" type="info" @click="checkConnection">{{
+                $t('setup.buttons.connect')
+            }}</at-button>
         </div>
     </validation-observer>
 </template>
@@ -81,7 +81,6 @@
             };
         },
         mounted() {
-            console.log(this.storage['database'].databaseParams);
             if (this.storage['database'].hasOwnProperty('databaseParams')) {
                 this.databaseForm = this.storage['database'].databaseParams;
                 this.$emit('setState', { database: { status: this.status, databaseParams: this.databaseForm } });
@@ -94,7 +93,7 @@
                 this.message = this.$t(`setup.header.database.process`);
                 this.typeStatus = 'info';
                 try {
-                    const { data } = await this.apiService.chechConnectionDatabase(this.databaseForm);
+                    const { data } = await this.apiService.checkConnectionDatabase(this.databaseForm);
                     this.status = 'finish';
                     this.typeStatus = 'success';
                     this.message = this.$t(`setup.header.database.success`);
@@ -105,6 +104,15 @@
                 }
 
                 this.$emit('setState', { database: { status: this.status, databaseParams: this.databaseForm } });
+
+                this.$Notify({
+                    title: this.$t(`setup.header.database.status`),
+                    message: this.$t(`setup.header.database.${this.getStatus()}`),
+                    type: this.getStatus(),
+                });
+            },
+            getStatus() {
+                return this.status === 'finish' ? 'success' : this.status;
             },
         },
         watch: {
@@ -121,12 +129,18 @@
 </script>
 
 <style lang="scss" scoped>
+    .database {
+        display: flex;
+        flex-direction: column;
+        width: 50%;
+    }
     .status {
         display: flex;
         justify-content: flex-end;
         margin-top: 16px;
         &__alert {
             margin-right: 10px;
+            min-width: 150px;
         }
     }
 </style>

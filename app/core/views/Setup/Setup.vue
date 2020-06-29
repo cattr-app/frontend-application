@@ -14,8 +14,8 @@
                     </at-steps>
                 </div>
 
-                <div class="row form-wrap">
-                    <div class="col-8 col-offset-8">
+                <div class="col form-wrap">
+                    <div class="form-wrap__header">
                         <div class="header-text">
                             <h2 class="header-text__title">
                                 {{ $t(`setup.header.${this.stepName}.title`) }}
@@ -24,30 +24,34 @@
                                 {{ $t(`setup.header.${this.stepName}.subtitle`) }}
                             </p>
                         </div>
+                    </div>
+                    <div class="form-wrap__component">
                         <component
                             :is="currentComponent"
                             :storage="stateOfComponents"
                             @setState="getStateOfCurrentComponent"
+                            @getStatusOfInstalled="makeHikeControls"
                         />
                     </div>
                 </div>
 
-                <div class="wrap-buttons">
-                    <at-button
-                        :disabled="isDisabledNext"
-                        type="success"
-                        class="wrap-buttons__button"
-                        @click="changeStep(1)"
-                    >
-                        Next<!--need translate -->
-                    </at-button>
+                <div v-if="!isHideControls" class="wrap-buttons">
                     <at-button
                         v-if="currentStep !== 0"
                         type="primary"
                         class="wrap-buttons__button"
                         @click="changeStep(-1)"
                     >
-                        Back
+                        {{ $t('setup.buttons.back') }}
+                    </at-button>
+                    <at-button
+                        v-if="currentStep !== components.length - 1"
+                        :disabled="isDisabledNext"
+                        type="success"
+                        class="wrap-buttons__button"
+                        @click="changeStep(1)"
+                    >
+                        {{ $t('setup.buttons.next') }}
                     </at-button>
                 </div>
             </div>
@@ -71,6 +75,7 @@
                 stepName: '',
                 components: Components,
                 stateOfComponents,
+                isHideControls: false,
             };
         },
         created() {
@@ -95,6 +100,9 @@
             getStateOfCurrentComponent(state) {
                 this.stateOfComponents = { ...this.stateOfComponents, ...state };
             },
+            makeHikeControls(val) {
+                this.isHideControls = val;
+            },
         },
         computed: {
             currentStatusComponent() {
@@ -109,19 +117,25 @@
 
 <style lang="scss" scoped>
     .form-wrap {
-        padding: 2rem 0;
+        margin-bottom: $layout-01;
         .header-text {
-            padding-bottom: 1rem;
+            margin-bottom: $layout-01;
+
+            &__title,
+            &__subtitle {
+                text-align: center;
+            }
+        }
+        &__component,
+        &__header {
+            display: flex;
+            justify-content: center;
         }
     }
     .wrap-steps {
         display: flex;
-        width: 100%;
         justify-content: center;
-
-        &__steps {
-            width: 80%;
-        }
+        margin-bottom: $layout-01;
     }
     .wrap-buttons {
         width: 100%;

@@ -1,7 +1,9 @@
 <template>
     <div class="status">
         <at-alert class="status__alert" :type="typeStatus" :message="message" show-icon />
-        <at-button type="info" class="status__button" @click="makeConnection">Update status</at-button>
+        <at-button type="info" class="status__button" @click="makeConnection">{{
+            $t('setup.buttons.update')
+        }}</at-button>
     </div>
 </template>
 

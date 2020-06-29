@@ -1,14 +1,14 @@
 <template>
     <validation-observer ref="validateObs">
         <validation-provider v-slot="{ errors }" rules="required" name="Timezone">
-            <small>Timezone</small>
+            <small>{{ $t('setup.header.company.timezone') }}</small>
             <timezone-picker :value="companyForm.timezone" @onTimezoneChange="onTimezoneChange" />
             <p>{{ errors[0] }}</p>
         </validation-provider>
 
         <validation-provider v-slot="{ errors }" rules="required" name="Language">
-            <small>Language</small>
-            <at-select v-model="companyForm.language">
+            <small>{{ $t('setup.header.company.language') }}</small>
+            <at-select v-model="companyForm.language" :placeholder="$t('control.select')" @on-change="onLanguage">
                 <at-option v-for="(language, index) in languageList" :key="index" :value="index">{{
                     language
                 }}</at-option>
@@ -21,6 +21,7 @@
 <script>
     import { ValidationObserver, ValidationProvider } from 'vee-validate';
     import TimezonePicker from '@/components/TimezonePicker.vue';
+    import { getLangCookie, setLangCookie } from '@/i18n/index';
 
     export default {
         name: 'company',
@@ -46,6 +47,12 @@
             if (this.storage['company'].hasOwnProperty('companyParams')) {
                 this.companyForm = this.storage['company'].companyParams;
             }
+
+            const lang = getLangCookie();
+            if (lang) {
+                this.companyForm.language = lang;
+            }
+
             this.$emit('setState', { company: { status: this.status } });
         },
         computed: {
@@ -56,6 +63,10 @@
         methods: {
             onTimezoneChange(val) {
                 this.companyForm.timezone = val;
+            },
+            onLanguage(val) {
+                setLangCookie(val);
+                this.$i18n.locale = val;
             },
         },
         watch: {
