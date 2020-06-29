@@ -110,6 +110,7 @@
                         DB_DATABASE: this.storage[name].databaseParams.database_name,
                         DB_USERNAME: this.storage[name].databaseParams.user_name,
                         DB_PASSWORD: this.storage[name].databaseParams.password,
+                        MAIL_FROM_ADDRESS: 'mail@example.com',
                         ...recaptchaParams,
                     });
                     this.installSteps[this.stepNumber].color = 'green';
@@ -174,6 +175,9 @@
 
                         return;
                     }
+                }
+                if (this.isDocker) {
+                    this.apiService.setConfig({});
                 }
 
                 this.isProcess = false;
