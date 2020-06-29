@@ -1,5 +1,5 @@
 import AccountService from '../services/accountService';
-import LanguageSelector from '../components/LanguageSelector';
+import LanguageSelector from '@/components/LanguageSelector';
 
 export function fieldsProvider() {
     return [

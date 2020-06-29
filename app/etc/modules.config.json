@@ -1,5 +1,5 @@
 {
-  "AmazingCat_DemoModule": {
+  "AmazingCat_Demo": {
     "enabled": false,
     "type": "package",
     "ref": "@amazingcat/cattr-frontend-module-demo"
