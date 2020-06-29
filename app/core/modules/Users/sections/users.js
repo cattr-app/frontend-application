@@ -7,7 +7,7 @@ import ProjectRoles from '../components/ProjectRoles';
 import Users from '../views/Users';
 import UsersService from '../services/usersService';
 import Store from '@/store';
-import LanguageSelector from '../components/LanguageSelector';
+import LanguageSelector from '@/components/LanguageSelector';
 import ProjectService from '@/service/resource/projectService';
 import i18n from '@/i18n';
 import ProjectRolesView from '../components/ProjectRolesView';
