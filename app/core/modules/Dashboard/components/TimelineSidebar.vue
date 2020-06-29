@@ -12,7 +12,9 @@
                 <Skeleton :loading="isDataLoading" width="100%" height="15px">
                     <div class="project__title">
                         <span class="project__name" :title="project.name">
-                            {{ project.name }}
+                            <router-link class="task__title-link" :to="`/projects/view/${project.id}`">
+                                {{ project.name }}
+                            </router-link>
                         </span>
                         <span class="project__duration">
                             {{ formatDuration(project.duration) }}
@@ -25,13 +27,17 @@
 
             <ul class="task-list">
                 <li
-                    v-for="task in getTasks(project.id)"
+                    v-for="task in getVisibleTasks(project.id)"
                     :key="task.id"
                     class="task"
                     :class="{ 'task-active': activeTask === task.id }"
                 >
                     <Skeleton :loading="isDataLoading" width="100%" height="15px">
-                        <h3 class="task__title" :title="task.name">{{ task.name }}</h3>
+                        <h3 class="task__title" :title="task.name">
+                            <router-link class="task__title-link" :to="`/tasks/view/${task.id}`">
+                                {{ task.name }}
+                            </router-link>
+                        </h3>
 
                         <div class="task__progress">
                             <at-progress
@@ -46,6 +52,21 @@
                     </Skeleton>
                 </li>
             </ul>
+
+            <template v-if="getAllTasks(project.id).length > 3">
+                <at-button
+                    v-if="!isExpanded(project.id)"
+                    class="project__expand"
+                    size="small"
+                    @click.prevent="expand(project.id)"
+                >
+                    {{ $t('projects.show-more') }}
+                </at-button>
+
+                <at-button v-else class="project__shrink" size="small" @click.prevent="shrink(project.id)">
+                    {{ $t('projects.show-less') }}
+                </at-button>
+            </template>
         </div>
     </div>
 </template>
@@ -69,6 +90,11 @@
                 default: false,
             },
         },
+        data() {
+            return {
+                expandedProjects: [],
+            };
+        },
         computed: {
             ...mapGetters('timeline', ['timePerProject']),
             ...mapGetters('user', ['user']),
@@ -89,8 +115,21 @@
             },
         },
         methods: {
-            getTasks(projectID) {
+            isExpanded(projectID) {
+                return this.expandedProjects.indexOf(+projectID) !== -1;
+            },
+            expand(projectID) {
+                this.expandedProjects.push(+projectID);
+            },
+            shrink(projectID) {
+                this.expandedProjects = this.expandedProjects.filter(proj => +proj !== +projectID);
+            },
+            getAllTasks(projectID) {
                 return Object.values(this.timePerProject[this.user.id][projectID].tasks);
+            },
+            getVisibleTasks(projectID) {
+                const tasks = this.getAllTasks(projectID);
+                return this.isExpanded(projectID) ? tasks : tasks.slice(0, 3);
             },
             formatDuration: formatDurationString,
         },
@@ -110,7 +149,7 @@
     .project {
         &__header {
             padding: 0 20px;
-            margin-bottom: 15px;
+            margin-bottom: 5px;
         }
 
         &__title {
@@ -135,8 +174,14 @@
             font-size: 15px;
         }
 
+        &__expand,
+        &__shrink {
+            display: block;
+            margin: 5px auto 0;
+        }
+
         &:not(:last-child) {
-            margin-bottom: 70px;
+            margin-bottom: 35px;
         }
     }
 
@@ -173,6 +218,10 @@
             font-size: 15px;
             font-weight: 600;
             text-overflow: ellipsis;
+        }
+
+        &__title-link {
+            color: inherit;
         }
 
         &__active {
