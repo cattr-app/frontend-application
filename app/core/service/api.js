@@ -24,6 +24,10 @@ export default class ApiService extends StoreService {
         return await axios.post('installation/change/env', params);
     }
 
+    async setConfig(params) {
+        return await axios.post('installation/set/config', params);
+    }
+
     async getStatusOfInstalling() {
         return await axios.get('installation/status');
     }
