@@ -44,8 +44,6 @@
                 this.showStatusRegistration = true;
             },
             handlPermission(val) {
-                console.log(val);
-
                 if (!val) {
                     this.permission = val;
                     this.status = 'finish';
