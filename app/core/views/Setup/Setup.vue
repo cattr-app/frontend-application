@@ -35,7 +35,11 @@
                     </div>
                 </div>
 
-                <div v-if="!isHideControls" class="wrap-buttons">
+                <div
+                    v-if="!isHideControls"
+                    class="wrap-buttons"
+                    :style="currentStep === 0 ? 'justify-content: flex-end' : ''"
+                >
                     <at-button
                         v-if="currentStep !== 0"
                         type="primary"
@@ -141,6 +145,7 @@
         width: 100%;
         display: flex;
         justify-content: space-between;
+        margin-top: 2rem;
 
         &__button {
             margin: 0 20px;

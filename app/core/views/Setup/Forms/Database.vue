@@ -1,5 +1,5 @@
 <template>
-    <validation-observer ref="validate" class="database">
+    <validation-observer ref="validate" class="database" v-on:keyup.enter="checkConnection">
         <validation-provider v-slot="{ errors }" rules="required" :name="$t(`setup.header.database.host`)">
             <h6>{{ $t(`setup.header.database.host`) }}</h6>
             <at-input
@@ -7,6 +7,7 @@
                 :status="errors.length > 0 ? 'error' : ''"
                 :placeholder="$t(`setup.header.database.host`)"
                 type="text"
+                :disabled="isDisabledInputs"
             />
             <p>{{ errors[0] }}</p>
         </validation-provider>
@@ -18,6 +19,7 @@
                 :status="errors.length > 0 ? 'error' : ''"
                 :placeholder="$t(`setup.header.database.database`)"
                 type="text"
+                :disabled="isDisabledInputs"
             />
             <p>{{ errors[0] }}</p>
         </validation-provider>
@@ -29,6 +31,7 @@
                 :status="errors.length > 0 ? 'error' : ''"
                 :placeholder="$t(`setup.header.database.username`)"
                 type="text"
+                :disabled="isDisabledInputs"
             />
             <p>{{ errors[0] }}</p>
         </validation-provider>
@@ -40,9 +43,11 @@
                 :status="errors.length > 0 ? 'error' : ''"
                 :placeholder="$t(`setup.header.database.password`)"
                 type="text"
+                :disabled="isDisabledInputs"
             />
             <p>{{ errors[0] }}</p>
         </validation-provider>
+
         <div class="status">
             <at-alert v-if="message" class="status__alert" :type="typeStatus" :message="message" show-icon />
             <at-button :disabled="isDisabled" type="info" @click="checkConnection">{{
@@ -55,6 +60,7 @@
 <script>
     import { ValidationObserver, ValidationProvider } from 'vee-validate';
     import ApiService from '@/service/api';
+
     export default {
         name: 'database',
         components: {
@@ -74,13 +80,14 @@
                 },
                 disabledForm: false,
                 status: 'process',
-                typeStatus: '',
+                typeStatus: 'info',
                 message: '',
                 isDisabled: true,
                 apiService: new ApiService(),
+                isDisabledInputs: false,
             };
         },
-        mounted() {
+        created() {
             if (this.storage['database'].hasOwnProperty('databaseParams')) {
                 this.databaseForm = this.storage['database'].databaseParams;
                 this.$emit('setState', { database: { status: this.status, databaseParams: this.databaseForm } });
@@ -90,13 +97,17 @@
         },
         methods: {
             async checkConnection() {
+                if (this.isDisabled) {
+                    return;
+                }
+
                 this.message = this.$t(`setup.header.database.process`);
-                this.typeStatus = 'info';
                 try {
                     const { data } = await this.apiService.checkConnectionDatabase(this.databaseForm);
                     this.status = 'finish';
                     this.typeStatus = 'success';
                     this.message = this.$t(`setup.header.database.success`);
+                    this.isDisabledInputs = true;
                 } catch ({ response }) {
                     this.status = 'error';
                     this.typeStatus = this.status;
@@ -104,12 +115,6 @@
                 }
 
                 this.$emit('setState', { database: { status: this.status, databaseParams: this.databaseForm } });
-
-                this.$Notify({
-                    title: this.$t(`setup.header.database.status`),
-                    message: this.$t(`setup.header.database.${this.getStatus()}`),
-                    type: this.getStatus(),
-                });
             },
             getStatus() {
                 return this.status === 'finish' ? 'success' : this.status;
@@ -117,10 +122,12 @@
         },
         watch: {
             databaseForm: {
-                handler() {
-                    this.$refs.validate.validate().then(el => {
-                        this.isDisabled = !el;
-                    });
+                handler(val) {
+                    if ('validate' in this.$refs) {
+                        this.$refs.validate.validate().then(el => {
+                            this.isDisabled = !el;
+                        });
+                    }
                 },
                 deep: true,
             },

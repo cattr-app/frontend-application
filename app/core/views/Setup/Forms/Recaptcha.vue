@@ -27,6 +27,11 @@
                 <p>{{ errors[0] }}</p>
             </validation-provider>
         </validation-observer>
+        <div v-if="isEnabledRecaptcha" class="recaptcha__wrap-button">
+            <h5 class="recaptcha__get-key" color="info" @click="openRegistrationRecaptcha">
+                {{ $t('setup.header.recaptcha.get_recaptcha') }}
+            </h5>
+        </div>
     </div>
 </template>
 
@@ -78,6 +83,10 @@
             handlStatusRecaptcha(val) {
                 this.isEnabledRecaptcha = val;
             },
+            openRegistrationRecaptcha() {
+                var win = window.open('https://www.google.com/recaptcha/admin/create', '_blank');
+                win.focus();
+            },
         },
         watch: {
             isEnabledRecaptcha(val) {
@@ -115,6 +124,16 @@
         display: flex;
         flex-direction: column;
         width: 50%;
+        &__get-key {
+            margin-top: 1rem;
+            cursor: pointer;
+            color: #618fe8;
+            box-shadow: 0px 1px 0px 0px #618fe8;
+        }
+        &__wrap-button {
+            display: flex;
+            justify-content: flex-end;
+        }
     }
     .switch-custom {
         display: flex;

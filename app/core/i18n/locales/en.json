@@ -89,7 +89,8 @@
       },
       "recaptcha": {
         "title": "Settings of reCAPTCHA",
-        "subtitle": "Enable a recaptcha?"
+        "subtitle": "Connect reCAPTCHA to protect user accounts from password attacks.",
+        "get_recaptcha": "Get keys of reCAPTCHA"
       }
     }
   },
