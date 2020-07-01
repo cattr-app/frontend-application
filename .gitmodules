@@ -1,44 +1,12 @@
-[submodule "app/modules/AmazingCat/CoreModule"]
-	path = app/modules/AmazingCat/CoreModule
-	url = https://git.amazingcat.net/AmazingTime/core/modules/frontend/core.git
-	branch = master
-[submodule "app/modules/AmazingCat/DashboardModule"]
-	path = app/modules/AmazingCat/DashboardModule
-	url = https://git.amazingcat.net/AmazingTime/core/modules/frontend/dashboard.git
-	branch = master
-[submodule "app/modules/AmazingCat/DemoModule"]
-	path = app/modules/AmazingCat/DemoModule
-	url = https://git.amazingcat.net/AmazingTime/core/modules/frontend/demo.git
-	branch = master
-[submodule "app/modules/AmazingCat/GitlabIntegration"]
-	path = app/modules/AmazingCat/GitlabIntegration
-	url = https://git.amazingcat.net/AmazingTime/core/modules/gitlab/frontend.git
-	branch = master
-[submodule "app/modules/AmazingCat/ProjectReportModule"]
-	path = app/modules/AmazingCat/ProjectReportModule
-	url = https://git.amazingcat.net/AmazingTime/core/modules/frontend/project-report.git
-	branch = master
-[submodule "app/modules/AmazingCat/ProjectsModule"]
-	path = app/modules/AmazingCat/ProjectsModule
-	url = https://git.amazingcat.net/AmazingTime/core/modules/frontend/projects.git
-	branch = master
-[submodule "app/modules/AmazingCat/RedmineIntegration"]
-	path = app/modules/AmazingCat/RedmineIntegration
+[submodule "Redmine"]
+	path = app/vendor_modules/AmazingCat/RedmineIntegration
 	url = https://git.amazingcat.net/AmazingTime/core/modules/redmine/frontend.git
 	branch = master
-[submodule "app/modules/AmazingCat/ScreenshotsModule"]
-	path = app/modules/AmazingCat/ScreenshotsModule
-	url = https://git.amazingcat.net/AmazingTime/core/modules/frontend/screenshots.git
+[submodule "Gitlab"]
+	path = app/vendor_modules/AmazingCat/GitlabIntegration
+	url = https://git.amazingcat.net/AmazingTime/core/modules/gitlab/frontend.git
 	branch = master
-[submodule "app/modules/AmazingCat/TasksModule"]
-	path = app/modules/AmazingCat/TasksModule
-	url = https://git.amazingcat.net/AmazingTime/core/modules/frontend/tasks.git
-	branch = master
-[submodule "app/modules/AmazingCat/TimeIntervalsModule"]
-	path = app/modules/AmazingCat/TimeIntervalsModule
-	url = https://git.amazingcat.net/AmazingTime/core/modules/frontend/time-intervals.git
-	branch = master
-[submodule "app/modules/AmazingCat/TimeUseReportModule"]
-	path = app/modules/AmazingCat/TimeUseReportModule
-	url = https://git.amazingcat.net/AmazingTime/core/modules/frontend/time-use-report.git
+[submodule "Demo"]
+	path = app/vendor_modules/AmazingCat/Demo
+	url = https://git.amazingcat.net/AmazingTime/core/modules/frontend/demo.git
 	branch = master

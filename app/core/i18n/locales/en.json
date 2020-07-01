@@ -240,7 +240,8 @@
     },
     "work_time": "Working Hours",
     "notice": "Notice",
-    "report": "Report"
+    "report": "Report",
+    "minutes": "{value} минут"
   },
   "filter": {
     "enter-single": "Enter {0}",
