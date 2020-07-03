@@ -1,0 +1,20 @@
+{
+  "navigation": {
+    "tasks": "Tasks"
+  },
+  "tasks": {
+    "grid-title": "Tasks",
+    "crud-title": "Task",
+    "source": {
+      "internal": "Internal"
+    },
+    "priority": {
+      "low": "Low",
+      "normal": "Normal",
+      "high": "High"
+    }
+  },
+  "field": {
+    "source": "Source"
+  }
+}

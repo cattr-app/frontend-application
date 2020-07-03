@@ -67,18 +67,23 @@
         },
         async mounted() {
             this.isLoading = true;
+            try {
+                const { data } = await axios.get('about');
+                this.appData = data.app;
+                this.modulesData = data.modules;
 
-            const { data } = await axios.get('about');
-            this.appData = data.app;
-            this.modulesData = data.modules;
-
-            if (data.app.vulnerable) {
-                this.knownVulnerableMsg = `${this.$i18n.t('message.vulnerable_version')} ${data.app.last_version}`;
-            } else if (data.app.last_version && data.app.last_version !== data.app.version) {
-                if (semverGt(data.app.last_version, data.app.version)) {
-                    this.updateVersionMsg = `${this.$i18n.t('message.update_version')} ${data.app.last_version}`;
-                } else {
-                    this.infoMsg = data.app.message;
+                if (data.app.vulnerable) {
+                    this.knownVulnerableMsg = `${this.$i18n.t('message.vulnerable_version')} ${data.app.last_version}`;
+                } else if (data.app.last_version && data.app.last_version !== data.app.version) {
+                    if (semverGt(data.app.last_version, data.app.version)) {
+                        this.updateVersionMsg = `${this.$i18n.t('message.update_version')} ${data.app.last_version}`;
+                    } else {
+                        this.infoMsg = data.app.message;
+                    }
+                }
+            } catch ({ response }) {
+                if (process.env.NODE_ENV === 'development') {
+                    console.warn(response ? response : 'request to about is canceled');
                 }
             }
 

@@ -10,7 +10,7 @@
                 </template>
             </at-menu>
             <div class="settings__content">
-                <router-view @onUpdate="reinitSections"></router-view>
+                <router-view></router-view>
             </div>
         </div>
     </div>
@@ -27,39 +27,8 @@
             sections() {
                 return this.$store.getters['settings/sections']
                     .filter(section => section.scope === 'settings')
-                    .sort((a, b) => {
-                        if (b.label < a.label) {
-                            return 1;
-                        } else if (b.label > a.label) {
-                            return -1;
-                        }
-                        return 0;
-                    });
+                    .sort((a, b) => a.order - b.order);
             },
-        },
-        methods: {
-            async reinitSections() {
-                if (this.reloadingSections) {
-                    return;
-                }
-
-                this.reloadingSections = true;
-
-                try {
-                    await this.$store.dispatch('user/setCompanyData', {});
-                    await this.$store.dispatch('settings/clearSections');
-                    const userApi = await this.$store.getters['user/apiService'];
-                    await userApi.getCompanyData();
-                } finally {
-                    this.reloadingSections = false;
-                }
-            },
-        },
-
-        mounted() {
-            if (this.$route.name === 'settings') {
-                this.$router.push({ name: 'settings.account' });
-            }
         },
     };
 </script>

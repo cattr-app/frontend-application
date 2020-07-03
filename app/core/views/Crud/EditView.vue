@@ -45,10 +45,10 @@
                                             :content="$t(field.tooltipValue)"
                                             placement="top-left"
                                         >
-                                            <p class="label label-tooltip">
+                                            <u class="label label-tooltip">
                                                 {{ $t(field.label) }}
                                                 <span v-if="field.required">*</span>
-                                            </p>
+                                            </u>
                                         </at-tooltip>
                                         <p v-else class="label">
                                             {{ $t(field.label) }}
@@ -297,7 +297,7 @@
                         })
                         .catch(({ response }) => {
                             if (response.data.error_type === 'query.item_not_found') {
-                                this.$router.push({ name: 'forbidden' });
+                                this.$router.replace({ name: 'forbidden' });
                             }
                         });
 
@@ -398,10 +398,6 @@
 
                     .label {
                         font-weight: bold;
-                    }
-                    .label-tooltip {
-                        border-bottom: 1.5px dashed;
-                        cursor: pointer;
                     }
                 }
             }

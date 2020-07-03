@@ -44,7 +44,7 @@ ModuleLoaderInterceptor.on('loaded', router => {
     const settings = [
         {
             path: '/company',
-            name: 'company',
+            redirect: { name: 'Settings.company.general' },
             component: () => import(/* webpackChunkName: "company" */ '../views/Settings/CompanySettings.vue'),
             meta: {
                 auth: true,
@@ -57,7 +57,7 @@ ModuleLoaderInterceptor.on('loaded', router => {
         },
         {
             path: '/settings',
-            name: 'settings',
+            redirect: { name: 'Users.settings.account' },
             component: () => import(/* webpackChunkName: "settings" */ '../views/Settings/Settings.vue'),
             meta: {
                 auth: true,
