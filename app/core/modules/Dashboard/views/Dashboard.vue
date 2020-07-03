@@ -66,7 +66,7 @@
 
     .dashboard-routes {
         &__link {
-            margin-right: 1.8em;
+            margin-right: $layout-03;
             font-size: 1.8rem;
 
             &:last-child {
