@@ -96,7 +96,7 @@
             screenshotTime() {
                 const timezone = this.timezone || this.companyData['timezone'];
 
-                if (!timezone && !this.screenshot.time_interval.start_at) {
+                if (!timezone || !this.screenshot.time_interval.start_at) {
                     return;
                 }
 

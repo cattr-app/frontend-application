@@ -91,10 +91,10 @@ export default class ApiService extends StoreService {
     }
 
     async getCompanyData() {
-        const { data } = await axios.get('/companymanagement/getData', { ignoreCancel: true });
+        const { data } = await axios.get('/company-settings', { ignoreCancel: true });
 
-        this.context.dispatch('setCompanyData', data);
+        this.context.dispatch('setCompanyData', data.data);
 
-        return data;
+        return data.data;
     }
 }

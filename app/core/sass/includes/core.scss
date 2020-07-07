@@ -59,3 +59,9 @@ body {
     height: 40px;
   }
 }
+
+.label-tooltip {
+  text-decoration: none;
+  border-bottom: 1px dashed #3f536e;
+  cursor: help;
+}

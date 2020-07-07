@@ -1,7 +1,6 @@
 /** @typedef {import('@vue/cli-service/lib/PluginAPI')} PluginAPI */
 
 const fs = require('fs'),
-    path = require('path'),
     isObject = require('lodash/isObject');
 
 const iterator = (moduleList, fdArray) => {
@@ -10,8 +9,8 @@ const iterator = (moduleList, fdArray) => {
             const moduleConfig = moduleList[moduleName];
 
             if (
-              moduleConfig.type === 'package' &&
-              (moduleConfig.hasOwnProperty('enabled') ? moduleConfig.enabled : true)
+                moduleConfig.type === 'package' &&
+                (moduleConfig.hasOwnProperty('enabled') ? moduleConfig.enabled : true)
             ) {
                 fdArray.push(`    () => require('${moduleConfig.ref}'),`);
                 console.log(`${moduleName} => added package as static require dependency`);
@@ -44,12 +43,12 @@ module.exports = (api, options) => {
 
         fdArray = iterator(moduleList, fdArray);
 
-        if (fs.existsSync(api.resolve(`app/etc/modules.${process.env.NODE_ENV}.json`))){
+        if (fs.existsSync(api.resolve(`app/etc/modules.${process.env.NODE_ENV}.json`))) {
             moduleList = require(api.resolve(`app/etc/modules.${process.env.NODE_ENV}.json`));
             fdArray = iterator(moduleList, fdArray);
         }
 
-        if (fs.existsSync(api.resolve('app/etc/modules.local.json'))){
+        if (fs.existsSync(api.resolve('app/etc/modules.local.json'))) {
             moduleList = require(api.resolve('app/etc/modules.local.json'));
             fdArray = iterator(moduleList, fdArray);
         }

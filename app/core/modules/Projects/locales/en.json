@@ -1,0 +1,10 @@
+{
+  "navigation": {
+    "projects": "Projects"
+  },
+  "projects": {
+    "grid-title": "Projects",
+    "crud-title": "Project",
+    "amount_of_tasks": "No tasks | 1 task | {count} tasks"
+  }
+}
