@@ -10,7 +10,7 @@ your team's performance straight to the top.
 ### Screenshots
 Dashboard             |  Project report
 :-------------------------:|:-------------------------:
-![](https://git.amazingcat.net/AmazingTime/core/cattr-frontend/uploads/69a5912d9db48237c29cd58aa54728b1/2.png)  |  ![](https://git.amazingcat.net/AmazingTime/core/cattr-frontend/uploads/78efcc9386d7ff2874c4bafc355f6c23/1.png)
+![](https://git.amazingcat.net/AmazingTime/core/cattr-frontend/uploads/69a5912d9db48237c29cd58aa54728b1/2.png)  |  ![](https://git.amazingcat.net/AmazingTime/core/cattr-frontend/uploads/bd595fdde959e6aff922ce2253a8acc8/1.png)
 
 ### Demo
 The demo app is available here: [demo.cattr.app](https://demo.cattr.app)
@@ -51,6 +51,7 @@ https://github.com/cattr-app/desktop-application – Cattr Desktop Application. 
 any OS from the [official site](https://cattr.app/desktop/).
 
 https://github.com/cattr-app/frontend-application – Cattr Frontend Application.
+
 https://github.com/cattr-app/backend-application – Cattr Backend Application.
 
 ## Documentation
