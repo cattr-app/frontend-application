@@ -2,7 +2,21 @@
 
 Here is an official development repository: https://git.amazingcat.net/AmazingTime/core/cattr-frontend
 
-## Build
+## About Cattr
+Cattr is an open-source time tracking solution, designed to be flawlessly integrated with your infrastructure. 
+Superpowered with features like built-in screenshot capture and activity detection, it's a great instrument to boost 
+your team's performance straight to the top.
+
+### Screenshots
+Dashboard             |  Project report
+:-------------------------:|:-------------------------:
+![](https://git.amazingcat.net/AmazingTime/core/cattr-frontend/uploads/69a5912d9db48237c29cd58aa54728b1/2.png)  |  ![](https://git.amazingcat.net/AmazingTime/core/cattr-frontend/uploads/78efcc9386d7ff2874c4bafc355f6c23/1.png)
+
+### Demo
+The demo app is available here: [demo.cattr.app](https://demo.cattr.app)
+
+## Install Cattr
+[Installation manual](https://docs.cattr.app/#/en/getting-started/) on the documentation website
 ```
 # Install dependencies
 npm install
@@ -22,7 +36,7 @@ npm run build
 
 Note: if you want to work with the compiler or core use `npm link`
 
-## Modules configuration
+### Modules configuration
 
 By default, will be loaded config from /app/etc/modules.*.json.
 
@@ -31,3 +45,18 @@ By default, will be loaded config from /app/etc/modules.*.json.
 `modules.<NODE_ENV>.json` if it exists, and then merged with contents of
 
 `modules.local.json` if it exists
+
+## Links
+https://github.com/cattr-app/desktop-application – Cattr Desktop Application. You can also download the built app for 
+any OS from the [official site](https://cattr.app/desktop/).
+
+https://github.com/cattr-app/frontend-application – Cattr Frontend Application.
+https://github.com/cattr-app/backend-application – Cattr Backend Application.
+
+## Documentation
+You can find the Cattr documentation [on the website](https://docs.cattr.app)
+
+Checkout the [Getting Started](https://docs.cattr.app/#/en/getting-started/) page for a quick overview.
+
+## Questions
+For questions and support please use the [official forum](https://community.cattr.app). 
