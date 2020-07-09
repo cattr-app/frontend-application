@@ -222,7 +222,6 @@
     }
 
     .screenshot {
-        height: 100px;
         position: relative;
         margin-bottom: $layout-01;
 
@@ -234,9 +233,8 @@
         }
 
         &::v-deep {
-            .screenshot-image {
+            .screenshot__image {
                 img {
-                    border-radius: 5px;
                     height: 100px;
                 }
             }
