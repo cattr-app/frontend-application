@@ -16,5 +16,9 @@
   "control": {
     "add_new_task": "Add new task",
     "edit_intervals": "Change task"
+  },
+  "projects": {
+    "show-more": "Show more",
+    "show-less": "Show less"
   }
 }
