@@ -197,7 +197,13 @@
     "user_computer_time_popup": "User's inactivity time in minutes before 'inactivity detected' modal pops up",
     "user_interval_screenshot": "Screenshot creation time in minutes",
     "color_intervals": "Lets you select colors for workday time intervals from 0 to 100%",
-    "work_time": "Minimum working hours/day"
+    "work_time": "Minimum working hours/day",
+    "activity_progress": {
+      "not_tracked": "Activity was not tracked",
+      "overall": "Overall activity: {percent}%",
+      "mouse": "Mouse: {percent}%",
+      "keyboard": "Keyboard: {percent}%"
+    }
   },
   "invite": {
     "resend": "Resend invite"

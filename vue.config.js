@@ -23,7 +23,7 @@ module.exports = {
         sourceMap: isDevMod,
         loaderOptions: {
             scss: {
-                sourceMap: true,
+                sourceMap: false,
                 prependData: `
                     @import "~@/sass/includes/variables";
                 `,
