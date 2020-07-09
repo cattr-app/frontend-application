@@ -11,8 +11,8 @@
             }"
         >
             <div v-if="hoverPopup.event">
-                {{ getProjectName(hoverPopup.event.project_id) }}
-                ({{ getTaskName(hoverPopup.event.task_id) }})
+                {{ getTaskName(hoverPopup.event.task_id) }}
+                ({{ getProjectName(hoverPopup.event.project_id) }})
             </div>
 
             <div v-if="hoverPopup.event">
@@ -44,12 +44,12 @@
             </div>
 
             <div v-if="clickPopup.event">
-                <router-link :to="`/projects/view/${clickPopup.event.project_id}`">
-                    {{ getProjectName(clickPopup.event.project_id) }}
+                <router-link :to="`/tasks/view/${clickPopup.event.task_id}`">
+                    {{ getTaskName(clickPopup.event.task_id) }}
                 </router-link>
 
-                <router-link :to="`/tasks/view/${clickPopup.event.task_id}`">
-                    ({{ getTaskName(clickPopup.event.task_id) }})
+                <router-link :to="`/projects/view/${clickPopup.event.project_id}`">
+                    ({{ getProjectName(clickPopup.event.project_id) }})
                 </router-link>
             </div>
 
