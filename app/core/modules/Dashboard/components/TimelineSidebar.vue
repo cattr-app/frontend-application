@@ -57,13 +57,13 @@
                 <at-button
                     v-if="!isExpanded(project.id)"
                     class="project__expand"
-                    size="small"
+                    type="text"
                     @click.prevent="expand(project.id)"
                 >
                     {{ $t('projects.show-more') }}
                 </at-button>
 
-                <at-button v-else class="project__shrink" size="small" @click.prevent="shrink(project.id)">
+                <at-button v-else class="project__shrink" type="text" @click.prevent="shrink(project.id)">
                     {{ $t('projects.show-less') }}
                 </at-button>
             </template>
@@ -177,7 +177,13 @@
         &__expand,
         &__shrink {
             display: block;
-            margin: 5px auto 0;
+            color: #b1b1be;
+            padding: 0;
+            margin: 5px 0 0 20px;
+
+            &::v-deep .at-btn__text {
+                font-size: 14px;
+            }
         }
 
         &:not(:last-child) {
