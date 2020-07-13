@@ -345,16 +345,23 @@ export default (context, router) => {
     crud.edit.addField(fieldsToFill);
     crud.new.addField(fieldsToFill);
 
-    grid.addFilterField([
+    grid.addFilter([
         {
-            key: 'full_name',
-            label: 'field.full_name',
-            placeholder: 'field.full_name',
-            fieldOptions: { type: 'text' },
+            filterName: 'filter.fields.full_name',
+            referenceKey: 'full_name',
         },
         {
+            filterName: 'filter.fields.email',
+            referenceKey: 'email',
+        },
+    ]);
+
+    grid.addFilterField([
+        {
             key: 'active',
-            placeholder: 'field.status',
+            label: 'field.status',
+            placeholder: 'field.statuses.any',
+            saveToQuery: true,
             fieldOptions: {
                 type: 'select',
                 options: [
@@ -363,11 +370,11 @@ export default (context, router) => {
                         label: 'field.statuses.any',
                     },
                     {
-                        value: 0,
+                        value: '0',
                         label: 'field.statuses.disabled',
                     },
                     {
-                        value: 1,
+                        value: '1',
                         label: 'field.statuses.active',
                     },
                 ],
@@ -375,7 +382,9 @@ export default (context, router) => {
         },
         {
             key: 'role_id',
-            placeholder: 'field.role',
+            label: 'field.role',
+            placeholder: 'field.roles.any',
+            saveToQuery: true,
             fieldOptions: {
                 type: 'select',
                 options: [
@@ -384,24 +393,42 @@ export default (context, router) => {
                         label: 'field.roles.any',
                     },
                     {
-                        value: 1,
+                        value: '1',
                         label: 'field.roles.manager',
                     },
                     {
-                        value: 2,
+                        value: '2',
                         label: 'field.roles.user',
                     },
                     {
-                        value: 3,
+                        value: '3',
                         label: 'field.roles.auditor',
                     },
                 ],
             },
         },
         {
-            key: 'email',
-            placeholder: 'field.email',
-            fieldOptions: { type: 'text' },
+            key: 'type',
+            label: 'field.type',
+            placeholder: 'field.types.any',
+            saveToQuery: true,
+            fieldOptions: {
+                type: 'select',
+                options: [
+                    {
+                        value: '',
+                        label: 'field.types.any',
+                    },
+                    {
+                        value: 'employee',
+                        label: 'field.types.employee',
+                    },
+                    {
+                        value: 'client',
+                        label: 'field.types.client',
+                    },
+                ],
+            },
         },
     ]);
 
