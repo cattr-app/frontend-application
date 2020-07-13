@@ -354,6 +354,42 @@ export function init(context, router) {
         },
     ]);
 
+    grid.addFilterField([
+        {
+            key: 'project_id',
+            label: 'tasks.projects',
+            fieldOptions: { type: 'project-select' },
+        },
+        {
+            key: 'user_id',
+            label: 'tasks.users',
+            fieldOptions: { type: 'user-select' },
+        },
+        {
+            key: 'active',
+            label: 'tasks.status',
+            placeholder: 'tasks.statuses.any',
+            saveToQuery: true,
+            fieldOptions: {
+                type: 'select',
+                options: [
+                    {
+                        value: '',
+                        label: 'tasks.statuses.any',
+                    },
+                    {
+                        value: '1',
+                        label: 'tasks.statuses.open',
+                    },
+                    {
+                        value: '0',
+                        label: 'tasks.statuses.closed',
+                    },
+                ],
+            },
+        },
+    ]);
+
     grid.addAction([
         {
             title: 'control.view',
@@ -396,23 +432,6 @@ export function init(context, router) {
     ]);
 
     grid.addPageControls([
-        {
-            key: 'isActive',
-            frontedType: 'checkbox',
-            label: 'control.show_active',
-            onChange: data => {
-                if (data.values.isActive) {
-                    data.$set(data.queryParams, 'active', ['=', data.values.isActive]);
-                } else {
-                    data.$delete(data.queryParams, 'active');
-                }
-
-                data.fetchData();
-            },
-            renderCondition: ({ $store }) => {
-                return $store.getters['user/canInAnyProject']('tasks/create');
-            },
-        },
         {
             label: 'control.create',
             type: 'primary',

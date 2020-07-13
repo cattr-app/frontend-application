@@ -1,6 +1,6 @@
 <template>
     <div class="user-select" :class="{ 'at-select--visible': showPopup }" @click="togglePopup">
-        <at-input class="user-select-input" :readonly="true" :value="inputValue"></at-input>
+        <at-input class="user-select-input" :readonly="true" :value="inputValue" :size="size" />
 
         <span
             v-show="userIDs.length"
@@ -142,6 +142,10 @@
                 default: () => {
                     return {};
                 },
+            },
+            size: {
+                type: String,
+                default: 'normal',
             },
         },
         data() {
@@ -338,7 +342,6 @@
 
         &::v-deep {
             .at-input__original {
-                border: 1px solid #eeeef5;
                 border-radius: 5px;
 
                 padding-right: $spacing-08;

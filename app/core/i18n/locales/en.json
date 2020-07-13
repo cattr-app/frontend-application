@@ -150,6 +150,7 @@
     "type": "Type",
     "types": {
       "all": "All",
+      "any": "Any",
       "employee": "Employee",
       "client": "Client"
     },

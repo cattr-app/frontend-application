@@ -1,6 +1,15 @@
 <template>
     <div class="at-select-wrapper">
-        <at-select ref="select" v-model="model" multiple filterable placeholder="" @click="onClick" @input="onChange">
+        <at-select
+            ref="select"
+            v-model="model"
+            multiple
+            filterable
+            placeholder=""
+            :size="size"
+            @click="onClick"
+            @input="onChange"
+        >
             <li v-if="showSelectAll" class="at-select__option" @click="selectAll">
                 {{ $t('control.select_all') }}
             </li>
@@ -50,6 +59,10 @@
             placeholder: {
                 type: String,
                 required: true,
+            },
+            size: {
+                type: String,
+                default: 'normal',
             },
         },
         data() {
@@ -179,6 +192,11 @@
             position: absolute;
             z-index: 1;
             font-size: 0.9rem;
+        }
+
+        &--small ~ &__placeholder {
+            font-size: 11px;
+            padding: 5px 24px 0 8px;
         }
 
         &__clear {
