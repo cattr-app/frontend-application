@@ -660,6 +660,8 @@
 
         &__popup-filter-title {
             font-weight: 600;
+            font-size: $font-size-smer;
+            margin-bottom: $spacing-02;
         }
 
         &__popup-filter {
