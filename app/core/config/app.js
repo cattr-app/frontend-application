@@ -6,7 +6,7 @@ if (process.env.NODE_ENV === 'development') {
     console.log(env);
 }
 
-axios.defaults.baseURL = (env.API_URL || `${window.location.origin}/api`) + '/' + (env.API_VERSION || '');
+axios.defaults.baseURL = (env.API_URL || `${window.location.origin}/api`) + '/';
 axios.defaults.headers.common['X-REQUESTED-WITH'] = 'XMLHttpRequest';
 
 httpInterceptor.setup();
