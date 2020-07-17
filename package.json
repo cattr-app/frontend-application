@@ -6,9 +6,10 @@
   "license": "SSPL-1.0",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "npm run clean && vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "compile": "npx vue-cli-service modules:compile"
+    "compile": "npx vue-cli-service modules:compile",
+    "clean": "git clean -fX output/*"
   },
   "husky": {
     "hooks": {
