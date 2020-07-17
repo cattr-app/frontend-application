@@ -118,7 +118,13 @@
                         if (query.length) {
                             this.lastQuery = query;
                         } else {
-                            this.$refs.select.query = this.lastQuery;
+                            if (window.event && window.event.type === 'keypress') {
+                                // If query changed by user typing, save query
+                                this.lastQuery = query;
+                            } else {
+                                // If query changed by clicking option and so on, restore query
+                                this.$refs.select.query = this.lastQuery;
+                            }
                         }
                     } else {
                         this.lastQuery = query;
