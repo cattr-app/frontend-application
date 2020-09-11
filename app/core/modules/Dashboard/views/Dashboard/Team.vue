@@ -72,6 +72,7 @@
 
                     <time-interval-edit
                         :screenshots="selectedScreenshots"
+                        :intervals="selectedIntervals"
                         :selected-interval-ids="selectedIntervalIds"
                         @remove="onBulkRemove"
                         @edit="load"
@@ -137,6 +138,7 @@
                 showExportModal: false,
                 selectedIntervalIds: [],
                 selectedScreenshots: [],
+                selectedIntervals: [],
                 sessionStorageKey: sessionStorageKey,
                 isDataLoading: false,
             };
@@ -346,6 +348,9 @@
                 this.selectedScreenshots = this.screenshots.filter(screenshot =>
                     this.selectedIntervalIds.includes(screenshot.time_interval_id),
                 );
+                this.selectedIntervals = Object.values(this.intervals).reduce((acc, curr) => {
+                    return [...acc, ...curr.intervals.filter(interval => event.ids.includes(interval.id))];
+                }, []);
             },
             onBulkRemove() {
                 this.recalculateStatistic(this.selectedScreenshots);
@@ -376,6 +381,7 @@
             },
             clearIntervals() {
                 this.selectedScreenshots = [];
+                this.selectedIntervals = [];
                 this.selectedIntervalIds = [];
             },
 

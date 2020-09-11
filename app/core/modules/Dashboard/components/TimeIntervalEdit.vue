@@ -1,7 +1,7 @@
 <template>
     <div>
         <transition name="slide-up">
-            <div v-if="intervals.length" class="time-interval-edit-panel">
+            <div v-if="intervalIds.length" class="time-interval-edit-panel">
                 <div class="container-fluid">
                     <div class="row flex-middle flex-between">
                         <div class="col-4">
@@ -80,6 +80,9 @@
             screenshots: {
                 type: Array,
             },
+            intervals: {
+                type: Array,
+            },
         },
         computed: {
             ...mapGetters('user', ['user']),
@@ -98,19 +101,30 @@
 
                 modal: '',
                 disabledButtons: false,
-                intervals: [],
+                intervalIds: [],
             };
         },
         methods: {
             totalTimeOfSelectedIntervals() {
-                return this.screenshots
-                    .filter(screenshot => this.intervals.includes(screenshot.time_interval_id))
-                    .map(screenshot => {
-                        const start = moment.utc(screenshot.time_interval.start_at);
-                        const end = moment.utc(screenshot.time_interval.end_at);
-                        return end.diff(start);
-                    })
-                    .reduce((total, curr) => total + curr, 0);
+                if (typeof this.intervals !== 'undefined') {
+                    return this.intervals
+                        .filter(interval => this.intervalIds.includes(interval.id))
+                        .map(interval => {
+                            const start = moment.utc(interval.start_at);
+                            const end = moment.utc(interval.end_at);
+                            return end.diff(start);
+                        })
+                        .reduce((total, curr) => total + curr, 0);
+                } else {
+                    return this.screenshots
+                        .filter(screenshot => this.intervalIds.includes(screenshot.time_interval_id))
+                        .map(screenshot => {
+                            const start = moment.utc(screenshot.time_interval.start_at);
+                            const end = moment.utc(screenshot.time_interval.end_at);
+                            return end.diff(start);
+                        })
+                        .reduce((total, curr) => total + curr, 0);
+                }
             },
             getFormattedTotalTime() {
                 return moment.utc(this.totalTimeOfSelectedIntervals()).format('HH:mm:ss');
@@ -146,7 +160,7 @@
                     this.disabledButtons = true;
 
                     await this.timeIntervalsService.bulkDelete({
-                        intervals: this.intervals,
+                        intervals: this.intervalIds,
                     });
 
                     this.$Notify({
@@ -155,8 +169,8 @@
                         message: this.$t('notification.screenshot.delete.success.message'),
                     });
 
-                    this.$emit('remove', this.intervals);
-                    this.intervals = [];
+                    this.$emit('remove', this.intervalIds);
+                    this.intervalIds = [];
                     this.disabledButtons = false;
                 } catch (e) {
                     this.$Notify({
@@ -185,7 +199,7 @@
                     );
 
                     const task = taskResponse.data.res;
-                    const intervals = this.intervals.map(id => ({
+                    const intervals = this.intervalIds.map(id => ({
                         id,
                         task_id: task.id,
                     }));
@@ -221,7 +235,7 @@
                 this.createTask(projectId, taskName, taskDescription);
             },
             onChangeTaskModalConfirm(taskId) {
-                const intervals = this.intervals.map(id => ({ id, task_id: taskId }));
+                const intervals = this.intervalIds.map(id => ({ id, task_id: taskId }));
                 this.saveTimeIntervals({ intervals });
             },
             onAddNewTaskModalCancel() {
@@ -233,7 +247,7 @@
         },
         watch: {
             selectedIntervalIds(values) {
-                this.intervals = values;
+                this.intervalIds = values;
             },
         },
     };
