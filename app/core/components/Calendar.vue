@@ -1,5 +1,5 @@
 <template>
-    <div class="calendar" @click.stop="togglePopup">
+    <div class="calendar" @click="togglePopup">
         <at-input class="input" :readonly="true" :value="inputValue">
             <template #prepend>
                 <i class="icon icon-chevron-left previous" @click.stop.prevent="selectPrevious"></i>
@@ -261,6 +261,10 @@
                 this.showPopup = !this.showPopup;
             },
             hidePopup() {
+                if (this.$el.contains(event.target)) {
+                    return;
+                }
+
                 this.showPopup = false;
             },
             selectPrevious() {

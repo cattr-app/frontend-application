@@ -3,8 +3,8 @@
         <h3 class="screenshots__title">{{ $t('field.screenshots') }}</h3>
         <at-checkbox-group v-model="selectedIntervalIds">
             <div class="row">
-                <div v-for="screenshot in screenshots" :key="screenshot.id" class="col-4 screenshots__item">
-                    <div class="screenshot">
+                <div v-for="(screenshot, index) in screenshots" :key="screenshot.id" class="col-4 screenshots__item">
+                    <div class="screenshot" :index="index" @click.shift.prevent.stop="onShiftClick(index)">
                         <Screenshot
                             :disableModal="true"
                             :project="getProject(screenshot)"
@@ -12,9 +12,11 @@
                             :task="getTask(screenshot)"
                             :user="user"
                             :timezone="timezone"
-                            @click="showPopup(screenshot)"
+                            @click="showPopup(screenshot, $event)"
                         />
-                        <at-checkbox class="screenshot__checkbox" :label="screenshot.time_interval_id" />
+                        <div @click="onCheckboxClick(index)">
+                            <at-checkbox class="screenshot__checkbox" :label="screenshot.time_interval_id" />
+                        </div>
                     </div>
                 </div>
                 <ScreenshotModal
@@ -56,6 +58,7 @@
                     task: null,
                     show: false,
                 },
+                firstSelectedCheckboxIndex: null,
             };
         },
         computed: {
@@ -74,6 +77,21 @@
             window.removeEventListener('keydown', this.onKeyDown);
         },
         methods: {
+            onShiftClick(index) {
+                if (this.firstSelectedCheckboxIndex === null) {
+                    this.firstSelectedCheckboxIndex = index;
+                }
+
+                this.selectedIntervalIds = this.screenshots
+                    .slice(
+                        Math.min(index, this.firstSelectedCheckboxIndex),
+                        Math.max(index, this.firstSelectedCheckboxIndex) + 1,
+                    )
+                    .map(el => el.time_interval_id);
+            },
+            onCheckboxClick(index) {
+                if (this.firstSelectedCheckboxIndex === null) this.firstSelectedCheckboxIndex = index;
+            },
             onKeyDown(e) {
                 if (e.key === 'ArrowLeft') {
                     e.preventDefault();
@@ -83,7 +101,11 @@
                     this.showNext();
                 }
             },
-            showPopup(screenshot) {
+            showPopup(screenshot, e) {
+                if (e.shiftKey) {
+                    return;
+                }
+
                 if (typeof screenshot !== 'object' || screenshot.id === null) {
                     return;
                 }
@@ -176,6 +198,8 @@
         },
         watch: {
             selectedIntervalIds(intervalIds) {
+                if (intervalIds.length === 0) this.firstSelectedCheckboxIndex = null;
+
                 this.$emit('onSelectedIntervals', intervalIds);
             },
         },
@@ -198,7 +222,6 @@
     }
 
     .screenshot {
-        height: 100px;
         position: relative;
         margin-bottom: $layout-01;
 
@@ -210,9 +233,8 @@
         }
 
         &::v-deep {
-            .screenshot-image {
+            .screenshot__image {
                 img {
-                    border-radius: 5px;
                     height: 100px;
                 }
             }

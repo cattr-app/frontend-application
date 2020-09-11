@@ -1,5 +1,5 @@
 <template>
-    <div class="user-select" :class="{ 'at-select--visible': showPopup }" @click.stop="togglePopup">
+    <div class="user-select" :class="{ 'at-select--visible': showPopup }" @click="togglePopup">
         <at-input class="user-select-input" :readonly="true" :value="inputValue"></at-input>
 
         <span
@@ -249,6 +249,9 @@
                 }
             },
             hidePopup() {
+                if (this.$el.contains(event.target)) {
+                    return;
+                }
                 this.showPopup = false;
 
                 if (this.changed) {
