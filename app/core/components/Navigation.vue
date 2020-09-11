@@ -24,7 +24,7 @@
             <at-dropdown-menu slot="menu">
                 <template v-for="(item, key) of userDropdownItems">
                     <at-dropdown-item :key="key" :name="item.to.name">
-                        <span v-html="item.title">{{ item.title }}</span>
+                        <span><i class="icon" :class="[item.icon]"></i>{{ item.title }}</span>
                     </at-dropdown-item>
                 </template>
                 <li class="at-dropdown-menu__item" @click="logout()">
@@ -95,24 +95,23 @@
                         to: {
                             name: 'about',
                         },
-                        title: `<i class="icon icon-info"></i> ${this.$t('navigation.about')}`,
-                    },
-                    {
-                        to: {
-                            name: 'Users.settings.account',
-                        },
-                        title: `<i class="icon icon-settings"></i> ${this.$t('navigation.settings')}`,
+                        title: this.$t('navigation.about'),
+                        icon: 'icon-info',
                     },
                 ];
-
-                if (this.user && this.user.is_admin) {
-                    items.push({
-                        to: {
-                            name: 'Settings.company.general',
-                        },
-                        title: `<i class="icon icon-settings"></i> ${this.$t('navigation.company_settings')}`,
+                this.modules.forEach(m => {
+                    const entriesDropdown = m.getNavbarMenuEntriesDropDown();
+                    Object.keys(entriesDropdown).forEach(el => {
+                        const { displayCondition, label, to, icon } = entriesDropdown[el];
+                        if (displayCondition(this.$store)) {
+                            items.push({
+                                to,
+                                icon,
+                                title: this.$t(label),
+                            });
+                        }
                     });
-                }
+                });
 
                 return items;
             },
