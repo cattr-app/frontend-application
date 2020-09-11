@@ -43,6 +43,13 @@ const routes = [
             auth: false,
         },
         component: () => import(/* webpackChunkName: "Register" */ '../views/Auth/Register.vue'),
+        beforeEnter: (to, from, next) => {
+            if (Store.getters['user/loggedIn']) {
+                Store.dispatch('user/forceUserExit');
+            }
+
+            next();
+        },
     },
     {
         path: '*',
