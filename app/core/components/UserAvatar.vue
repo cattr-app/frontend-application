@@ -8,7 +8,7 @@
             :backgroundColor="backgroundColor"
             :src="src"
         ></vue-avatar>
-        <div v-show="isOnline" class="avatar__online-status"></div>
+        <div v-show="online" class="avatar__online-status"></div>
     </div>
 </template>
 
@@ -31,7 +31,7 @@
                 type: Object,
                 required: true,
             },
-            isOnline: {
+            online: {
                 type: Boolean,
             },
         },
