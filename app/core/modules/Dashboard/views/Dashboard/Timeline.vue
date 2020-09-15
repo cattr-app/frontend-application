@@ -1,12 +1,12 @@
 <template>
     <div class="timeline">
         <div class="row">
-            <div class="col-5 pr-1">
+            <div class="col-5 col-xl-4 pr-1">
                 <div class="at-container sidebar">
                     <TimelineSidebar :active-task="activeTask" :isDataLoading="isDataLoading" />
                 </div>
             </div>
-            <div class="col-19">
+            <div class="col-19 col-xl-20">
                 <div class="controls-row flex-between">
                     <div class="flex">
                         <Calendar
