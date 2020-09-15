@@ -79,7 +79,6 @@ export function fieldsToFillProvider() {
             type: 'input',
             frontendType: 'password',
             placeholder: 'field.password',
-            displayable: view => view.values.id,
         },
         {
             label: 'field.manual_time',

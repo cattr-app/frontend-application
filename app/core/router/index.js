@@ -7,7 +7,6 @@ const originalPush = VueRouter.prototype.push;
 VueRouter.prototype.push = function push(location) {
     return originalPush.call(this, location).catch(err => err);
 };
-//
 
 Vue.use(VueRouter);
 
@@ -43,6 +42,13 @@ const routes = [
             auth: false,
         },
         component: () => import(/* webpackChunkName: "Register" */ '../views/Auth/Register.vue'),
+        beforeEnter: (to, from, next) => {
+            if (Store.getters['user/loggedIn']) {
+                Store.dispatch('user/forceUserExit');
+            }
+
+            next();
+        },
     },
     {
         path: '*',

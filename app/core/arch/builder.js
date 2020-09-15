@@ -4,6 +4,6 @@ export default class Builder {
     constructor(moduleContext) {
         this.moduleContext = moduleContext;
         this.routerPrefix =
-            (moduleContext.getRouterPrefix().indexOf(0) !== '/' ? '/' : '') + moduleContext.getRouterPrefix();
+            (moduleContext.getRouterPrefix().startsWith('/') ? '' : '/') + moduleContext.getRouterPrefix();
     }
 }

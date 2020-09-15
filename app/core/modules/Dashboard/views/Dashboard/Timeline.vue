@@ -72,6 +72,7 @@
 
                     <time-interval-edit
                         :screenshots="selectedScreenshots"
+                        :intervals="selectedIntervals"
                         :selected-interval-ids="selectedIntervalIds"
                         @remove="onBulkRemove"
                         @edit="loadData"
@@ -131,6 +132,7 @@
                 showExportModal: false,
                 selectedIntervalIds: [],
                 selectedScreenshots: [],
+                selectedIntervals: [],
                 sessionStorageKey: sessionStorageKey,
                 isDataLoading: false,
             };
@@ -228,6 +230,9 @@
                 this.selectedScreenshots = this.screenshots.filter(screenshot =>
                     this.selectedIntervalIds.includes(screenshot.time_interval.id),
                 );
+                this.selectedIntervals = Object.values(this.intervals).reduce((acc, curr) => {
+                    return [...acc, ...curr.intervals.filter(interval => event.ids.includes(interval.id))];
+                }, []);
             },
             async onExport(format) {
                 const mimetype = getMimeType(format);
@@ -286,6 +291,9 @@
                 this.selectedScreenshots = this.screenshots.filter(screenshot =>
                     intervalIds.includes(screenshot.time_interval_id),
                 );
+                this.selectedIntervals = Object.values(this.intervals).reduce((acc, curr) => {
+                    return [...acc, ...curr.intervals.filter(interval => intervalIds.includes(interval.id))];
+                }, []);
                 this.selectedIntervalIds = intervalIds;
             },
             clearIntervals() {
@@ -293,6 +301,7 @@
                     this.$refs.timelineScreenshots.clearSelectedIntervals();
                 }
                 this.selectedScreenshots = [];
+                this.selectedIntervals = [];
                 this.selectedIntervalIds = [];
             },
         },

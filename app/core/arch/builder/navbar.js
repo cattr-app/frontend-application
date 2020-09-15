@@ -1,7 +1,7 @@
 import isObject from 'lodash/isObject';
 
 export default class NavbarEntry {
-    constructor(label, to, displayCondition = () => true, section) {
+    constructor({ label, to, displayCondition = () => true, section, icon }) {
         if (!isObject(to)) {
             throw new Error('[to] instance must be a JavaScript object');
         }
@@ -9,6 +9,7 @@ export default class NavbarEntry {
         this.to = to;
         this.displayCondition = displayCondition;
         this.section = section;
+        this.icon = icon;
     }
 
     getData() {
@@ -17,6 +18,7 @@ export default class NavbarEntry {
             to: this.to,
             displayCondition: this.displayCondition,
             section: this.section,
+            icon: this.icon,
         };
     }
 }
