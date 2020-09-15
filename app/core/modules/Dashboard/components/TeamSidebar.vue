@@ -328,7 +328,8 @@
                         );
                     }
 
-                    if (user.online) {
+                    const currentTask = this.currentTasks[user.id];
+                    if (user.online && currentTask) {
                         // Avatar active icon
                         this.canvas.add(
                             new fabric.Circle({
@@ -341,10 +342,7 @@
                                 ...fabricObjectOptions,
                             }),
                         );
-                    }
 
-                    const currentTask = this.currentTasks[user.id];
-                    if (currentTask) {
                         // Task name overflow ellipsis
                         const taskName = new fabric.Textbox(currentTask.task_name.toUpperCase(), {
                             left: avatarSize + 10,
