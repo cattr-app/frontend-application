@@ -5,6 +5,7 @@ import { ModuleLoaderInterceptor } from '@/moduleLoader';
 import UserAvatar from '@/components/UserAvatar';
 import i18n from '@/i18n';
 import { formatDate, formatDurationString } from '@/utils/time';
+import { VueEditor } from 'vue2-editor';
 
 export const ModuleConfig = {
     routerPrefix: 'tasks',
@@ -118,7 +119,16 @@ export function init(context, router) {
             key: 'description',
             label: 'field.description',
             render: (h, props) => {
-                return h('pre', {}, props.currentValue);
+                return h('div', {
+                    class: { 'ql-editor': true },
+                    domProps: {
+                        innerHTML: props.currentValue,
+                    },
+                    style: {
+                        padding: 0,
+                        'overflow-y': 'hidden',
+                    },
+                });
             },
         },
         {
@@ -218,8 +228,57 @@ export function init(context, router) {
         {
             label: 'field.description',
             key: 'description',
-            type: 'textarea',
-            placeholder: 'field.description',
+            render: (h, props) => {
+                return h(VueEditor, {
+                    props: {
+                        useMarkdownShortcuts: true,
+                        editorToolbar: [
+                            [
+                                {
+                                    header: [false, 1, 2, 3, 4, 5, 6],
+                                },
+                            ],
+                            ['bold', 'italic', 'underline', 'strike'],
+                            [
+                                {
+                                    list: 'ordered',
+                                },
+                                {
+                                    list: 'bullet',
+                                },
+                                {
+                                    list: 'check',
+                                },
+                            ],
+                            [
+                                {
+                                    indent: '-1',
+                                },
+                                {
+                                    indent: '+1',
+                                },
+                            ],
+                            [
+                                {
+                                    color: [],
+                                },
+                                {
+                                    background: [],
+                                },
+                            ],
+                            ['link'],
+                            ['clean'],
+                        ],
+                        value: props.values.description,
+                        placeholder: i18n.t('field.description'),
+                    },
+                    on: {
+                        input: function(text) {
+                            props.inputHandler(text);
+                        },
+                    },
+                });
+            },
         },
         {
             label: 'field.important',
