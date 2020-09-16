@@ -87,17 +87,19 @@
                 }
             }
 
-            if (this.selected) {
+            if (this.selected.length) {
                 this.model = this.selected;
             }
 
-            this.$nextTick(function() {
+            this.$nextTick(() => {
                 this.model.forEach(modelValue => {
-                    this.$refs.select.$children.forEach(option => {
-                        if (option.value === modelValue) {
-                            option.selected = true;
-                        }
-                    });
+                    if (this.$refs.select && Object.prototype.hasOwnProperty.call(this.$refs.select, '$children')) {
+                        this.$refs.select.$children.forEach(option => {
+                            if (option.value === modelValue) {
+                                option.selected = true;
+                            }
+                        });
+                    }
                 });
             });
 
@@ -133,9 +135,6 @@
             );
         },
         watch: {
-            selected() {
-                this.model = this.selected.hasOwnProperty('length') ? this.selected : [];
-            },
             model(value) {
                 if (this.inputHandler) {
                     this.inputHandler(value);
