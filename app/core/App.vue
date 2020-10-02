@@ -74,7 +74,7 @@
         watch: {
             isLoggedIn(status) {
                 if (status) {
-                    this.$router.push({ name: 'dashboard' });
+                    this.$router.push({ path: '/' });
                 } else {
                     const reason = this.$store.getters['user/lastLogoutReason'];
                     const message =

@@ -21,7 +21,7 @@ const routes = [
         component: () => import(/* webpackChunkName: "login" */ '../views/Auth/Login.vue'),
         beforeEnter: (to, from, next) => {
             if (Store.getters['user/loggedIn']) {
-                next({ name: 'index' });
+                next('/');
             } else {
                 next();
             }
@@ -87,16 +87,14 @@ router.beforeEach((to, from, next) => {
         if (!Store.getters['user/loggedIn']) {
             return next({ name: 'auth.login' });
         }
+    } else if (to.matched.some(record => !record.meta.auth) && !Store.getters['user/loggedIn']) {
+        return next();
     }
 
     const requiredPermissions = to.matched
         .map(record => record.meta.permissions)
         .filter(permissions => permissions)
         .reduce((total, permissions) => total.concat(permissions), []);
-
-    if (!requiredPermissions.length) {
-        return next();
-    }
 
     const checkPermissions = () => {
         if (
@@ -106,7 +104,7 @@ router.beforeEach((to, from, next) => {
             return next();
         }
 
-        next({ name: 'forbidden' });
+        return next({ name: 'forbidden' });
     };
 
     if (!Store.getters['user/rulesLoaded']) {
