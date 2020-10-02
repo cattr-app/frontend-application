@@ -1,19 +1,19 @@
 <template>
     <at-menu class="navbar container-fluid" router mode="horizontal">
-        <router-link to="/dashboard" class="navbar__logo"></router-link>
+        <router-link to="/" class="navbar__logo"></router-link>
         <div v-if="loggedIn">
             <template v-for="(item, key) in navItems">
-                <at-menu-item :key="key" :to="item.to">
+                <navigation-menu-item :key="key" :to="item.to">
                     {{ $t(item.label) }}
-                </at-menu-item>
+                </navigation-menu-item>
             </template>
             <template v-for="(item, key) in navDropdowns">
                 <at-submenu :key="key" :title="$t(key)">
                     <template slot="title">{{ $t(key) }}</template>
                     <template v-for="(val, itemKey) in item">
-                        <at-menu-item :key="itemKey" :to="val.to">
+                        <navigation-menu-item :key="itemKey" :to="val.to">
                             {{ $t(val.label) }}
-                        </at-menu-item>
+                        </navigation-menu-item>
                     </template>
                 </at-submenu>
             </template>
@@ -39,10 +39,12 @@
     import { mapGetters } from 'vuex';
     import UserAvatar from './UserAvatar';
     import { getModuleList } from '../moduleLoader';
+    import NavigationMenuItem from '@/components/NavigationMenuItem';
 
     export default {
         components: {
             UserAvatar,
+            NavigationMenuItem,
         },
         data() {
             return {
