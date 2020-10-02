@@ -272,8 +272,8 @@
 
                 this.filterFieldsTimeout = setTimeout(() => {
                     this.updateQueryParams();
-                    const firstPage = 1;
-                    this.handlePageChange(firstPage);
+                    this.queryParams.page = 1;
+                    this.fetchData();
                 }, 500);
             },
             onFilterFieldChange(key, data) {
@@ -655,7 +655,7 @@
 
             padding: $spacing-03;
 
-            z-index: 1;
+            z-index: 100;
         }
 
         &__popup-filter-title {
