@@ -120,7 +120,7 @@
                         if (query.length) {
                             this.lastQuery = query;
                         } else {
-                            if (window.event && window.event.type === 'keypress') {
+                            if (window.event && window.event.type === 'input') {
                                 // If query changed by user typing, save query
                                 this.lastQuery = query;
                             } else {
