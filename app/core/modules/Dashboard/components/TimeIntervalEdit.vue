@@ -32,6 +32,12 @@
                                     ><i class="icon icon-trash"></i>
                                     {{ $t('control.delete') }}
                                 </at-button>
+
+                                <div class="divider"></div>
+
+                                <at-button class="time-interval-edit-panel__btn" @click="$emit('close')">{{
+                                    $t('control.cancel')
+                                }}</at-button>
                             </div>
                         </div>
                     </div>
@@ -272,5 +278,11 @@
                 margin-right: 0;
             }
         }
+    }
+
+    .divider {
+        background-color: $gray-4;
+        width: 1px;
+        margin-right: $layout-01;
     }
 </style>
