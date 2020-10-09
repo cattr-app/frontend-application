@@ -428,8 +428,6 @@
                     !e.target.closest('.at-modal') &&
                     !e.target.closest('.popup')
                 ) {
-                    this.$emit('outsideClick');
-
                     if (this.clickPopup.show) {
                         this.clickPopup.show = false;
                     }
