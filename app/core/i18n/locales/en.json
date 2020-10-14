@@ -201,9 +201,9 @@
     "work_time": "Minimum working hours/day",
     "activity_progress": {
       "not_tracked": "Activity was not tracked",
-      "overall": "Overall activity: {percent}%",
-      "mouse": "Mouse: {percent}%",
-      "keyboard": "Keyboard: {percent}%"
+      "overall": "Overall activity: | Overall activity: {percent}%",
+      "mouse": "Mouse: | Mouse: {percent}%",
+      "keyboard": "Keyboard: | Keyboard: {percent}%"
     }
   },
   "invite": {

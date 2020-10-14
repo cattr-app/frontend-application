@@ -201,9 +201,9 @@
     "work_time": "Минимальная продолжительность рабочего дня",
     "activity_progress": {
       "not_tracked": "Активность не отслеживалась",
-      "overall": "Общая активность: {percent}%",
-      "mouse": "Мышь: {percent}%",
-      "keyboard": "Клавиатура: {percent}%"
+      "overall": "Общая активность: | Общая активность: {percent}%",
+      "mouse": "Мышь: | Мышь: {percent}%",
+      "keyboard": "Клавиатура: | Клавиатура: {percent}%"
     }
   },
   "invite": {
