@@ -194,7 +194,7 @@
     "task_important": "Related screenshots should not be deleted automatically",
     "user_change_password": "Makes the password change after the first login mandatory",
     "user_manual_time": "Allow users to manually add time",
-    "user_send_invite": "Email user the account's credentials",
+    "user_send_invite": "Email user the account's credentials. If \"Password\" field is not filled in, an email with an auto-generated password will be sent in any case ",
     "user_computer_time_popup": "User's inactivity time in minutes before 'inactivity detected' modal pops up",
     "user_interval_screenshot": "Screenshot creation time in minutes",
     "color_intervals": "Lets you select colors for workday time intervals from 0 to 100%",
