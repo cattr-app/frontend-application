@@ -147,15 +147,6 @@
         position: relative;
     }
 
-    .timezone::v-deep {
-        .at-select {
-            &__selection,
-            &__selection:hover {
-                border: 1px solid $gray-6;
-            }
-        }
-    }
-
     .total-time-row {
         display: flex;
         justify-content: space-between;
