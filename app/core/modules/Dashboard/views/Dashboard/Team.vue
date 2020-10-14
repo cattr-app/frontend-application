@@ -497,14 +497,6 @@
         }
     }
 
-    ::v-deep {
-        .at-select {
-            &__selection {
-                border: 1px solid $gray-6;
-            }
-        }
-    }
-
     .button-invite {
         color: #618fea;
     }

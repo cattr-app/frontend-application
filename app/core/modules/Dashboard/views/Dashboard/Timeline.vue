@@ -376,12 +376,4 @@
     .pr-1 {
         padding-right: 1em;
     }
-
-    ::v-deep {
-        .at-select {
-            &__selection {
-                border: 1px solid $gray-6;
-            }
-        }
-    }
 </style>
