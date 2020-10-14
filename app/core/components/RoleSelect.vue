@@ -38,7 +38,7 @@
         async created() {
             await this.getRoles();
 
-            if (this.$refs.select !== undefined) {
+            if (this.$refs.select && Object.prototype.hasOwnProperty.call(this.$refs.select, '$children')) {
                 this.$refs.select.$children.forEach(option => {
                     option.hidden = false;
                 });

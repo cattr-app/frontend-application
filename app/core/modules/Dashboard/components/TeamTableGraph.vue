@@ -444,6 +444,9 @@
                 this.canvas.requestRenderAll();
             }, 100),
             onResize: debounce(function() {
+                if (!this.$refs.canvasWrapper) {
+                    return;
+                }
                 const { width } = this.$refs.canvasWrapper.getBoundingClientRect();
                 const height = this.users.length * rowHeight + titleHeight + subtitleHeight;
                 this.canvas.setWidth(width);

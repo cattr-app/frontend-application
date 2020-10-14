@@ -117,7 +117,7 @@
                 const task = user.tasks.find(task => task.id === data.task.id);
                 const screenshots = task.screenshots?.[data.keys.date]?.[data.keys.hours];
                 for (const screenshotIndex in screenshots)
-                    if (screenshots[screenshotIndex].id === data.screenshot.id) screenshots[screenshotIndex] = null;
+                    if (screenshots[screenshotIndex].id === data.screenshot.id) delete screenshots[screenshotIndex];
             },
             onUsersSelect(uids) {
                 this.userIds = uids;

@@ -233,6 +233,9 @@
                 this.canvas.requestRenderAll();
             }),
             onResize: debounce(function() {
+                if (!this.$refs.canvasWrapper) {
+                    return;
+                }
                 const { width } = this.$refs.canvasWrapper.getBoundingClientRect();
                 this.canvas.setWidth(width);
 
