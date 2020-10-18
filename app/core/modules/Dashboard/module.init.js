@@ -1,3 +1,5 @@
+import store from '@/store';
+
 export const ModuleConfig = {
     routerPrefix: 'dashboard',
     loadOrder: 20,
@@ -14,6 +16,19 @@ export function init(context) {
             auth: true,
         },
         children: [
+            {
+                path: '',
+                beforeEnter: (to, from, next) => {
+                    if (
+                        store.getters['user/canInAnyProject']('dashboard/manager_access') &&
+                        (!localStorage.getItem('dashboard.tab') || localStorage.getItem('dashboard.tab') === 'team')
+                    ) {
+                        return next({ name: 'dashboard.team' });
+                    }
+
+                    return next({ name: 'dashboard.timeline' });
+                },
+            },
             {
                 path: 'timeline',
                 alias: '/timeline',
@@ -38,7 +53,7 @@ export function init(context) {
     context.addNavbarEntry({
         label: 'navigation.dashboard',
         to: {
-            name: 'dashboard',
+            path: '/dashboard',
         },
     });
 

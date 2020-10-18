@@ -5,6 +5,7 @@
         :selected="selectedProjectIds"
         :service="projectService"
         name="projects"
+        :size="size"
         @onOptionsLoad="onLoad"
     >
     </multi-select>
@@ -20,6 +21,12 @@
         name: 'ProjectSelect',
         components: {
             MultiSelect,
+        },
+        props: {
+            size: {
+                type: String,
+                default: 'normal',
+            },
         },
         data() {
             return {

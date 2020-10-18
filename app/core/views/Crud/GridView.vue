@@ -20,6 +20,70 @@
             </at-input>
 
             <div class="col crud__control-items">
+                <div v-if="visibleFilterFields && visibleFilterFields.length" class="crud__control-items__item">
+                    <at-button icon="icon-filter" size="large" @click.prevent.stop="toggleFilterPopup" />
+
+                    <div v-show="filterPopupVisible" class="crud__popup-filters">
+                        <template v-for="filter of visibleFilterFields">
+                            <div :key="filter.key + '_title'" class="crud__popup-filter-title">
+                                {{ $t(filter.label) }}
+                            </div>
+
+                            <at-select
+                                v-if="filter.fieldOptions && filter.fieldOptions.type === 'select'"
+                                :key="filter.key"
+                                v-model="filterFieldsModel[filter.key]"
+                                type="text"
+                                size="small"
+                                class="crud__popup-filter"
+                                :placeholder="$t(filter.placeholder)"
+                                @input="onFilterFieldChange(filter.key, $event)"
+                            >
+                                <at-option
+                                    v-for="(option, optionKey) of filter.fieldOptions.options"
+                                    :key="optionKey"
+                                    :value="option.value"
+                                >
+                                    {{ $t(option.label) }}
+                                </at-option>
+                            </at-select>
+
+                            <UserSelect
+                                v-else-if="filter.fieldOptions && filter.fieldOptions.type === 'user-select'"
+                                :key="filter.key"
+                                v-model="filterFieldsModel[filter.key]"
+                                size="small"
+                                class="crud__popup-filter"
+                                @change="onUserSelectChange(filter.key, $event)"
+                            ></UserSelect>
+
+                            <ProjectSelect
+                                v-else-if="filter.fieldOptions && filter.fieldOptions.type === 'project-select'"
+                                :key="filter.key"
+                                v-model="filterFieldsModel[filter.key]"
+                                size="small"
+                                class="crud__popup-filter"
+                                @change="onProjectsChange(filter.key, $event)"
+                            />
+
+                            <at-input
+                                v-else
+                                :key="filter.key"
+                                v-model="filterFieldsModel[filter.key]"
+                                type="text"
+                                size="small"
+                                class="crud__popup-filter"
+                                :placeholder="$t(filter.placeholder)"
+                                @input="onFilterFieldChange(filter.key, $event)"
+                            >
+                                <template slot="prepend">
+                                    <i class="icon icon-search"></i>
+                                </template>
+                            </at-input>
+                        </template>
+                    </div>
+                </div>
+
                 <template v-for="(control, key) of pageControls">
                     <template v-if="checkWithCtx(control.renderCondition)">
                         <at-checkbox
@@ -47,44 +111,6 @@
         </div>
 
         <div class="at-container">
-            <div v-if="visibleFilterFields && visibleFilterFields.length" class="crud__column-filters">
-                <template v-for="filter of visibleFilterFields">
-                    <at-select
-                        v-if="filter.fieldOptions && filter.fieldOptions.type === 'select'"
-                        :key="filter.key"
-                        v-model="filterFieldsModel[filter.key]"
-                        type="text"
-                        :placeholder="$t(filter.placeholder)"
-                        class="crud__column-filter"
-                        :style="{ width: columnWidth[filter.key] + 'px' }"
-                        @input="filterFieldsData"
-                    >
-                        <at-option
-                            v-for="(option, optionKey) of filter.fieldOptions.options"
-                            :key="optionKey"
-                            :value="option.value"
-                        >
-                            {{ $t(option.label) }}
-                        </at-option>
-                    </at-select>
-
-                    <at-input
-                        v-else
-                        :key="filter.key"
-                        v-model="filterFieldsModel[filter.key]"
-                        type="text"
-                        :placeholder="$t(filter.placeholder)"
-                        class="crud__column-filter"
-                        :style="{ width: columnWidth[filter.key] + 'px' }"
-                        @input="filterFieldsData"
-                    >
-                        <template slot="prepend">
-                            <i class="icon icon-search"></i>
-                        </template>
-                    </at-input>
-                </template>
-            </div>
-
             <div ref="tableWrapper" class="crud__table">
                 <at-table ref="table" :key="columnsKey" size="large" :columns="columns" :data="displayableData" />
                 <preloader v-if="isDataLoading" :is-transparent="true" />
@@ -96,13 +122,15 @@
             :current="page"
             :page-size="itemsPerPage"
             class="crud__pagination"
-            @page-change="handlePageChange"
+            @page-change="onPageChange"
         />
     </div>
 </template>
 
 <script>
     import Preloader from '@/components/Preloader';
+    import ProjectSelect from '@/components/ProjectSelect';
+    import UserSelect from '@/components/UserSelect';
 
     const defaultItemsPerPage = 10;
 
@@ -110,8 +138,11 @@
         name: 'GridView',
         components: {
             Preloader,
+            ProjectSelect,
+            UserSelect,
         },
         data() {
+            const { query } = this.$route;
             const { gridData, sortable } = this.$route.meta;
 
             let orderBy = null;
@@ -128,6 +159,14 @@
             const withParam = gridData.with;
             const withCount = gridData.withCount;
 
+            const filterFieldsModel = {};
+            const fieldsToLoad = (gridData.filterFields || []).filter(f => f.saveToQuery).map(f => f.key);
+            Object.keys(query).forEach(field => {
+                if (fieldsToLoad.indexOf(field) !== -1) {
+                    filterFieldsModel[field] = query[field];
+                }
+            });
+
             return {
                 title: gridData.title || '',
                 filters: gridData.filters || [],
@@ -139,8 +178,8 @@
                 filterFieldsTimeout: null,
                 orderBy,
 
-                filterFieldsModel: {},
-                columnWidth: {},
+                filterPopupVisible: false,
+                filterFieldsModel: { ...filterFieldsModel },
 
                 service: gridData.service,
 
@@ -162,6 +201,7 @@
                 },
 
                 isDataLoading: false,
+                skipRouteUpdate: false,
             };
         },
         methods: {
@@ -172,31 +212,91 @@
                     this.queryParams.search.query = this.filterModel;
                     const firstPage = 1;
                     this.handlePageChange(firstPage);
+                    this.updateRoute();
                 }, 500);
+            },
+            toggleFilterPopup() {
+                this.filterPopupVisible = !this.filterPopupVisible;
+            },
+            showFilterPopup() {
+                this.filterPopupVisible = true;
+            },
+            hideFilterPopup() {
+                this.filterPopupVisible = false;
+            },
+            getFilterFieldKeys() {
+                return this.visibleFilterFields.filter(f => f.saveToQuery).map(f => f.key);
+            },
+            getFilterFields() {
+                const filters = {};
+                const fieldsToSave = this.getFilterFieldKeys();
+                Object.keys(this.filterFieldsModel).forEach(field => {
+                    if (fieldsToSave.indexOf(field) !== -1 && typeof this.filterFieldsModel[field] !== undefined) {
+                        filters[field] = this.filterFieldsModel[field];
+                    }
+                });
+
+                return filters;
+            },
+            loadFilterFields() {
+                const { query } = this.$route;
+                const filters = {};
+                const fieldsToLoad = this.getFilterFieldKeys();
+                Object.keys(query).forEach(field => {
+                    if (fieldsToLoad.indexOf(field) !== -1) {
+                        filters[field] = query[field];
+                    }
+                });
+
+                this.filterFieldsModel = filters;
+            },
+            updateQueryParams() {
+                Object.keys(this.filterFieldsModel).forEach(field => {
+                    if (
+                        typeof this.filterFieldsModel[field] !== undefined &&
+                        this.filterFieldsModel[field].toString().length
+                    ) {
+                        const filter = this.filterFields.find(filter => filter.key === field);
+                        if (filter && filter.fieldOptions && filter.fieldOptions.type === 'text') {
+                            this.queryParams[field] = ['like', `%${this.filterFieldsModel[field]}%`];
+                        } else {
+                            this.queryParams[field] = this.filterFieldsModel[field];
+                        }
+                    } else {
+                        delete this.queryParams[field];
+                    }
+                });
             },
             filterFieldsData() {
                 clearTimeout(this.filterFieldsTimeout);
 
                 this.filterFieldsTimeout = setTimeout(() => {
-                    Object.keys(this.filterFieldsModel).forEach(field => {
-                        if (
-                            typeof this.filterFieldsModel[field] !== undefined &&
-                            this.filterFieldsModel[field].toString().length
-                        ) {
-                            const filter = this.filterFields.find(filter => filter.key === field);
-                            if (filter && filter.fieldOptions && filter.fieldOptions.type === 'text') {
-                                this.queryParams[field] = ['like', `%${this.filterFieldsModel[field]}%`];
-                            } else {
-                                this.queryParams[field] = this.filterFieldsModel[field];
-                            }
-                        } else {
-                            delete this.queryParams[field];
-                        }
-                    });
-
-                    const firstPage = 1;
-                    this.handlePageChange(firstPage);
+                    this.updateQueryParams();
+                    this.queryParams.page = 1;
+                    this.fetchData();
                 }, 500);
+            },
+            onFilterFieldChange(key, data) {
+                this.filterFieldsData();
+                this.updateRoute();
+            },
+            onUserSelectChange(key, data) {
+                if (data.length > 0) {
+                    this.filterFieldsModel[key] = ['=', data];
+                } else {
+                    this.filterFieldsModel[key] = '';
+                }
+
+                this.filterFieldsData();
+            },
+            onProjectsChange(key, data) {
+                if (data.length > 0) {
+                    this.filterFieldsModel[key] = ['=', data];
+                } else {
+                    this.filterFieldsModel[key] = '';
+                }
+
+                this.filterFieldsData();
             },
             checkWithCtx(callback) {
                 return callback ? callback(this) : true;
@@ -204,9 +304,17 @@
             handleWithCtx(callback) {
                 callback(this);
             },
-            async handlePageChange(page) {
+            async onPageChange(page) {
+                await this.handlePageChange(page);
+                this.updateRoute();
+            },
+            handlePageChange(page) {
+                if (this.queryParams.page === page) {
+                    return;
+                }
+
                 this.queryParams.page = page;
-                await this.fetchData();
+                return this.fetchData();
             },
             async fetchData() {
                 this.isDataLoading = true;
@@ -232,6 +340,15 @@
 
                 this.isDataLoading = false;
             },
+            handleClick(e) {
+                if (e.target.closest('.crud__popup-filters')) {
+                    return;
+                }
+
+                if (this.filterPopupVisible) {
+                    this.hideFilterPopup();
+                }
+            },
             handleResize() {
                 const { table } = this.$refs;
                 if (!table) {
@@ -239,13 +356,6 @@
                 }
 
                 table.handleResize();
-
-                this.$nextTick(() => {
-                    table.columnsData.forEach((column, index) => {
-                        const width = table.setCellWidth(column, index);
-                        this.$set(this.columnWidth, column.key, width);
-                    });
-                });
             },
             handleTableClick(e) {
                 const { sortable, orderBy } = this;
@@ -327,10 +437,20 @@
                 await this.fetchData();
             },
             updateRoute() {
-                this.$router.push({
+                if (this.skipRouteUpdate) {
+                    return;
+                }
+
+                const data = {
                     name: this.$route.name,
-                    query: { page: this.queryParams.page, search: this.queryParams.search.query },
-                });
+                    query: {
+                        page: this.queryParams.page,
+                        search: this.queryParams.search.query,
+                        ...this.getFilterFields(),
+                    },
+                };
+
+                this.$router.push(data);
             },
         },
         updated() {
@@ -420,7 +540,11 @@
             visibleFilterFields() {
                 return this.filterFields.filter(filter => {
                     const column = this.columns.find(column => column.key === filter.key);
-                    return !!column;
+                    if (column) {
+                        return this.checkWithCtx(column.renderCondition);
+                    }
+
+                    return true;
                 });
             },
             displayableData() {
@@ -456,8 +580,11 @@
             },
         },
         async mounted() {
+            this.loadFilterFields();
+            this.updateQueryParams();
             await this.fetchData();
 
+            window.addEventListener('click', this.handleClick);
             window.addEventListener('resize', this.handleResize);
             this.handleResize();
 
@@ -466,20 +593,21 @@
             }
         },
         watch: {
-            $route(to) {
+            async $route(to) {
+                this.skipRouteUpdate = true;
+
                 this.queryParams.page = to.query.page;
                 this.queryParams.search.query = to.query.search;
                 this.filterModel = to.query.search;
-                this.fetchData();
-            },
-            queryParams: {
-                handler() {
-                    this.updateRoute();
-                },
-                deep: true,
+                this.loadFilterFields();
+                this.updateQueryParams();
+                await this.fetchData();
+
+                this.skipRouteUpdate = false;
             },
         },
         beforeDestory() {
+            window.removeEventListener('click', this.handleClick);
             window.removeEventListener('resize', this.handleResize);
 
             this.$refs.tableWrapper.removeEventListener('click', this.handleTableClick);
@@ -506,7 +634,43 @@
             justify-content: flex-end;
             align-items: center;
             &__item {
-                padding-right: 1rem;
+                position: relative;
+                margin-right: 1rem;
+            }
+        }
+
+        &__popup-filters {
+            position: absolute;
+            top: calc(100% + #{$spacing-03});
+            right: 0;
+
+            background: #fff;
+            border: 1px solid $gray-5;
+            border-radius: 5px;
+            box-shadow: 0px 0px 100px rgba(63, 51, 86, 0.05);
+
+            display: block;
+
+            min-width: 200px;
+
+            padding: $spacing-03;
+
+            z-index: 100;
+        }
+
+        &__popup-filter-title {
+            font-weight: 600;
+            font-size: $font-size-smer;
+            margin-bottom: $spacing-02;
+        }
+
+        &__popup-filter {
+            &:not(:last-child) {
+                margin-bottom: $spacing-03;
+            }
+
+            &::v-deep .at-select__placeholder {
+                color: #3f536e;
             }
         }
 

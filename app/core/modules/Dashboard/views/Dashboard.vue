@@ -19,37 +19,8 @@
 
     export default {
         name: 'Index',
-
-        beforeMount() {
-            if (this.$route.name !== 'dashboard') {
-                return;
-            }
-
-            if (localStorage.getItem('dashboard.tab') === 'team' || localStorage.getItem('dashboard.tab') === null) {
-                const redirect = () => {
-                    if (this.hasTeamAccess) {
-                        this.$router.push({ name: 'dashboard.team' });
-                    } else {
-                        this.$router.push({ name: 'dashboard.timeline' });
-                    }
-                };
-
-                if (!Object.keys(this.$store.getters['user/allowedRules']).length) {
-                    this.$store.watch(
-                        () => this.$store.getters['user/allowedRules'],
-                        () => redirect(),
-                    );
-                } else {
-                    redirect();
-                }
-            } else {
-                this.$router.push({ name: 'dashboard.timeline' });
-            }
-        },
-
         computed: {
-            ...mapGetters('user', ['user', 'allowedRules', 'canInAnyProject']),
-
+            ...mapGetters('user', ['canInAnyProject']),
             hasTeamAccess() {
                 return this.canInAnyProject('dashboard/manager_access');
             },

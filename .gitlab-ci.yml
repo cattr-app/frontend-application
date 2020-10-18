@@ -39,11 +39,8 @@ live_deploy:
     - ssh $CI_USER@$CI_HOST 'cd cattr/frontend && git submodule update --init --force'
     - ssh $CI_USER@$CI_HOST 'source .zshrc && cd cattr/frontend && npm install'
     - ssh $CI_USER@$CI_HOST 'source .zshrc && cd cattr/frontend && npm run compile'
+    - ssh $CI_USER@$CI_HOST 'source .zshrc && cd cattr/frontend && npm run clean'
     - ssh $CI_USER@$CI_HOST 'source .zshrc && cd cattr/frontend && npm run build'
-    - ssh $CI_USER@$CI_HOST 'test -f cattr/frontend/dist/index.html || exit 1'
-    - ssh $CI_USER@$CI_HOST 'cd cattr/frontend && git clean -Xf output/*'
-    - ssh $CI_USER@$CI_HOST 'cp -rf cattr/frontend/dist/* cattr/frontend/output'
-    - ssh $CI_USER@$CI_HOST 'cd cattr/frontend && git clean -Xf dist'
     - ssh $CI_USER@$CI_HOST 'cd cattr/frontend && sentry-cli releases deploys `cat package.json | grep version | grep -o ":.*" | grep -o "\".*\"" | sed "s/\"//g"` new -e "production"'
 
 staging_deploy:
@@ -63,11 +60,8 @@ staging_deploy:
     - ssh $STAGING_USER@$STAGING_HOST 'cp -f frontend/app/etc/env.staging.js frontend/app/etc/env.js'
     - ssh $STAGING_USER@$STAGING_HOST 'source .zshrc && cd frontend && npm install'
     - ssh $STAGING_USER@$STAGING_HOST 'source .zshrc && cd frontend && npm run compile'
+    - ssh $STAGING_USER@$STAGING_HOST 'source .zshrc && cd frontend && npm run clean'
     - ssh $STAGING_USER@$STAGING_HOST 'source .zshrc && cd frontend && npm run build'
-    - ssh $STAGING_USER@$STAGING_HOST 'test -f frontend/dist/index.html || exit 1'
-    - ssh $STAGING_USER@$STAGING_HOST 'cd frontend && git clean -Xf output/*'
-    - ssh $STAGING_USER@$STAGING_HOST 'cp -rf frontend/dist/* frontend/output'
-    - ssh $STAGING_USER@$STAGING_HOST 'cd frontend && git clean -Xf dist'
     - ssh $STAGING_USER@$STAGING_HOST 'cd frontend && sentry-cli releases deploys `cat package.json | grep version | grep -o ":.*" | grep -o "\".*\"" | sed "s/\"//g"` new -e "staging"'
 
 npm_publish:

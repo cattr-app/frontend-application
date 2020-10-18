@@ -9,6 +9,7 @@ const isDevMod = process.env.NODE_ENV === 'development';
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const SentryPlugin = require('@sentry/webpack-plugin');
+const CattrWebpackPlugin = require('./webpack/CattrWebpackPlugin');
 
 Object.keys(env).forEach(p => {
     process.env[`VUE_APP_${p}`] = env[p];
@@ -57,6 +58,7 @@ module.exports = {
             maxEntrypointSize: 2000000,
         },
         plugins: [
+            new CattrWebpackPlugin(),
             new MiniCssExtractPlugin({
                 filename: '[name].css',
                 chunkFilename: '[id].css',

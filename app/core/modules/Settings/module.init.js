@@ -5,8 +5,16 @@ export const ModuleConfig = {
 };
 
 export function init(context, router) {
-    context.addCompanySection(require('./sections/general').default);
-
+    const sectionGeneral = require('./sections/general');
+    context.addCompanySection(sectionGeneral.default);
+    context.addUserMenuEntry({
+        label: 'navigation.company_settings',
+        icon: 'icon-settings',
+        to: {
+            name: 'Settings.company.general',
+        },
+        displayCondition: store => store.getters['user/user'].is_admin === 1,
+    });
     context.addLocalizationData({
         en: require('./locales/en'),
         ru: require('./locales/ru'),

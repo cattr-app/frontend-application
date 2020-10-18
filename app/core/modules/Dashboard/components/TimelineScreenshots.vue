@@ -3,7 +3,11 @@
         <h3 class="screenshots__title">{{ $t('field.screenshots') }}</h3>
         <at-checkbox-group v-model="selectedIntervalIds">
             <div class="row">
-                <div v-for="(screenshot, index) in screenshots" :key="screenshot.id" class="col-4 screenshots__item">
+                <div
+                    v-for="(screenshot, index) in screenshots"
+                    :key="screenshot.id"
+                    class="col-4 col-xl-3 screenshots__item"
+                >
                     <div class="screenshot" :index="index" @click.shift.prevent.stop="onShiftClick(index)">
                         <Screenshot
                             :disableModal="true"

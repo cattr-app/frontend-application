@@ -5,6 +5,7 @@ import { ModuleLoaderInterceptor } from '@/moduleLoader';
 import UserAvatar from '@/components/UserAvatar';
 import i18n from '@/i18n';
 import { formatDate, formatDurationString } from '@/utils/time';
+import { VueEditor } from 'vue2-editor';
 
 export const ModuleConfig = {
     routerPrefix: 'tasks',
@@ -118,7 +119,16 @@ export function init(context, router) {
             key: 'description',
             label: 'field.description',
             render: (h, props) => {
-                return h('pre', {}, props.currentValue);
+                return h('div', {
+                    class: { 'ql-editor': true },
+                    domProps: {
+                        innerHTML: props.currentValue,
+                    },
+                    style: {
+                        padding: 0,
+                        'overflow-y': 'hidden',
+                    },
+                });
             },
         },
         {
@@ -218,8 +228,57 @@ export function init(context, router) {
         {
             label: 'field.description',
             key: 'description',
-            type: 'textarea',
-            placeholder: 'field.description',
+            render: (h, props) => {
+                return h(VueEditor, {
+                    props: {
+                        useMarkdownShortcuts: true,
+                        editorToolbar: [
+                            [
+                                {
+                                    header: [false, 1, 2, 3, 4, 5, 6],
+                                },
+                            ],
+                            ['bold', 'italic', 'underline', 'strike'],
+                            [
+                                {
+                                    list: 'ordered',
+                                },
+                                {
+                                    list: 'bullet',
+                                },
+                                {
+                                    list: 'check',
+                                },
+                            ],
+                            [
+                                {
+                                    indent: '-1',
+                                },
+                                {
+                                    indent: '+1',
+                                },
+                            ],
+                            [
+                                {
+                                    color: [],
+                                },
+                                {
+                                    background: [],
+                                },
+                            ],
+                            ['link'],
+                            ['clean'],
+                        ],
+                        value: props.values.description,
+                        placeholder: i18n.t('field.description'),
+                    },
+                    on: {
+                        input: function(text) {
+                            props.inputHandler(text);
+                        },
+                    },
+                });
+            },
         },
         {
             label: 'field.important',
@@ -354,6 +413,42 @@ export function init(context, router) {
         },
     ]);
 
+    grid.addFilterField([
+        {
+            key: 'project_id',
+            label: 'tasks.projects',
+            fieldOptions: { type: 'project-select' },
+        },
+        {
+            key: 'user_id',
+            label: 'tasks.users',
+            fieldOptions: { type: 'user-select' },
+        },
+        {
+            key: 'active',
+            label: 'tasks.status',
+            placeholder: 'tasks.statuses.any',
+            saveToQuery: true,
+            fieldOptions: {
+                type: 'select',
+                options: [
+                    {
+                        value: '',
+                        label: 'tasks.statuses.any',
+                    },
+                    {
+                        value: '1',
+                        label: 'tasks.statuses.open',
+                    },
+                    {
+                        value: '0',
+                        label: 'tasks.statuses.closed',
+                    },
+                ],
+            },
+        },
+    ]);
+
     grid.addAction([
         {
             title: 'control.view',
@@ -396,23 +491,6 @@ export function init(context, router) {
     ]);
 
     grid.addPageControls([
-        {
-            key: 'isActive',
-            frontedType: 'checkbox',
-            label: 'control.show_active',
-            onChange: data => {
-                if (data.values.isActive) {
-                    data.$set(data.queryParams, 'active', ['=', data.values.isActive]);
-                } else {
-                    data.$delete(data.queryParams, 'active');
-                }
-
-                data.fetchData();
-            },
-            renderCondition: ({ $store }) => {
-                return $store.getters['user/canInAnyProject']('tasks/create');
-            },
-        },
         {
             label: 'control.create',
             type: 'primary',

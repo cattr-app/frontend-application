@@ -20,8 +20,6 @@ import VueLazyload from 'vue-lazyload';
 import * as screenshot from '@/components/Screenshot';
 import * as screenshotModal from '@/components/ScreenshotModal';
 import env from '_app/etc/env';
-import loadSections from '@/helpers/common';
-import Module from './arch/module';
 
 if (
     process.env.NODE_ENV !== 'development' &&
