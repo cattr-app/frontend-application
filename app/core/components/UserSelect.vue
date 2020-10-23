@@ -137,6 +137,12 @@
             Preloader,
         },
         props: {
+            value: {
+                required: false,
+                default: () => {
+                    return [];
+                },
+            },
             currentTasks: {
                 required: false,
                 default: () => {
@@ -150,8 +156,12 @@
         },
         data() {
             let userIDs = [];
-            if (localStorage.getItem(localStorageKey)) {
-                userIDs = JSON.parse(localStorage.getItem(localStorageKey));
+            if (typeof this.value !== 'undefined') {
+                userIDs = this.value;
+            } else {
+                if (localStorage.getItem(localStorageKey)) {
+                    userIDs = JSON.parse(localStorage.getItem(localStorageKey));
+                }
             }
 
             return {
@@ -330,6 +340,13 @@
             },
             onTabChange({ name }) {
                 this.userSelectTab = name;
+            },
+        },
+        watch: {
+            value(value) {
+                if (typeof value !== 'undefined') {
+                    this.userIDs = value;
+                }
             },
         },
     };

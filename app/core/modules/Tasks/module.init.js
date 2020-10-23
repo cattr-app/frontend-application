@@ -3,6 +3,7 @@ import ProjectsService from '@/service/resource/projectService';
 import UsersService from '@/service/resource/usersService';
 import { ModuleLoaderInterceptor } from '@/moduleLoader';
 import UserAvatar from '@/components/UserAvatar';
+import UserSelect from '@/components/UserSelect';
 import i18n from '@/i18n';
 import { formatDate, formatDurationString } from '@/utils/time';
 import { VueEditor } from 'vue2-editor';
@@ -33,7 +34,7 @@ export function init(context, router) {
     });
 
     const crud = context.createCrud('tasks.crud-title', 'tasks', TasksService, {
-        with: 'priority, project, user',
+        with: 'priority, project, users',
     });
 
     const crudViewRoute = crud.view.getViewRouteName();
@@ -51,7 +52,7 @@ export function init(context, router) {
     crud.edit.addToMetaProperties('permissions', 'tasks/edit', crud.edit.getRouterConfig());
 
     const grid = context.createGrid('tasks.grid-title', 'tasks', TasksService, {
-        with: 'priority, project, user',
+        with: 'priority, project, users',
         is_active: true,
     });
     grid.addToMetaProperties('navigation', navigation, grid.getRouterConfig());
@@ -94,24 +95,36 @@ export function init(context, router) {
             },
         },
         {
-            key: 'user',
-            label: 'field.user',
+            key: 'users',
+            label: 'field.users',
             render: (h, data) => {
                 if (!router.app.$store.getters['user/user'].is_admin) {
-                    return h('span', data.currentValue.full_name);
+                    return h(
+                        'ul',
+                        {},
+                        data.currentValue.map(item => h('li', item.full_name)),
+                    );
                 }
 
                 return h(
-                    'router-link',
-                    {
-                        props: {
-                            to: {
-                                name: routes.usersView,
-                                params: { id: data.currentValue.id },
-                            },
-                        },
-                    },
-                    data.currentValue.full_name,
+                    'ul',
+                    {},
+                    data.currentValue.map(item =>
+                        h('li', {}, [
+                            h(
+                                'router-link',
+                                {
+                                    props: {
+                                        to: {
+                                            name: routes.usersView,
+                                            params: { id: item.id },
+                                        },
+                                    },
+                                },
+                                item.full_name,
+                            ),
+                        ]),
+                    ),
                 );
             },
         },
@@ -288,12 +301,21 @@ export function init(context, router) {
             initialValue: false,
         },
         {
-            label: 'field.user',
-            key: 'user_id',
-            type: 'resource-select',
-            service: new UsersService(),
-            required: true,
-            default: ({ getters }) => getters['user/user'].id,
+            label: 'field.users',
+            key: 'users',
+            render: (h, props) => {
+                const value = typeof props.values.users !== 'undefined' ? props.values.users.map(user => user.id) : [];
+                return h(UserSelect, {
+                    props: {
+                        value,
+                    },
+                    on: {
+                        change: function(value) {
+                            props.inputHandler(value);
+                        },
+                    },
+                });
+            },
         },
         {
             label: 'field.priority',
@@ -371,33 +393,32 @@ export function init(context, router) {
             },
         },
         {
-            title: 'field.user',
-            key: 'user',
+            title: 'field.users',
+            key: 'users',
             render: (h, { item }) => {
-                const user = item.user;
-                if (!user) {
-                    return null;
-                }
-
-                return h('div', { class: 'flex' }, [
-                    h(
-                        'AtTooltip',
-                        {
-                            props: {
-                                placement: 'top',
-                                content: user.full_name,
-                            },
-                        },
-                        [
-                            h(UserAvatar, {
+                return h(
+                    'div',
+                    { class: 'flex' },
+                    item.users.map(user =>
+                        h(
+                            'AtTooltip',
+                            {
                                 props: {
-                                    user,
-                                    showTooltip: true,
+                                    placement: 'top',
+                                    content: user.full_name,
                                 },
-                            }),
-                        ],
+                            },
+                            [
+                                h(UserAvatar, {
+                                    props: {
+                                        user,
+                                        showTooltip: true,
+                                    },
+                                }),
+                            ],
+                        ),
                     ),
-                ]);
+                );
             },
         },
     ]);
@@ -420,7 +441,7 @@ export function init(context, router) {
             fieldOptions: { type: 'project-select' },
         },
         {
-            key: 'user_id',
+            key: 'users.user_id',
             label: 'tasks.users',
             fieldOptions: { type: 'user-select' },
         },
