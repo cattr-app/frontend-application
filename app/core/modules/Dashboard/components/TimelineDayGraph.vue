@@ -424,6 +424,7 @@
             onClick(e) {
                 if (
                     e.target &&
+                    e.target.parentElement &&
                     !e.target.parentElement.classList.contains(this.canvas.wrapperEl.classList) &&
                     !e.target.closest('.time-interval-edit-panel') &&
                     !e.target.closest('.screenshot') &&
