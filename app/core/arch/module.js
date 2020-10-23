@@ -16,6 +16,7 @@ export default class Module {
     settingsSections = [];
     companySections = [];
     locales = {};
+    pluralizationRules = {};
     additionalFields = [];
 
     constructor(routerPrefix, moduleName) {
@@ -181,6 +182,13 @@ export default class Module {
     }
 
     /**
+     * Add pluralization rules
+     */
+    addPluralizationRules(rules) {
+        this.pluralizationRules = rules;
+    }
+
+    /**
      * Init all available sections
      * @returns {Promise<void>[]}
      */
@@ -275,6 +283,15 @@ export default class Module {
      */
     getLocalizationData() {
         return this.locales;
+    }
+
+    /**
+     * Get pluralization rules
+     *
+     * @returns {Object}
+     */
+    getPluralizationRules() {
+        return this.pluralizationRules;
     }
 
     /**

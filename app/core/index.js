@@ -19,7 +19,6 @@ import './vee-validate';
 import VueLazyload from 'vue-lazyload';
 import * as screenshot from '@/components/Screenshot';
 import * as screenshotModal from '@/components/ScreenshotModal';
-import env from '_app/etc/env';
 
 if (
     process.env.NODE_ENV !== 'development' &&
@@ -61,7 +60,7 @@ if (process.env.NODE_ENV === 'development') {
 
 localModuleLoader(router);
 
-if (env.GET_SCREENSHOTS_BY_ID) {
+if (process.env.VUE_APP_GET_SCREENSHOTS_BY_ID) {
     // Modify screenshot paths
     screenshot.config.thumbnailPathProvider = screenshot => `uploads/screenshots/thumbs/${screenshot.id}`;
     screenshotModal.config.screenshotPathProvider = screenshot => `uploads/screenshots/${screenshot.id}`;

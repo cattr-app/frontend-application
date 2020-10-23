@@ -95,7 +95,6 @@
 <script>
     import moment from 'moment';
     import AppImage from './AppImage';
-    import env from '_app/etc/env';
     import { mapGetters } from 'vuex';
 
     export function screenshotPathProvider(screenshot) {
@@ -134,7 +133,7 @@
         computed: {
             ...mapGetters('user', ['companyData']),
             baseURL() {
-                return (env.API_URL || `${window.location.origin}/api`) + '/';
+                return (process.env.VUE_APP_API_URL || `${window.location.origin}/api`) + '/';
             },
         },
         methods: {

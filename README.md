@@ -21,11 +21,8 @@ The demo app is available here: [demo.cattr.app](https://demo.cattr.app)
 # Install dependencies
 npm install
 
-# Copy frontend configuration file
-cp app/etc/env.production.js app/etc/env.js
-
-# Adjust parameters in env.js (API_URL at least)
-nano app/etc/env.js
+# Adjust parameters in env.local.js (API_URL at least)
+nano app/etc/env.local.js
 
 # Compile modules
 npm run compile
@@ -35,6 +32,18 @@ npm run build
 ```
 
 Note: if you want to work with the compiler or core use `npm link`
+
+### Env configuration
+
+By default, will be loaded config from /app/etc/env.*.js.
+
+`env.js` will always be read and loaded and then merged with contents of
+
+`env.<NODE_ENV>.js` if it exists, and then merged with contents of
+
+`env.local.js` if it exists
+
+All variables will be accessible via VUE_APP_<variable_name> inside Vue components
 
 ### Modules configuration
 

@@ -1,9 +1,8 @@
 build_test:
   image: node:lts-alpine
   stage: build
-  before_script:
-    - cp app/etc/env.production.js app/etc/env.js
   script:
+    - apk add git
     - npm install
     - npm run compile
     - npm run build
@@ -57,7 +56,6 @@ staging_deploy:
   script:
     - ssh $STAGING_USER@$STAGING_HOST 'cd frontend && git pull'
     - ssh $STAGING_USER@$STAGING_HOST 'cd frontend && git submodule update --init --force'
-    - ssh $STAGING_USER@$STAGING_HOST 'cp -f frontend/app/etc/env.staging.js frontend/app/etc/env.js'
     - ssh $STAGING_USER@$STAGING_HOST 'source .zshrc && cd frontend && npm install'
     - ssh $STAGING_USER@$STAGING_HOST 'source .zshrc && cd frontend && npm run compile'
     - ssh $STAGING_USER@$STAGING_HOST 'source .zshrc && cd frontend && npm run clean'

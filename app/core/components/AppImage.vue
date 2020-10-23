@@ -7,7 +7,6 @@
 
 <script>
     import axios from 'axios';
-    import env from '_app/etc/env';
 
     export default {
         name: 'AppImage',
@@ -27,7 +26,7 @@
         },
         data() {
             return {
-                url: (env.API_URL || `${window.location.origin}/api`) + '/' + this.src,
+                url: (process.env.VUE_APP_API_URL || `${window.location.origin}/api`) + '/' + this.src,
             };
         },
         methods: {
@@ -40,7 +39,7 @@
                 if (this.src) {
                     axios
                         .get(this.src, {
-                            baseURL: (env.API_URL || `${window.location.origin}/api`) + '/',
+                            baseURL: (process.env.VUE_APP_API_URL || `${window.location.origin}/api`) + '/',
                             responseType: 'blob',
                         })
                         .then(response => {
@@ -66,7 +65,7 @@
                 if (this.isBlob) {
                     this.load();
                 } else {
-                    this.url = (env.API_URL || `${window.location.origin}/api`) + '/' + this.src;
+                    this.url = (process.env.VUE_APP_API_URL || `${window.location.origin}/api`) + '/' + this.src;
                 }
             },
         },

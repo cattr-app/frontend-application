@@ -16,6 +16,7 @@ const routes = [
         name: 'auth.login',
         meta: {
             auth: false,
+            guest: true,
             layout: 'auth-layout',
         },
         component: () => import(/* webpackChunkName: "login" */ '../views/Auth/Login.vue'),
@@ -26,6 +27,23 @@ const routes = [
                 next();
             }
         },
+    },
+    {
+        path: '/auth/desktop/login',
+        name: 'auth.desktop.login',
+        meta: {
+            auth: false,
+            guest: true,
+            layout: 'auth-layout',
+        },
+        beforeEnter: (to, from, next) => {
+            if (Store.getters['user/loggedIn']) {
+                next('/');
+            } else {
+                next();
+            }
+        },
+        component: () => import(/* webpackChunkName: "desktop-login" */ '../views/Auth/Desktop.vue'),
     },
     {
         path: '/auth/password/reset',
@@ -71,6 +89,11 @@ const routes = [
         name: 'about',
         component: () => import(/* webpackChunkName: "About" */ '../views/About.vue'),
     },
+    {
+        path: '/desktop-login',
+        name: 'desktop-login',
+        component: () => import(/* webpackChunkName: "DesktopLogin" */ '../views/DesktopLogin.vue'),
+    },
 ];
 
 const router = new VueRouter({
@@ -89,6 +112,12 @@ router.beforeEach((to, from, next) => {
         }
     } else if (to.matched.some(record => !record.meta.auth) && !Store.getters['user/loggedIn']) {
         return next();
+    }
+
+    if (to.matched.some(record => typeof record.meta.guest !== 'undefined' && record.meta.guest)) {
+        if (Store.getters['user/loggedIn']) {
+            return next({ name: 'index' });
+        }
     }
 
     const requiredPermissions = to.matched

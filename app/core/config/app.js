@@ -1,12 +1,12 @@
 import axios from 'axios';
-import env from '_app/etc/env';
 import httpInterceptor from '@/helpers/httpInterceptor';
 
 if (process.env.NODE_ENV === 'development') {
-    console.log(env);
+    console.log(process.env);
 }
 
-axios.defaults.baseURL = (env.API_URL || `${window.location.origin}/api`) + '/';
+axios.defaults.baseURL =
+    (process.env.VUE_APP_API_URL !== 'null' ? process.env.VUE_APP_API_URL : `${window.location.origin}/api`) + '/';
 axios.defaults.headers.common['X-REQUESTED-WITH'] = 'XMLHttpRequest';
 
 httpInterceptor.setup();
