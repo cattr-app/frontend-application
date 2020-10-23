@@ -68,7 +68,7 @@
                                                     :type="field.fieldOptions.frontendType || ''"
                                                     :status="errors.length > 0 ? 'error' : ''"
                                                     @focus="removeReadonly"
-                                                ></at-input>
+                                                />
                                                 <small>{{ errors[0] }}</small>
                                             </validation-provider>
 
@@ -85,7 +85,7 @@
                                                     :max="field.maxValue"
                                                     size="large"
                                                     @blur="handleInputNumber($event, field.key)"
-                                                ></at-input-number>
+                                                />
                                                 <small>{{ errors[0] }}</small>
                                             </validation-provider>
 
@@ -121,7 +121,7 @@
                                                     :class="{
                                                         'at-textarea--error': errors.length > 0,
                                                     }"
-                                                ></at-textarea>
+                                                />
                                                 <small>{{ errors[0] }}</small>
                                             </validation-provider>
 
@@ -149,6 +149,42 @@
                                                 :vid="field.key"
                                             >
                                                 <at-checkbox v-model="values[field.key]" label="" />
+                                                <small>{{ errors[0] }}</small>
+                                            </validation-provider>
+
+                                            <validation-provider
+                                                v-else-if="field.fieldOptions.type === 'switch'"
+                                                v-slot="{ errors }"
+                                                :rules="field.rules || ''"
+                                                :name="$t(field.label)"
+                                                :vid="field.key"
+                                            >
+                                                <span
+                                                    v-if="field.fieldOptions.checkedText"
+                                                    v-html="field.fieldOptions.checkedText"
+                                                />
+                                                <at-switch
+                                                    v-model="values[field.key]"
+                                                    size="large"
+                                                    @change="$set(values, field.key, $event)"
+                                                >
+                                                    <template
+                                                        v-if="field.fieldOptions.innerCheckedText"
+                                                        v-slot:checkedText
+                                                    >
+                                                        <span v-html="field.fieldOptions.innerCheckedText" />
+                                                    </template>
+                                                    <template
+                                                        v-if="field.fieldOptions.innerUnCheckedText"
+                                                        v-slot:unCheckedText
+                                                    >
+                                                        <span v-html="field.fieldOptions.innerUnCheckedText" />
+                                                    </template>
+                                                </at-switch>
+                                                <span
+                                                    v-if="field.fieldOptions.unCheckedText"
+                                                    v-html="field.fieldOptions.unCheckedText"
+                                                />
                                                 <small>{{ errors[0] }}</small>
                                             </validation-provider>
                                         </div>

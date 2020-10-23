@@ -1,5 +1,5 @@
 import Store from '../store';
-import { getModuleList, ModuleLoaderInterceptor } from '../moduleLoader';
+import { getModuleList, ModuleLoaderInterceptor } from '@/moduleLoader';
 
 /**
  * Initialising setting parent route

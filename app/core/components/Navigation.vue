@@ -3,7 +3,7 @@
         <router-link to="/" class="navbar__logo"></router-link>
         <div v-if="loggedIn">
             <template v-for="(item, key) in navItems">
-                <navigation-menu-item :key="key" :to="item.to">
+                <navigation-menu-item :key="key" :to="item.to || undefined" @click="item.click || undefined">
                     {{ $t(item.label) }}
                 </navigation-menu-item>
             </template>
@@ -11,7 +11,7 @@
                 <at-submenu :key="key" :title="$t(key)">
                     <template slot="title">{{ $t(key) }}</template>
                     <template v-for="(val, itemKey) in item">
-                        <navigation-menu-item :key="itemKey" :to="val.to">
+                        <navigation-menu-item :key="itemKey" :to="val.to || undefined" @click="val.click || undefined">
                             {{ $t(val.label) }}
                         </navigation-menu-item>
                     </template>
@@ -20,7 +20,7 @@
         </div>
         <at-dropdown v-if="loggedIn" placement="bottom-right" @on-dropdown-command="userDropdownHandle">
             <i class="icon icon-chevron-down at-menu__submenu-icon"></i>
-            <user-avatar :user="user" :border-radius="10"></user-avatar>
+            <user-avatar :border-radius="10" :user="user"></user-avatar>
             <at-dropdown-menu slot="menu">
                 <template v-for="(item, key) of userDropdownItems">
                     <at-dropdown-item :key="key" :name="item.to.name">
@@ -38,7 +38,7 @@
 <script>
     import { mapGetters } from 'vuex';
     import UserAvatar from './UserAvatar';
-    import { getModuleList } from '../moduleLoader';
+    import { getModuleList } from '@/moduleLoader';
     import NavigationMenuItem from '@/components/NavigationMenuItem';
 
     export default {
@@ -94,21 +94,31 @@
             userDropdownItems() {
                 const items = [
                     {
+                        name: 'about',
                         to: {
                             name: 'about',
                         },
                         title: this.$t('navigation.about'),
                         icon: 'icon-info',
                     },
+                    {
+                        name: 'desktop-login',
+                        to: {
+                            name: 'desktop-login',
+                        },
+                        title: this.$t('navigation.client-login'),
+                        icon: 'icon-log-in',
+                    },
                 ];
                 this.modules.forEach(m => {
                     const entriesDropdown = m.getNavbarMenuEntriesDropDown();
                     Object.keys(entriesDropdown).forEach(el => {
-                        const { displayCondition, label, to, icon } = entriesDropdown[el];
+                        const { displayCondition, label, to, click, icon } = entriesDropdown[el];
                         if (displayCondition(this.$store)) {
                             items.push({
                                 to,
                                 icon,
+                                click,
                                 title: this.$t(label),
                             });
                         }
@@ -129,18 +139,18 @@
 
 <style lang="scss" scoped>
     .navbar {
+        border-bottom: 0;
+        box-shadow: 0px 0px 10px rgba(63, 51, 86, 0.1);
         display: flex;
         height: auto;
-        padding: 0.75em 24px;
         justify-content: space-between;
-        box-shadow: 0px 0px 10px rgba(63, 51, 86, 0.1);
-        border-bottom: 0;
+        padding: 0.75em 24px;
 
         &__logo {
             background: url('../assets/logo.svg');
+            background-size: cover;
             height: 45px;
             width: 45px;
-            background-size: cover;
         }
 
         &::v-deep {
@@ -157,27 +167,27 @@
             }
 
             .at-dropdown {
-                display: flex;
                 align-items: center;
+                display: flex;
 
                 &-menu {
                     overflow: hidden;
 
                     &__item {
-                        font-weight: 600;
                         color: $gray-3;
+                        font-weight: 600;
 
                         &:hover {
-                            color: $blue-2;
                             background-color: #fff;
+                            color: $blue-2;
                         }
                     }
                 }
 
                 &__trigger {
-                    display: flex;
                     align-items: center;
                     cursor: pointer;
+                    display: flex;
 
                     .icon {
                         margin-right: 8px;

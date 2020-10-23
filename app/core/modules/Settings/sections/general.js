@@ -128,6 +128,15 @@ export default {
                         });
                     },
                 },
+                {
+                    label: 'field.auto_thin',
+                    key: 'auto_thinning',
+                    fieldOptions: {
+                        type: 'switch',
+                        placeholder: 'field.auto_thin',
+                    },
+                    tooltipValue: 'tooltip.auto_thin',
+                },
             ],
         },
     },

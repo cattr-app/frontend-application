@@ -2,6 +2,7 @@ import axios from '@/config/app';
 import SettingsService from '@/service/settingsService';
 import Store from '@/store';
 import i18n from '@/i18n';
+import moment from 'moment';
 
 /**
  * Section service class.
@@ -57,6 +58,7 @@ export default class AccountService extends SettingsService {
      */
     save(data) {
         i18n.locale = data.user_language;
+        moment.locale(data.user_language);
         return axios.post('users/edit', data).then(({ data }) => {
             return {
                 data: {

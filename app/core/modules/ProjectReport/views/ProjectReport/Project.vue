@@ -123,7 +123,6 @@
 
 <script>
     import moment from 'moment';
-    import env from '_app/etc/env';
     import Screenshot from '@/components/Screenshot';
     import ScreenshotModal from '@/components/ScreenshotModal';
     import UserAvatar from '@/components/UserAvatar';
@@ -140,7 +139,6 @@
         },
         data() {
             return {
-                apiPath: env.API_URL,
                 modal: {
                     show: false,
                     dateScreenshots: {},

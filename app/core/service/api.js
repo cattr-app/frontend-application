@@ -68,6 +68,25 @@ export default class ApiService extends StoreService {
             });
     }
 
+    attemptDesktopLogin(token) {
+        const instance = axios.create();
+
+        instance.defaults.headers.common['Authorization'] = `desktop ${token}`;
+
+        return instance
+            .put('/auth/desktop-key', {}, { ignoreCancel: true })
+            .then(({ data }) => {
+                this.setUserToken(data.access_token);
+                this.setUserData(data.user);
+                this.setLoggedInStatus();
+
+                return Promise.resolve(data);
+            })
+            .catch(response => {
+                return Promise.reject(response);
+            });
+    }
+
     logout() {
         return axios.post('/auth/logout').then(() => {
             this.context.dispatch('forceUserExit');

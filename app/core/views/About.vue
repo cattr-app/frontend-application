@@ -39,10 +39,22 @@
                             </skeleton>
                         </strong>
                     </p>
-                    <p v-if="modulesData.length" class="about__table">
-                        <at-table :columns="modulesColumns" :data="modulesData" />
-                    </p>
-
+                    <at-tabs>
+                        <at-tab-pane :label="$t('about.module_versions')" name="about_versions">
+                            <p v-if="modulesData.length" class="about__table">
+                                <at-table :columns="modulesColumns" :data="modulesData" />
+                            </p>
+                            <p v-else v-t="'about.no_modules'" />
+                        </at-tab-pane>
+                        <at-tab-pane
+                            v-if="$store.getters['user/user'].is_admin"
+                            :label="$t('about.module_storage')"
+                            class="storage"
+                            name="about_storage"
+                        >
+                            <StorageManagementTab />
+                        </at-tab-pane>
+                    </at-tabs>
                     <div><a class="about__link" href="https://cattr.app">cattr.app</a></div>
                     <div><a class="about__link" href="https://community.cattr.app">community</a></div>
                 </div>
@@ -63,6 +75,8 @@
     export default {
         name: 'About',
         components: {
+            StorageManagementTab: () =>
+                import(/* webpackChunkName: "StorageManagementTab" */ '@/components/StorageManagementTab'),
             Skeleton,
         },
         async mounted() {
