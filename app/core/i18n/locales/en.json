@@ -221,9 +221,11 @@
     "auto_thin": "Old screenshots will be deleted automatically",
     "activity_progress": {
       "not_tracked": "Activity was not tracked",
-      "overall": "Overall activity: | Overall activity: {percent}%",
-      "mouse": "Mouse: | Mouse: {percent}%",
-      "keyboard": "Keyboard: | Keyboard: {percent}%"
+      "overall": "Overall activity: | Overall activity: 1% | Overall activity: {percent}%",
+      "mouse": "Mouse: 0% | Mouse: 1% | Mouse: {percent}%",
+      "keyboard": "Keyboard: 0% | Keyboard: 1% | Keyboard: {percent}%",
+      "just_mouse": "Mouse:",
+      "just_keyboard": "Keyboard:"
     }
   },
   "invite": {
