@@ -69,8 +69,8 @@
     import Screenshot from '@/components/Screenshot';
     import ScreenshotModal from '@/components/ScreenshotModal';
     import UserSelect from '@/components/UserSelect';
-    import ProjectService from '@/service/resource/projectService';
-    import ScreenshotService from '@/service/resource/screenshotService';
+    import ProjectService from '@/services/resource/project.service';
+    import ScreenshotService from '@/services/resource/screenshot.service';
     import { getStartOfDayInTimezone, getEndOfDayInTimezone } from '@/utils/time';
     import Preloader from '@/components/Preloader';
     import ProjectSelect from '@/components/ProjectSelect';

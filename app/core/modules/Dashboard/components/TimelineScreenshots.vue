@@ -44,7 +44,7 @@
     import { mapGetters } from 'vuex';
     import Screenshot from '@/components/Screenshot';
     import ScreenshotModal from '@/components/ScreenshotModal';
-    import ScreenshotService from '@/service/resource/screenshotService';
+    import ScreenshotService from '@/services/resource/screenshot.service';
 
     export default {
         name: 'TimelineScreenshots',

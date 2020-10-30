@@ -1,4 +1,4 @@
-import ResourceService from './resourceService';
+import ResourceService from './resource.service';
 import axios from 'axios';
 
 export default class ScreenshotService extends ResourceService {

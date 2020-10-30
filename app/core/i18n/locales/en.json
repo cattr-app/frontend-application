@@ -154,6 +154,7 @@
     "total_time": "Total time",
     "total_spent": "Total Spent Time",
     "time": "Time",
+    "members": "Members",
     "auto_thin": "Automatic storage thinning",
     "statuses": {
       "any": "Any",
@@ -259,6 +260,12 @@
     }
   },
   "notification": {
+    "save": {
+      "success": {
+        "title": "Success",
+        "message": "Saved successfully"
+      }
+    },
     "record": {
       "save": {
         "success": {

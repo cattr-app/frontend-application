@@ -1,16 +1,14 @@
 import cloneDeep from 'lodash/cloneDeep';
 import axios from '@/config/app';
 import TimezonePicker from '@/components/TimezonePicker';
-import CoreUsersService from '@/service/resource/usersService';
+import CoreUsersService from '@/services/resource/user.service';
 import RoleSelect from '@/components/RoleSelect';
-import ProjectRoles from '../components/ProjectRoles';
 import Users from '../views/Users';
-import UsersService from '../services/usersService';
+import UsersService from '../services/user.service';
 import Store from '@/store';
 import LanguageSelector from '@/components/LanguageSelector';
-import ProjectService from '@/service/resource/projectService';
 import i18n from '@/i18n';
-import ProjectRolesView from '../components/ProjectRolesView';
+import Vue from 'vue';
 
 export function fieldsToFillProvider() {
     return [
@@ -187,27 +185,6 @@ export function fieldsToFillProvider() {
             },
         },
         {
-            label: 'field.project_roles',
-            key: 'project_roles',
-            render(h, props) {
-                if (Array.isArray(props.currentValue) && props.currentValue.length === 0) {
-                    props.currentValue = {};
-                }
-
-                return h(ProjectRoles, {
-                    props: {
-                        relations: props.currentValue,
-                        service: new ProjectService(),
-                    },
-                    on: {
-                        updateRelation(relations) {
-                            props.inputHandler(relations);
-                        },
-                    },
-                });
-            },
-        },
-        {
             label: 'field.type',
             key: 'type',
             type: 'select',
@@ -319,20 +296,6 @@ export default (context, router) => {
             key: 'role',
             render: (h, { currentValue }) => {
                 return h('span', i18n.t(`field.roles.${currentValue.name}`));
-            },
-        },
-        {
-            label: 'field.project_roles',
-            key: 'project_roles',
-            render: (h, { currentValue }) => {
-                if (!Object.keys(currentValue).length) {
-                    currentValue = {};
-                }
-                return h(ProjectRolesView, {
-                    props: {
-                        relations: currentValue,
-                    },
-                });
             },
         },
         {
@@ -473,8 +436,8 @@ export default (context, router) => {
             onClick: (router, { item }, context) => {
                 context.onView(item);
             },
-            renderCondition({ $store }) {
-                return $store.getters['user/can']('users/show');
+            renderCondition({ $can }) {
+                return true;
             },
         },
         {
@@ -483,19 +446,8 @@ export default (context, router) => {
             onClick: (router, { item }, context) => {
                 context.onEdit(item);
             },
-            renderCondition({ $store }) {
-                return $store.getters['user/can']('users/edit');
-            },
-        },
-        {
-            title: 'control.delete',
-            actionType: 'error',
-            icon: 'icon-trash-2',
-            onClick: (router, { item }, context) => {
-                context.onDelete(item);
-            },
-            renderCondition({ $store }) {
-                return $store.getters['user/can']('users/remove');
+            renderCondition({ $can }, item) {
+                return $can('update', 'user', item);
             },
         },
     ]);
@@ -508,8 +460,8 @@ export default (context, router) => {
             onClick: ({ $router }) => {
                 $router.push({ name: crudNewRoute });
             },
-            renderCondition({ $store }) {
-                return $store.getters['user/can']('users/edit');
+            renderCondition({ $can }) {
+                return $can('create', 'user');
             },
         },
     ]);
@@ -524,8 +476,8 @@ export default (context, router) => {
                 await service.sendInvite(values.id);
                 $Message.success(i18n.t('message.success'));
             },
-            renderCondition({ $store, values }) {
-                return $store.getters['user/can']('users/edit') && values.invitation_sent;
+            renderCondition({ $can, values }, item) {
+                return $can('update', 'user', item) && values.invitation_sent;
             },
         },
     ]);
@@ -534,14 +486,7 @@ export default (context, router) => {
         // Check if this section can be rendered and accessed, this param IS OPTIONAL (true by default)
         // NOTICE: this route will not be added to VueRouter AT ALL if this check fails
         // MUST be a function that returns a boolean
-        accessCheck: async () => {
-            let user = Store.getters['user/user'];
-            if (Object.keys(user).length) {
-                return user.is_admin === 1;
-            }
-
-            return (await axios.get('/auth/me')).data.user.is_admin === 1;
-        },
+        accessCheck: async () => Vue.prototype.$can('viewAny', 'user'),
 
         scope: 'company',
         order: 10,

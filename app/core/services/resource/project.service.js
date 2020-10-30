@@ -1,4 +1,4 @@
-import ResourceService from './resourceService';
+import ResourceService from './resource.service';
 import axios from 'axios';
 import difference from 'lodash/difference';
 import { serialize } from '../../utils/url';
@@ -22,7 +22,7 @@ export default class ProjectService extends ResourceService {
      * @returns {Promise<AxiosResponse<T>>}
      */
     getItem(id) {
-        return axios.get(this.getItemRequestUri(id));
+        return axios.get(this.getItemRequestUri(id) + '&' + serialize({ with: ['users'] }));
     }
 
     /**
@@ -58,51 +58,8 @@ export default class ProjectService extends ResourceService {
         return axios.post(`projects/${isNew ? 'create' : 'edit'}`, data);
     }
 
-    /**
-     * @param userID
-     * @returns {Promise<AxiosResponse<T>>}
-     */
-    getUserProjectRelations(userID) {
-        return axios.post('projects-users/list', {
-            user_id: userID,
-        });
-    }
-
-    /**
-     * @param userID
-     * @param projectID
-     * @param roleID
-     * @returns {Promise<AxiosResponse<T>>}
-     */
-    addUserProjectRelation(userID, projectID, roleID) {
-        return axios.post('projects-users/create', {
-            user_id: userID,
-            project_id: projectID,
-            role_id: roleID,
-        });
-    }
-
-    /**
-     * @param userID
-     * @param projectID
-     * @returns {Promise<AxiosResponse<T>>}
-     */
-    removeUserProjectRelation(userID, projectID) {
-        return axios.post('projects-users/remove', {
-            user_id: userID,
-            project_id: projectID,
-        });
-    }
-
-    removeUsersFromProject(projectId, users) {
-        return axios.post('project-users/bulk-remove', {});
-    }
-
-    addUsersToProject(projectId, users) {}
-
-    saveUsersRelations(newData, originalData) {
-        const addedUsers = difference(newData, originalData);
-        const removedUsers = difference(originalData, newData);
+    bulkEditMembers(data) {
+        return axios.post('project-members/bulk-edit', data);
     }
 
     /**

@@ -13,7 +13,7 @@
 
 <script>
     import MultiSelect from './MultiSelect';
-    import ProjectService from '../service/resource/projectService';
+    import ProjectService from '../services/resource/project.service';
 
     const localStorageKey = 'amazingcat.local.storage.project_select';
 

@@ -158,7 +158,7 @@
 
 <script>
     import { ValidationObserver, ValidationProvider } from 'vee-validate';
-    import AuthService from '@/service/authService';
+    import AuthService from '@/services/auth.service';
 
     export default {
         name: 'ResetPassword',

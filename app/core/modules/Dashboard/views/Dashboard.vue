@@ -1,10 +1,10 @@
 <template>
     <div class="dashboard">
-        <div class="dashboard-routes dashboard__routes flex">
-            <h1 class="dashboard-routes__link">
+        <div class="dashboard__routes">
+            <h1 class="dashboard__link">
                 <router-link :to="{ name: 'dashboard.timeline' }">{{ $t('dashboard.timeline') }}</router-link>
             </h1>
-            <h1 v-if="hasTeamAccess" class="dashboard-routes__link">
+            <h1 v-if="$can('viewTeamTab', 'dashboard')" class="dashboard__link">
                 <router-link :to="{ name: 'dashboard.team' }">{{ $t('dashboard.team') }}</router-link>
             </h1>
         </div>
@@ -15,16 +15,8 @@
 </template>
 
 <script>
-    import { mapGetters } from 'vuex';
-
     export default {
         name: 'Index',
-        computed: {
-            ...mapGetters('user', ['canInAnyProject']),
-            hasTeamAccess() {
-                return this.canInAnyProject('dashboard/manager_access');
-            },
-        },
     };
 </script>
 
@@ -32,10 +24,9 @@
     .dashboard {
         &__routes {
             margin-bottom: 1em;
+            display: flex;
         }
-    }
 
-    .dashboard-routes {
         &__link {
             margin-right: $layout-03;
             font-size: 1.8rem;

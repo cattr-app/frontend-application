@@ -1,4 +1,4 @@
-import StoreService from './storeService';
+import StoreService from './store.service';
 import axios from 'axios';
 
 export default class ApiService extends StoreService {
@@ -91,22 +91,6 @@ export default class ApiService extends StoreService {
         return axios.post('/auth/logout').then(() => {
             this.context.dispatch('forceUserExit');
         });
-    }
-
-    async getAllowedRules() {
-        const { data } = await axios.get('/roles/allowed-rules', { ignoreCancel: true });
-
-        this.context.dispatch('setAllowedRules', data.res);
-
-        return data;
-    }
-
-    async getProjectRules() {
-        const { data } = await axios.get('/roles/project-rules', { ignoreCancel: true });
-
-        this.context.dispatch('setProjectRules', data.res);
-
-        return data;
     }
 
     async getCompanyData() {

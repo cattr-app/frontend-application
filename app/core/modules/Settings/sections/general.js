@@ -1,5 +1,5 @@
 import TimezonePicker from '@/components/TimezonePicker';
-import CompanyService from '../services/companyService';
+import CompanyService from '../services/company.service';
 import ColorSelect from '../components/ColorSelect';
 import Store from '@/store';
 

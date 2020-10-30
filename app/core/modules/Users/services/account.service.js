@@ -1,5 +1,5 @@
 import axios from '@/config/app';
-import SettingsService from '@/service/settingsService';
+import SettingsService from '@/services/settings.service';
 import Store from '@/store';
 import i18n from '@/i18n';
 import moment from 'moment';

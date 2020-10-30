@@ -5,6 +5,8 @@
   "projects": {
     "grid-title": "Projects",
     "crud-title": "Project",
-    "amount_of_tasks": "No tasks | 1 task | {count} tasks"
+    "amount_of_tasks": "No tasks | 1 task | {count} tasks",
+    "project_members": "Project members",
+    "members": "Members"
   }
 }

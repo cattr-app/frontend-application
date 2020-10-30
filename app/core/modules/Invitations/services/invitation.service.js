@@ -1,4 +1,4 @@
-import ResourceService from '@/service/resource/resourceService';
+import ResourceService from '@/services/resource/resource.service';
 import axios from 'axios';
 
 export default class InvitationService extends ResourceService {
