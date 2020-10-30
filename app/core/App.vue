@@ -10,21 +10,20 @@
 <script>
     import * as Sentry from '@sentry/browser';
     import { getLangCookie, setLangCookie } from './i18n';
+    import Vue from 'vue';
 
     export const config = { beforeLayout: null };
 
     export default {
         name: 'App',
-        async beforeMount() {
+        async created() {
             const userApi = this.$store.getters['user/apiService'];
             if (userApi.token()) {
                 try {
                     this.$loading.show();
-
                     await userApi.checkApiAuth();
-                    await userApi.getAllowedRules();
-                    await userApi.getProjectRules();
                     await userApi.getCompanyData();
+
                     Sentry.setUser({
                         email: this.$store.state.user.user.data.email,
                         full_name: this.$store.state.user.user.data.full_name,
@@ -32,6 +31,7 @@
                         role: this.$store.state.user.user.data.role.name,
                     });
                 } catch (e) {
+                    console.log(e);
                     // Whoops
                 } finally {
                     this.$loading.hide();

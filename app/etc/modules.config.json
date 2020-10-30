@@ -6,12 +6,17 @@
   },
   "AmazingCat_GitlabIntegration": {
     "enabled": true,
-    "type": "package",
-    "ref": "@amazingcat/cattr-frontend-module-gitlab-integration"
+    "type": "local",
+    "ref": "AmazingCat_GitlabIntegration"
   },
   "AmazingCat_RedmineIntegration": {
     "enabled": true,
-    "type": "package",
-    "ref": "@amazingcat/cattr-frontend-module-redmine-integration"
+    "type": "local",
+    "ref": "AmazingCat_RedmineIntegration"
+  },
+  "AmazingCat_TrelloIntegration": {
+    "enabled": true,
+    "type": "local",
+    "ref": "AmazingCat_TrelloIntegration"
   }
 }

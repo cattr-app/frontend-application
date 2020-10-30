@@ -126,8 +126,8 @@
     import Screenshot from '@/components/Screenshot';
     import ScreenshotModal from '@/components/ScreenshotModal';
     import UserAvatar from '@/components/UserAvatar';
-    import ProjectReportService from '@/service/reports/ProjectReportService';
-    import ScreenshotService from '@/service/resource/screenshotService';
+    import ProjectReportService from '@/services/reports/project-report.service';
+    import ScreenshotService from '@/services/resource/screenshot.service';
     import { getEndDay, getStartDay, formatDurationString } from '@/utils/time';
 
     export default {

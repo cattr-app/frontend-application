@@ -11,8 +11,8 @@
             }"
         >
             <div v-if="hoverPopup.event">
-                {{ getTaskName(hoverPopup.event.task_id) }}
-                ({{ getProjectName(hoverPopup.event.project_id) }})
+                {{ getTaskName(hoverPopup.event.task.id) }}
+                ({{ getProjectName(hoverPopup.event.task.project_id) }})
             </div>
 
             <div v-if="hoverPopup.event">
@@ -34,8 +34,8 @@
                 <Screenshot
                     :lazyImage="false"
                     :screenshot="getScreenshotByInterval(clickPopup.intervalID)"
-                    :project="getProject(clickPopup.event.project_id)"
-                    :task="getTask(clickPopup.event.task_id)"
+                    :project="getProject(clickPopup.event.task.project_id)"
+                    :task="getTask(clickPopup.event.task.id)"
                     :user="getUser(clickPopup.event.user_id)"
                     :showText="false"
                     :disableModal="true"
@@ -44,12 +44,12 @@
             </div>
 
             <div v-if="clickPopup.event">
-                <router-link :to="`/tasks/view/${clickPopup.event.task_id}`">
-                    {{ getTaskName(clickPopup.event.task_id) }}
+                <router-link :to="`/tasks/view/${clickPopup.event.task.id}`">
+                    {{ getTaskName(clickPopup.event.task.id) }}
                 </router-link>
 
-                <router-link :to="`/projects/view/${clickPopup.event.project_id}`">
-                    ({{ getProjectName(clickPopup.event.project_id) }})
+                <router-link :to="`/projects/view/${clickPopup.event.task.project_id}`">
+                    ({{ getProjectName(clickPopup.event.task.project_id) }})
                 </router-link>
             </div>
 
@@ -80,7 +80,7 @@
     import Screenshot from '@/components/Screenshot';
     import ScreenshotModal from '@/components/ScreenshotModal';
     import { formatDurationString } from '@/utils/time';
-    import ScreenshotService from '@/service/resource/screenshotService';
+    import ScreenshotService from '@/services/resource/screenshot.service';
 
     const fabricObjectOptions = {
         editable: false,

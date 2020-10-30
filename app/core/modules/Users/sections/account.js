@@ -1,4 +1,4 @@
-import AccountService from '../services/accountService';
+import AccountService from '../services/account.service';
 import LanguageSelector from '@/components/LanguageSelector';
 
 export function fieldsProvider() {

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import moment from 'moment';
-import StoreService from './storeService';
+import StoreService from './store.service';
 
 export default class TimelineService extends StoreService {
     constructor(context, timeIntervalService, projectService, taskService, screenshotService, userService) {
@@ -114,8 +114,8 @@ export default class TimelineService extends StoreService {
                 Object.keys(data).forEach(userID => {
                     const userIntervals = data[userID].intervals;
                     userIntervals.forEach(interval => {
-                        uniqueProjectIDs.add(interval.project_id);
-                        uniqueTaskIDs.add(interval.task_id);
+                        uniqueProjectIDs.add(interval.task.project_id);
+                        uniqueTaskIDs.add(interval.task.id);
                     });
                 });
 
@@ -178,19 +178,6 @@ export default class TimelineService extends StoreService {
 
                     if (!data) {
                         return;
-                    }
-
-                    const uniqueTaskIDs = new Set();
-                    Object.keys(data).forEach(userID => {
-                        const userIntervals = data[userID].intervals;
-                        userIntervals.forEach(interval => {
-                            uniqueTaskIDs.add(interval.task_id);
-                        });
-                    });
-
-                    const taskIDs = [...uniqueTaskIDs];
-                    if (taskIDs.length) {
-                        return this.loadTasks(taskIDs, 'setLatestTasks');
                     }
                 }
             })

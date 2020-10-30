@@ -1,4 +1,4 @@
-import RoleService from '../../service/resource/roleService';
+import RoleService from '../../services/resource/role.service';
 
 const state = {
     roles: [],

@@ -1,5 +1,5 @@
 import axios from '@/config/app';
-import SettingsService from '@/service/settingsService';
+import SettingsService from '@/services/settings.service';
 
 /**
  * Section service class.

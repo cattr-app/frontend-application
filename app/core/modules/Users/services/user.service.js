@@ -1,7 +1,7 @@
-import ResourceService from '@/service/resource/resourceService';
+import ResourceService from '@/services/resource/resource.service';
 import axios from 'axios';
 
-export default class UsersService extends ResourceService {
+export default class UserService extends ResourceService {
     /**
      * Get all users.
      *

@@ -1,5 +1,5 @@
 import { extend, configure } from 'vee-validate';
-import i18n from './i18n';
+import i18n from '@/i18n';
 import * as validationRules from 'vee-validate/dist/rules';
 import isEmail from 'validator/lib/isEmail';
 
