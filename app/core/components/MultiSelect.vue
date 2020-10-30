@@ -87,7 +87,7 @@
                 }
             }
 
-            if (this.selected.length) {
+            if (Array.isArray(this.selected)) {
                 this.model = this.selected;
             }
 
