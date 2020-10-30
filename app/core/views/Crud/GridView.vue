@@ -113,7 +113,7 @@
         <div class="at-container">
             <div ref="tableWrapper" class="crud__table">
                 <at-table ref="table" :key="columnsKey" size="large" :columns="columns" :data="displayableData" />
-                <preloader v-if="isDataLoading" :is-transparent="true" />
+                <preloader v-if="isDataLoading" class="preloader" :is-transparent="true" />
             </div>
         </div>
 
@@ -459,11 +459,11 @@
                 return;
             }
 
-            const { tableWrapper } = this.$refs;
-
-            if (tableWrapper === undefined) {
+            if (typeof this.$refs.tableWrapper === 'undefined') {
                 return;
             }
+
+            const { tableWrapper } = this.$refs;
 
             const chevrons = tableWrapper.querySelectorAll('.at-table__cell.at-table__column > .chevron');
             chevrons.forEach(chevron => chevron.remove());
@@ -724,14 +724,18 @@
         &__table {
             position: relative;
 
-            &::v-deep tr {
-                th {
-                    background: #fff;
-                    color: #c4c4cf;
-                }
-            }
-
             &::v-deep .at-table {
+                table {
+                    border-radius: $border-radius-lger;
+                }
+
+                tr {
+                    th {
+                        background: #fff;
+                        color: #c4c4cf;
+                    }
+                }
+
                 &__content {
                     border: 0;
                 }
@@ -780,8 +784,11 @@
         }
     }
 
+    .preloader {
+        border-radius: $border-radius-lger;
+    }
+
     .at-container {
         margin-bottom: $layout-01;
-        overflow: hidden;
     }
 </style>

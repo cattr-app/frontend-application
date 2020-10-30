@@ -1,11 +1,11 @@
 import moment from 'moment';
 import 'moment-timezone';
-import TimelineService from '../../service/timeline';
-import ProjectService from '../../service/resource/projectService';
-import ScreenshotService from '../../service/resource/screenshotService';
-import TasksService from '../../service/resource/tasksService';
-import TimeIntervalService from '../../service/resource/timeIntervalService';
-import UserService from '../../service/resource/usersService';
+import TimelineService from '../../services/timeline.service';
+import ProjectService from '../../services/resource/project.service';
+import ScreenshotService from '../../services/resource/screenshot.service';
+import TasksService from '../../services/resource/task.service';
+import TimeIntervalService from '../../services/resource/time-interval.service';
+import UserService from '../../services/resource/user.service';
 
 const state = {
     service: null,
@@ -55,25 +55,25 @@ const getters = {
             }
 
             const projects = userEvents.reduce((projects, event) => {
-                if (!projects[event.project_id]) {
-                    projects[event.project_id] = {
-                        id: event.project_id,
-                        name: getters.tasks[event.task_id] ? getters.tasks[event.task_id].project.name : '',
+                if (!projects[event.task.project_id]) {
+                    projects[event.task.project_id] = {
+                        id: event.task.project_id,
+                        name: event.task.project.name,
                         duration: event.duration,
                         tasks: {},
                     };
                 } else {
-                    projects[event.project_id].duration += event.duration;
+                    projects[event.task.project_id].duration += event.duration;
                 }
 
-                if (!projects[event.project_id].tasks[event.task_id]) {
-                    projects[event.project_id].tasks[event.task_id] = {
-                        id: event.task_id,
-                        name: getters.tasks[event.task_id] ? getters.tasks[event.task_id].task_name : '',
+                if (!projects[event.task.project_id].tasks[event.task.id]) {
+                    projects[event.task.project_id].tasks[event.task.id] = {
+                        id: event.task.id,
+                        name: event.task.task_name,
                         duration: event.duration,
                     };
                 } else {
-                    projects[event.project_id].tasks[event.task_id].duration += event.duration;
+                    projects[event.task.project_id].tasks[event.task.id].duration += event.duration;
                 }
 
                 return projects;

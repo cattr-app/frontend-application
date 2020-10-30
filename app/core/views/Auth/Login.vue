@@ -91,7 +91,7 @@
 
         mounted() {
             if (this.$store.getters['user/isLoggedIn']) {
-                this.$router.push({ name: 'index' });
+                this.$router.push({ name: 'dashboard' });
             }
         },
 
@@ -130,8 +130,6 @@
                     }
 
                     await apiService.attemptLogin(this.user);
-                    await apiService.getAllowedRules();
-                    await apiService.getProjectRules();
                     await apiService.getCompanyData();
 
                     this.error = null;

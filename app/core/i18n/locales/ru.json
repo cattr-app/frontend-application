@@ -155,6 +155,7 @@
     "total_spent": "Потраченное время",
     "time": "Время",
     "auto_thin": "Автоматическая очистка хранилища",
+    "members": "Участники",
     "statuses": {
       "any": "Все",
       "active": "Активен",
@@ -259,6 +260,12 @@
     }
   },
   "notification": {
+    "save": {
+      "success": {
+        "title": "Успешно",
+        "message": "Сохранено успешно"
+      }
+    },
     "record": {
       "save": {
         "success": {

@@ -70,8 +70,8 @@
     import { mapGetters } from 'vuex';
     import AddNewTaskModal from './AddNewTaskModal';
     import ChangeTaskModal from './ChangeTaskModal';
-    import TasksService from '@/service/resource/tasksService';
-    import TimeIntervalsService from '@/service/resource/timeIntervalService';
+    import TasksService from '@/services/resource/task.service';
+    import TimeIntervalsService from '@/services/resource/time-interval.service';
 
     export default {
         name: 'TimeIntervalEdit',

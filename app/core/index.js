@@ -7,7 +7,7 @@ import Vue from 'vue';
 import App from './App.vue';
 import router from './router';
 import store from './store';
-import AtComponents from 'at-ui';
+import AtComponents from '@amazingcat/at-ui';
 import Dialog from 'vue-dialog-loading';
 import DatePicker from 'vue2-datepicker';
 import moment from 'vue-moment';
@@ -15,28 +15,14 @@ import VueAuthImage from 'vue-auth-image';
 import * as Sentry from '@sentry/browser';
 import * as Integrations from '@sentry/integrations';
 import i18n from './i18n';
-import './vee-validate';
 import VueLazyload from 'vue-lazyload';
 import * as screenshot from '@/components/Screenshot';
 import * as screenshotModal from '@/components/ScreenshotModal';
-
-if (
-    process.env.NODE_ENV !== 'development' &&
-    'VUE_APP_SENTRY_DSN' in process.env &&
-    process.env.VUE_APP_SENTRY_DSN !== 'undefined'
-) {
-    Sentry.init({
-        release: process.env.VUE_APP_VERSION,
-        environment: process.env.NODE_ENV,
-        dsn: process.env.VUE_APP_SENTRY_DSN,
-        integrations: [
-            new Integrations.Vue({
-                Vue,
-                attachProps: true,
-            }),
-        ],
-    });
-}
+import env from '_app/etc/env';
+import './plugins/vee-validate';
+import './plugins/sentry';
+import './policies';
+import Gate from './plugins/gate';
 
 //Global components
 import installGlobalComponents from './global-extension';
@@ -51,6 +37,7 @@ Vue.use(VueAuthImage);
 Vue.use(VueLazyload, {
     lazyComponent: true,
 });
+Vue.use(Gate);
 
 installGlobalComponents(Vue);
 

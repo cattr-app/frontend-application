@@ -1,5 +1,5 @@
-@import "~at-ui-style/src/mixins/index";
-@import "~at-ui-style/src/variables/timing-function";
+@import "~@amazingcat/at-ui/src/stylesheet/src/mixins/index";
+@import "~@amazingcat/at-ui/src/stylesheet/src/variables/timing-function";
 
 $heading-font-family: 'Nunito', sans-serif;
 
@@ -145,6 +145,7 @@ $wall-color                 : #EEF0F0;
 /* Border */
 $border-radius-base         : 4px;
 $border-radius-sm           : 4px;
+$border-radius-lger         : 20px;
 
 /* Font */
 $font-family                : 'Nunito', sans-serif;

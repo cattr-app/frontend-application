@@ -5,6 +5,8 @@
   "projects": {
     "grid-title": "Проекты",
     "crud-title": "Проект",
-    "amount_of_tasks": "Нет задач | 1 задача | {count} задач(и)"
+    "amount_of_tasks": "Нет задач | 1 задача | {count} задач(и)",
+    "project_members": "Участники",
+    "members": "Участники"
   }
 }

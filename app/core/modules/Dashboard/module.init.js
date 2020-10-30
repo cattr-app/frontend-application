@@ -1,4 +1,6 @@
+import Vue from 'vue';
 import store from '@/store';
+import './policies';
 
 export const ModuleConfig = {
     routerPrefix: 'dashboard',
@@ -20,7 +22,7 @@ export function init(context) {
                 path: '',
                 beforeEnter: (to, from, next) => {
                     if (
-                        store.getters['user/canInAnyProject']('dashboard/manager_access') &&
+                        Vue.prototype.$can('viewTeamTab', 'dashboard') &&
                         (!localStorage.getItem('dashboard.tab') || localStorage.getItem('dashboard.tab') === 'team')
                     ) {
                         return next({ name: 'dashboard.team' });
@@ -44,7 +46,7 @@ export function init(context) {
                 name: 'dashboard.team',
                 component: () => import(/* webpackChunkName: "dashboard" */ './views/Dashboard/Team.vue'),
                 meta: {
-                    permissions: ['dashboard/manager_access'],
+                    checkPermission: () => Vue.prototype.$can('viewTeamTab', 'dashboard'),
                 },
             },
         ],
