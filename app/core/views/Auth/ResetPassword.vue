@@ -192,11 +192,8 @@
                 };
 
                 try {
-                    const { data } = await this.authService.resetPasswordRequest(payload);
-
-                    if (data.success) {
-                        this.currentStep = 1;
-                    }
+                    await this.authService.resetPasswordRequest(payload);
+                    this.currentStep = 1;
                 } catch (e) {
                     //
                 } finally {
@@ -210,11 +207,8 @@
                 };
 
                 try {
-                    const { data } = await this.authService.resetPasswordValidateToken(payload);
-
-                    if (data.success) {
-                        this.isValidToken = true;
-                    }
+                    await this.authService.resetPasswordValidateToken(payload);
+                    this.isValidToken = true;
                 } catch (e) {
                     this.isValidToken = false;
                 }
@@ -230,12 +224,9 @@
                 };
 
                 try {
-                    const { data } = await this.authService.resetPasswordProcess(payload);
-
-                    if (data.success) {
-                        this.currentStep = 3;
-                        this.disabledForm = false;
-                    }
+                    await this.authService.resetPasswordProcess(payload);
+                    this.currentStep = 3;
+                    this.disabledForm = false;
                 } catch (e) {
                     //
                 } finally {
