@@ -1,5 +1,5 @@
 import TimezonePicker from '@/components/TimezonePicker';
-import CompanyService from '../services/companyService';
+import CompanyService from '../services/company.service';
 import ColorSelect from '../components/ColorSelect';
 import Store from '@/store';
 
@@ -127,6 +127,15 @@ export default {
                             },
                         });
                     },
+                },
+                {
+                    label: 'field.auto_thin',
+                    key: 'auto_thinning',
+                    fieldOptions: {
+                        type: 'switch',
+                        placeholder: 'field.auto_thin',
+                    },
+                    tooltipValue: 'tooltip.auto_thin',
                 },
             ],
         },

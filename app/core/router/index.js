@@ -16,6 +16,7 @@ const routes = [
         name: 'auth.login',
         meta: {
             auth: false,
+            guest: true,
             layout: 'auth-layout',
         },
         component: () => import(/* webpackChunkName: "login" */ '../views/Auth/Login.vue'),
@@ -26,6 +27,23 @@ const routes = [
                 next();
             }
         },
+    },
+    {
+        path: '/auth/desktop/login',
+        name: 'auth.desktop.login',
+        meta: {
+            auth: false,
+            guest: true,
+            layout: 'auth-layout',
+        },
+        beforeEnter: (to, from, next) => {
+            if (Store.getters['user/loggedIn']) {
+                next('/');
+            } else {
+                next();
+            }
+        },
+        component: () => import(/* webpackChunkName: "desktop-login" */ '../views/Auth/Desktop.vue'),
     },
     {
         path: '/auth/password/reset',
@@ -71,6 +89,11 @@ const routes = [
         name: 'about',
         component: () => import(/* webpackChunkName: "About" */ '../views/About.vue'),
     },
+    {
+        path: '/desktop-login',
+        name: 'desktop-login',
+        component: () => import(/* webpackChunkName: "DesktopLogin" */ '../views/DesktopLogin.vue'),
+    },
 ];
 
 const router = new VueRouter({
@@ -91,29 +114,33 @@ router.beforeEach((to, from, next) => {
         return next();
     }
 
-    const requiredPermissions = to.matched
-        .map(record => record.meta.permissions)
-        .filter(permissions => permissions)
-        .reduce((total, permissions) => total.concat(permissions), []);
+    if (to.matched.some(record => typeof record.meta.guest !== 'undefined' && record.meta.guest)) {
+        if (Store.getters['user/loggedIn']) {
+            return next('/');
+        }
+    }
 
-    const checkPermissions = () => {
-        if (
-            Store.getters['user/user'].is_admin ||
-            requiredPermissions.every(permission => Store.getters['user/canInAnyProject'](permission))
-        ) {
-            return next();
+    const checkPermission = () => {
+        if (!Vue.prototype.$gate.user) {
+            Vue.prototype.$gate.auth(Store.getters['user/user']);
         }
 
-        return next({ name: 'forbidden' });
+        if (to?.meta?.checkPermission) {
+            return to.meta.checkPermission() ? next() : next({ name: 'forbidden' });
+        }
+
+        return next();
     };
 
-    if (!Store.getters['user/rulesLoaded']) {
+    if (!Store.getters['user/user'] || !Object.keys(Store.getters['user/user']).length) {
         Store.watch(
-            () => Store.getters['user/rulesLoaded'],
-            () => checkPermissions(),
+            () => Store.getters['user/user'],
+            () => {
+                checkPermission();
+            },
         );
     } else {
-        checkPermissions();
+        checkPermission();
     }
 });
 

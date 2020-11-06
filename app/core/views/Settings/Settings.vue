@@ -10,7 +10,7 @@
                 </template>
             </at-menu>
             <div class="settings__content">
-                <router-view></router-view>
+                <router-view />
             </div>
         </div>
     </div>

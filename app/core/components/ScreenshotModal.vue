@@ -61,7 +61,7 @@
                     </div>
                     <div v-else class="screenshot__activity">
                         <div class="modal-field">
-                            <span class="modal-label">{{ $tc('tooltip.activity_progress.overall') }}</span>
+                            <span class="modal-label">{{ $tc('tooltip.activity_progress.overall', 0) }}</span>
                             <span class="modal-value">
                                 {{ screenshot.time_interval.activity_fill + '%' }}
                             </span>
@@ -69,7 +69,7 @@
 
                         <div v-if="screenshot.time_interval.mouse_fill !== null" class="modal-field">
                             <span class="modal-label">
-                                {{ $tc('tooltip.activity_progress.mouse') }}
+                                {{ $t('tooltip.activity_progress.just_mouse') }}
                             </span>
 
                             <span class="modal-value">
@@ -77,7 +77,7 @@
                             </span>
                         </div>
                         <div v-if="screenshot.time_interval.keyboard_fill !== null" class="modal-field">
-                            <span class="modal-label">{{ $tc('tooltip.activity_progress.keyboard') }} </span>
+                            <span class="modal-label">{{ $t('tooltip.activity_progress.just_keyboard') }}</span>
                             <span class="modal-value">
                                 {{ screenshot.time_interval.keyboard_fill + '%' }}
                             </span>
@@ -95,7 +95,6 @@
 <script>
     import moment from 'moment';
     import AppImage from './AppImage';
-    import env from '_app/etc/env';
     import { mapGetters } from 'vuex';
 
     export function screenshotPathProvider(screenshot) {
@@ -134,7 +133,7 @@
         computed: {
             ...mapGetters('user', ['companyData']),
             baseURL() {
-                return (env.API_URL || `${window.location.origin}/api`) + '/';
+                return (process.env.VUE_APP_API_URL || `${window.location.origin}/api`) + '/';
             },
         },
         methods: {

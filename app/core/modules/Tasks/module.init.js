@@ -1,6 +1,6 @@
-import TasksService from '@/service/resource/tasksService';
-import ProjectsService from '@/service/resource/projectService';
-import UsersService from '@/service/resource/usersService';
+import TasksService from '@/services/resource/task.service';
+import ProjectsService from '@/services/resource/project.service';
+import UsersService from '@/services/resource/user.service';
 import { ModuleLoaderInterceptor } from '@/moduleLoader';
 import UserAvatar from '@/components/UserAvatar';
 import UserSelect from '@/components/UserSelect';
@@ -488,11 +488,8 @@ export function init(context, router) {
             onClick: (router, { item }, context) => {
                 context.onEdit(item);
             },
-            renderCondition: ({ $store }, item) => {
-                const userCan = $store.getters['user/can']('tasks/edit', item.project_id);
-                const fromIntegration = typeof item.integration !== 'undefined';
-
-                return userCan && !fromIntegration;
+            renderCondition: ({ $can }, item) => {
+                return $can('update', 'task', item);
             },
         },
         {
@@ -502,11 +499,8 @@ export function init(context, router) {
             onClick: async (router, { item }, context) => {
                 context.onDelete(item);
             },
-            renderCondition: ({ $store }, item) => {
-                const userCan = $store.getters['user/can']('tasks/remove', item.project_id);
-                const fromIntegration = typeof item.integration !== 'undefined';
-
-                return userCan && !fromIntegration;
+            renderCondition: ({ $can }, item) => {
+                return $can('delete', 'task', item);
             },
         },
     ]);
@@ -519,8 +513,8 @@ export function init(context, router) {
             onClick: ({ $router }) => {
                 $router.push({ name: crudNewRoute });
             },
-            renderCondition: ({ $store }) => {
-                return $store.getters['user/canInAnyProject']('tasks/create');
+            renderCondition: ({ $can }) => {
+                return $can('create', 'task');
             },
         },
     ]);

@@ -125,7 +125,7 @@
 
 <script>
     import UserAvatar from './UserAvatar';
-    import UsersService from '../service/resource/usersService';
+    import UsersService from '../services/resource/user.service';
     import Preloader from '@/components/Preloader';
 
     const localStorageKey = 'user-select.users';

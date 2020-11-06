@@ -14,19 +14,23 @@
                     {{ $t('tooltip.activity_progress.not_tracked') }}
                 </div>
                 <div v-else class="screenshot__activity">
-                    <span class="screenshot__overall-activity">
+                    <span v-if="screenshot.time_interval.activity_fill !== null" class="screenshot__overall-activity">
                         {{
-                            $t('tooltip.activity_progress.overall', { percent: screenshot.time_interval.activity_fill })
+                            $tc('tooltip.activity_progress.overall', screenshot.time_interval.activity_fill, {
+                                percent: screenshot.time_interval.activity_fill,
+                            })
                         }}
                     </span>
                     <div class="screenshot__device-activity">
                         <span v-if="screenshot.time_interval.mouse_fill !== null">
                             {{
-                                $t('tooltip.activity_progress.mouse', { percent: screenshot.time_interval.mouse_fill })
+                                $tc('tooltip.activity_progress.mouse', screenshot.time_interval.mouse_fill, {
+                                    percent: screenshot.time_interval.mouse_fill,
+                                })
                             }}
                         </span>
                         <span v-if="screenshot.time_interval.keyboard_fill !== null">{{
-                            $t('tooltip.activity_progress.keyboard', {
+                            $tc('tooltip.activity_progress.keyboard', screenshot.time_interval.keyboard_fill, {
                                 percent: screenshot.time_interval.keyboard_fill,
                             })
                         }}</span>

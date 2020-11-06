@@ -46,11 +46,11 @@
 </template>
 
 <script>
-    import UsersService from '@/service/resource/usersService';
-    import ProjectService from '@/service/resource/projectService';
+    import UsersService from '@/services/resource/user.service';
+    import ProjectService from '@/services/resource/project.service';
     import Calendar from '@/components/Calendar';
     import UserSelect from '@/components/UserSelect';
-    import ProjectReportService from '@/service/reports/ProjectReportService';
+    import ProjectReportService from '@/services/reports/project-report.service';
     import Project from './ProjectReport/Project';
     import { getDateToday, getStartDate, getEndDate, formatDurationString } from '@/utils/time';
     import ProjectSelect from '@/components/ProjectSelect';

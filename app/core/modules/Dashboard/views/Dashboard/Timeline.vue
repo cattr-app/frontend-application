@@ -24,7 +24,7 @@
 
                     <div class="flex">
                         <router-link
-                            v-if="$store.getters['user/user'].manual_time || $store.getters['user/user'].is_admin"
+                            v-if="$can('viewManualTime', 'dashboard')"
                             to="/time-intervals/new"
                             class="controls-row__item"
                         >
@@ -93,7 +93,7 @@
     import TimelineCalendarGraph from '../../components/TimelineCalendarGraph';
     import TimelineScreenshots from '../../components/TimelineScreenshots';
     import TimezonePicker from '@/components/TimezonePicker';
-    import DashboardReportService from '@/service/reports/dashboardReportService';
+    import DashboardReportService from '@/services/reports/dashboard-report.service';
     import { getMimeType, downloadBlob } from '@/utils/file';
     import { getDateToday, getEndDay, getStartDay } from '@/utils/time';
     import { getStartOfDayInTimezone, getEndOfDayInTimezone } from '@/utils/time';

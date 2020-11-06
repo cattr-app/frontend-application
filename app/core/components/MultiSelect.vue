@@ -34,7 +34,7 @@
 </template>
 
 <script>
-    import ResourceService from '../service/resource/resourceService';
+    import ResourceService from '../services/resource/resource.service';
 
     export default {
         props: {
@@ -87,7 +87,7 @@
                 }
             }
 
-            if (this.selected.length) {
+            if (Array.isArray(this.selected)) {
                 this.model = this.selected;
             }
 

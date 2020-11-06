@@ -2,6 +2,7 @@
   "navigation": {
     "about":  "About",
     "settings": "Settings",
+    "client-login": "Desktop app login",
     "company_settings": "Company Settings",
     "logout": "Logout",
     "dropdown": {
@@ -16,7 +17,24 @@
       "solve_captcha": "You must solve a CAPTCHA",
       "auth_error": "Authorization error",
       "data_reset": "Data are flushing, please wait a minute and try again"
-    }
+    },
+    "desktop": {
+      "header": "Desktop application login",
+      "step": "Step {n}",
+      "step1": "Transferring data",
+      "step2": "Opening application",
+      "retry": "Retry",
+      "cancel": "Cancel",
+      "open": "Open application",
+      "finish": "Finish",
+      "error": "It seems, Desktop application is not installed on your PC",
+      "download": "You can download it by going {0}",
+      "download_button": "there"
+    },
+    "switch_to_common": "Login via password",
+    "close": "Close page",
+    "desktop_error": "Error happened during authorization",
+    "desktop_working": "Authorizing"
   },
   "reset": {
     "forgot_password": "Forgot password?",
@@ -136,6 +154,8 @@
     "total_time": "Total time",
     "total_spent": "Total Spent Time",
     "time": "Time",
+    "members": "Members",
+    "auto_thin": "Automatic storage thinning",
     "statuses": {
       "any": "Any",
       "active": "Active",
@@ -157,7 +177,7 @@
     "work_time": "Working Hours",
     "notice": "Notice",
     "report": "Report",
-    "minutes": "{value} минут"
+    "minutes": "{value} minutes"
   },
   "filter": {
     "enter-single": "Enter {0}",
@@ -199,11 +219,14 @@
     "user_interval_screenshot": "Screenshot creation time in minutes",
     "color_intervals": "Lets you select colors for workday time intervals from 0 to 100%",
     "work_time": "Minimum working hours/day",
+    "auto_thin": "Old screenshots will be deleted automatically",
     "activity_progress": {
       "not_tracked": "Activity was not tracked",
-      "overall": "Overall activity: | Overall activity: {percent}%",
-      "mouse": "Mouse: | Mouse: {percent}%",
-      "keyboard": "Keyboard: | Keyboard: {percent}%"
+      "overall": "Overall activity: | Overall activity: 1% | Overall activity: {percent}%",
+      "mouse": "Mouse: 0% | Mouse: 1% | Mouse: {percent}%",
+      "keyboard": "Keyboard: 0% | Keyboard: 1% | Keyboard: {percent}%",
+      "just_mouse": "Mouse:",
+      "just_keyboard": "Keyboard:"
     }
   },
   "invite": {
@@ -217,9 +240,32 @@
       "vulnerable": "Vulnerable",
       "ok": "Up to date",
       "outdated": "Outdated"
+    },
+    "module_versions": "Module versions",
+    "module_storage": "Storage",
+    "no_modules": "No modules installed",
+    "no_storage": "No info about storage",
+    "storage": {
+      "last_thinning": "Last clean was",
+      "space": {
+        "left": "Space left",
+        "total": "Total space available",
+        "used": "Space used"
+      },
+      "screenshots_available": "For deletion available",
+      "screenshots": "0 screenshots | {n} screenshot | {n} screenshots",
+      "thin_unavailable": "Thinning unavailable",
+      "thin_available": "Thinning available",
+      "thin": "Start thinning"
     }
   },
   "notification": {
+    "save": {
+      "success": {
+        "title": "Success",
+        "message": "Saved successfully"
+      }
+    },
     "record": {
       "save": {
         "success": {
