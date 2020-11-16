@@ -81,6 +81,20 @@ export function fieldsToFillProvider() {
             placeholder: 'field.password',
         },
         {
+            label: 'field.send_invite',
+            key: 'send_invite',
+            type: 'checkbox',
+            tooltipValue: 'tooltip.user_send_invite',
+            default: 1,
+            displayable: context => {
+                // If we edit an existing user
+                // then we don't display this field
+                if (context.values.id) return false;
+
+                return true;
+            },
+        },
+        {
             label: 'field.manual_time',
             key: 'manual_time',
             type: 'checkbox',
@@ -149,14 +163,6 @@ export function fieldsToFillProvider() {
                     },
                 });
             },
-        },
-        {
-            label: 'field.send_invite',
-            key: 'send_invite',
-            type: 'checkbox',
-            tooltipValue: 'tooltip.user_send_invite',
-            default: 1,
-            displayable: false,
         },
         {
             label: 'field.default_role',

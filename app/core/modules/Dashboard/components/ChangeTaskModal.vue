@@ -149,8 +149,13 @@
                 }
 
                 requestAnimationFrame(() => {
-                    this.$refs.project.reset();
-                    this.$refs.task.reset();
+                    if (Object.prototype.hasOwnProperty.call(this.$refs, 'project') && this.$refs.project) {
+                        this.$refs.project.reset();
+                    }
+
+                    if (Object.prototype.hasOwnProperty.call(this.$refs, 'task') && this.$refs.project) {
+                        this.$refs.task.reset();
+                    }
                 });
             },
         },

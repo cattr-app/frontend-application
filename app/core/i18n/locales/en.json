@@ -194,16 +194,18 @@
     "task_important": "Related screenshots should not be deleted automatically",
     "user_change_password": "Makes the password change after the first login mandatory",
     "user_manual_time": "Allow users to manually add time",
-    "user_send_invite": "Email user the account's credentials",
+    "user_send_invite": "Email user the account's credentials. If \"Password\" field is not filled in, an email with an auto-generated password will be sent in any case ",
     "user_computer_time_popup": "User's inactivity time in minutes before 'inactivity detected' modal pops up",
     "user_interval_screenshot": "Screenshot creation time in minutes",
     "color_intervals": "Lets you select colors for workday time intervals from 0 to 100%",
     "work_time": "Minimum working hours/day",
     "activity_progress": {
       "not_tracked": "Activity was not tracked",
-      "overall": "Overall activity: {percent}%",
-      "mouse": "Mouse: {percent}%",
-      "keyboard": "Keyboard: {percent}%"
+      "overall": "Overall activity: | Overall activity: 1% | Overall activity: {percent}%",
+      "mouse": "Mouse: 0% | Mouse: 1% | Mouse: {percent}%",
+      "keyboard": "Keyboard: 0% | Keyboard: 1% | Keyboard: {percent}%",
+      "just_mouse": "Mouse:",
+      "just_keyboard": "Keyboard:"
     }
   },
   "invite": {

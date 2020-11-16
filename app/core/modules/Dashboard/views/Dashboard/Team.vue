@@ -58,7 +58,6 @@
                             :events="events"
                             :timezone="timezone"
                             @selectedIntervals="onSelectedIntervals"
-                            @outsideClick="clearIntervals"
                         />
                         <TeamTableGraph
                             v-else
@@ -76,6 +75,7 @@
                         :selected-interval-ids="selectedIntervalIds"
                         @remove="onBulkRemove"
                         @edit="load"
+                        @close="clearIntervals"
                     ></time-interval-edit>
                 </div>
                 <preloader v-if="isDataLoading" class="team__loader" :is-transparent="true"></preloader>
@@ -494,14 +494,6 @@
         &::v-deep .at-btn__text {
             color: #2e2ef9;
             font-size: 25px;
-        }
-    }
-
-    ::v-deep {
-        .at-select {
-            &__selection {
-                border: 1px solid $gray-6;
-            }
         }
     }
 

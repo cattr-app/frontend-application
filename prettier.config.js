@@ -45,17 +45,5 @@ module.exports = {
                 parser: 'json',
             },
         },
-        {
-            files: '*.less',
-            options: {
-                parser: 'less',
-            },
-        },
-        {
-            files: '*.template.html',
-            options: {
-                parser: 'angular',
-            },
-        },
     ],
 };

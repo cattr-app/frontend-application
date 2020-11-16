@@ -3,11 +3,12 @@
         <v-select
             :options="options"
             label="label"
-            placeholder="Type at least 3 characters to search"
+            :placeholder="$t('time_intervals.task_select.placeholder')"
             :clearable="false"
             @input="inputHandler($event.id)"
             @search="onSearch"
         >
+            <div slot="no-options">{{ $t('time_intervals.task_select.no_options') }}</div>
         </v-select>
         <i class="icon icon-chevron-down at-select__arrow"></i>
     </div>
@@ -64,7 +65,7 @@
                     return data.map(task => {
                         const label =
                             typeof task.project !== 'undefined'
-                                ? `${task.project.name} - ${task.task_name}`
+                                ? `${task.task_name} (${task.project.name})`
                                 : task.task_name;
 
                         return { ...task, label };

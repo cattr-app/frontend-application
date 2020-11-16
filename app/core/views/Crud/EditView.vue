@@ -289,19 +289,21 @@
                 this.isDataLoading = true;
 
                 if (this.pageData.type === 'edit') {
-                    const data = await this.service
-                        .getItem(this.$route.params[this.service.getIdParam()], this.filters)
-                        .then(({ data }) => {
-                            this.isDataLoading = false;
-                            return data;
-                        })
-                        .catch(({ response }) => {
-                            if (response.data.error_type === 'query.item_not_found') {
-                                this.$router.replace({ name: 'forbidden' });
-                            }
-                        });
-
-                    this.values = { ...this.values, ...data };
+                    try {
+                        const { data } = await this.service.getItem(
+                            this.$route.params[this.service.getIdParam()],
+                            this.filters,
+                        );
+                        this.values = { ...this.values, ...data };
+                    } catch ({ response }) {
+                        if (
+                            response &&
+                            Object.prototype.hasOwnProperty.call(response, 'data') &&
+                            response.data.error_type === 'query.item_not_found'
+                        ) {
+                            this.$router.replace({ name: 'forbidden' });
+                        }
+                    }
                 } else if (this.pageData.type === 'new') {
                     this.fields.forEach(field => {
                         if (field.default !== undefined) {
@@ -310,6 +312,8 @@
                         }
                     });
                 }
+
+                this.isDataLoading = false;
             },
 
             async submit() {

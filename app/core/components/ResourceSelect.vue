@@ -28,12 +28,19 @@
             },
         },
         async mounted() {
-            this.options = await this.service.getOptionList();
-            await this.$nextTick();
-            if ('select' in this.$refs) {
-                this.$refs.select.$children.forEach(option => {
-                    option.hidden = false;
-                });
+            try {
+                this.options = await this.service.getOptionList();
+                await this.$nextTick();
+
+                if (this.$refs.select && Object.prototype.hasOwnProperty.call(this.$refs.select, '$children')) {
+                    this.$refs.select.$children.forEach(option => {
+                        option.hidden = false;
+                    });
+                }
+            } catch ({ response }) {
+                if (process.env.NODE_ENV === 'development') {
+                    console.warn(response ? response : 'request to resource is canceled');
+                }
             }
         },
         data() {

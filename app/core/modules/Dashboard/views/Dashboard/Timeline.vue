@@ -52,7 +52,6 @@
                         :events="userEvents"
                         :timezone="timezone"
                         @selectedIntervals="onIntervalsSelect"
-                        @outsideClick="clearIntervals"
                     />
                     <TimelineCalendarGraph
                         v-else
@@ -76,6 +75,7 @@
                         :selected-interval-ids="selectedIntervalIds"
                         @remove="onBulkRemove"
                         @edit="loadData"
+                        @close="clearIntervals"
                     ></time-interval-edit>
                 </div>
             </div>
@@ -375,13 +375,5 @@
 
     .pr-1 {
         padding-right: 1em;
-    }
-
-    ::v-deep {
-        .at-select {
-            &__selection {
-                border: 1px solid $gray-6;
-            }
-        }
     }
 </style>
