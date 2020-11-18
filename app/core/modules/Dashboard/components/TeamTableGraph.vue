@@ -10,7 +10,7 @@
 
 <script>
     import { fabric } from 'fabric';
-    import debounce from 'lodash/debounce';
+    import throttle from 'lodash/throttle';
     import moment from 'moment';
     import { formatDurationString } from '@/utils/time';
 
@@ -193,7 +193,7 @@
                 this.setScroll(0);
             },
             formatDuration: formatDurationString,
-            draw: debounce(function() {
+            draw: throttle(function() {
                 this.canvas.clear();
 
                 const width = this.contentWidth;
@@ -443,7 +443,7 @@
 
                 this.canvas.requestRenderAll();
             }, 100),
-            onResize: debounce(function() {
+            onResize: throttle(function() {
                 if (!this.$refs.canvasWrapper) {
                     return;
                 }
