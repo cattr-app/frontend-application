@@ -124,6 +124,10 @@ export function init(context, router) {
             key: 'description',
             label: 'field.description',
             render: (h, props) => {
+                if (!props.currentValue) {
+                    return;
+                }
+
                 return h('div', {
                     class: { 'ql-editor': true },
                     domProps: {
