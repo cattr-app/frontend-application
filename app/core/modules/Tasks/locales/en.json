@@ -20,7 +20,8 @@
       "any": "Any",
       "open": "Open",
       "closed": "Closed"
-    }
+    },
+    "unassigned": "Unassigned"
   },
   "field": {
     "source": "Source"
