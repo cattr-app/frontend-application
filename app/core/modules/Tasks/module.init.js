@@ -6,6 +6,7 @@ import UserAvatar from '@/components/UserAvatar';
 import i18n from '@/i18n';
 import { formatDate, formatDurationString } from '@/utils/time';
 import { VueEditor } from 'vue2-editor';
+import ResourceSelect from '@/components/ResourceSelect';
 
 export const ModuleConfig = {
     routerPrefix: 'tasks',
@@ -101,18 +102,22 @@ export function init(context, router) {
                     return h('span', data.currentValue.full_name);
                 }
 
-                return h(
-                    'router-link',
-                    {
-                        props: {
-                            to: {
-                                name: routes.usersView,
-                                params: { id: data.currentValue.id },
+                if (data.currentValue && data.currentValue.id) {
+                    return h(
+                        'router-link',
+                        {
+                            props: {
+                                to: {
+                                    name: routes.usersView,
+                                    params: { id: data.currentValue.id },
+                                },
                             },
                         },
-                    },
-                    data.currentValue.full_name,
-                );
+                        data.currentValue.full_name,
+                    );
+                }
+
+                return h('span', i18n.t('tasks.unassigned'));
             },
         },
         {
@@ -290,10 +295,25 @@ export function init(context, router) {
         {
             label: 'field.user',
             key: 'user_id',
-            type: 'resource-select',
-            service: new UsersService(),
-            required: true,
-            default: ({ getters }) => getters['user/user'].id,
+            render: (h, data) => {
+                let value = '';
+                if (typeof data.currentValue === 'number' || typeof data.currentValue === 'string') {
+                    value = data.currentValue;
+                }
+
+                return h(ResourceSelect, {
+                    props: {
+                        service: new UsersService(),
+                        value,
+                        clearable: true,
+                    },
+                    on: {
+                        input(value) {
+                            data.inputHandler(value);
+                        },
+                    },
+                });
+            },
         },
         {
             label: 'field.priority',
