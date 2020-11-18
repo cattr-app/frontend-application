@@ -87,7 +87,7 @@
 <script>
     import moment from 'moment';
     import 'moment-timezone';
-    import debounce from 'lodash/debounce';
+    import throttle from 'lodash/throttle';
     import { mapActions, mapGetters } from 'vuex';
     import Calendar from '@/components/Calendar';
     import UserSelect from '@/components/UserSelect';
@@ -258,7 +258,7 @@
             ...mapActions({
                 setTimezone: 'timeline/setTimezone',
             }),
-            load: debounce(async function(withLoadingIndicator = true) {
+            load: throttle(async function(withLoadingIndicator = true) {
                 this.isDataLoading = withLoadingIndicator;
                 if (!this.userIDs.length || !this.projectIDs.length) {
                     this.isDataLoading = false;

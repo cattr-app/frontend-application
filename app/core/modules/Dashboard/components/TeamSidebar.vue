@@ -5,7 +5,7 @@
 <script>
     import { fabric } from 'fabric';
     import md5 from 'js-md5';
-    import debounce from 'lodash/debounce';
+    import throttle from 'lodash/throttle';
     import moment from 'moment';
     import { getBackgroundColor } from '@/utils/avatar';
     import { getInitials } from '@/utils/string';
@@ -158,7 +158,7 @@
         },
         methods: {
             formatDuration: formatDurationString,
-            draw: debounce(function() {
+            draw: throttle(function() {
                 this.canvas.clear();
 
                 // User column header
@@ -435,7 +435,7 @@
 
                 this.canvas.requestRenderAll();
             }, 100),
-            onResize: debounce(function() {
+            onResize: throttle(function() {
                 const height = this.users.length * rowHeight + titleHeight + subtitleHeight;
                 this.canvas.setWidth(sidebarWidth);
                 this.canvas.setHeight(height);

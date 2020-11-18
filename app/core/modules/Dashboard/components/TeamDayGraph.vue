@@ -73,7 +73,7 @@
 
 <script>
     import { fabric } from 'fabric';
-    import debounce from 'lodash/debounce';
+    import throttle from 'lodash/throttle';
     import moment from 'moment';
     import 'moment-timezone';
     import { mapGetters } from 'vuex';
@@ -284,7 +284,7 @@
             getScreenshotByInterval(intervalID) {
                 return this.screenshots.find(screenshot => screenshot.time_interval_id === intervalID);
             },
-            draw: debounce(function() {
+            draw: throttle(function() {
                 this.canvas.clear();
 
                 const width = this.canvas.getWidth();
@@ -474,7 +474,7 @@
 
                 this.canvas.requestRenderAll();
             }, 100),
-            onResize: debounce(function() {
+            onResize: throttle(function() {
                 if (!this.$refs.canvasWrapper) {
                     return;
                 }
