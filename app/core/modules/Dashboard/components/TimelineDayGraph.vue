@@ -73,7 +73,7 @@
 
 <script>
     import { fabric } from 'fabric';
-    import debounce from 'lodash/debounce';
+    import throttle from 'lodash/throttle';
     import moment from 'moment';
     import { formatDurationString } from '@/utils/time';
     import Screenshot from '@/components/Screenshot';
@@ -253,7 +253,7 @@
             getScreenshotByInterval(intervalID) {
                 return this.screenshots.find(screenshot => screenshot.time_interval_id === intervalID);
             },
-            draw: debounce(function() {
+            draw: throttle(function() {
                 this.canvas.clear();
 
                 const width = this.canvas.getWidth();
@@ -424,6 +424,7 @@
             onClick(e) {
                 if (
                     e.target &&
+                    e.target.parentElement &&
                     !e.target.parentElement.classList.contains(this.canvas.wrapperEl.classList) &&
                     !e.target.closest('.time-interval-edit-panel') &&
                     !e.target.closest('.screenshot') &&
@@ -436,7 +437,7 @@
                     }
                 }
             },
-            onResize: debounce(function() {
+            onResize: throttle(function() {
                 if (!this.$refs.canvasWrapper) {
                     return;
                 }

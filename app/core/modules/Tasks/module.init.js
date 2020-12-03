@@ -7,6 +7,7 @@ import UserSelect from '@/components/UserSelect';
 import i18n from '@/i18n';
 import { formatDate, formatDurationString } from '@/utils/time';
 import { VueEditor } from 'vue2-editor';
+import ResourceSelect from '@/components/ResourceSelect';
 
 export const ModuleConfig = {
     routerPrefix: 'tasks',
@@ -132,6 +133,10 @@ export function init(context, router) {
             key: 'description',
             label: 'field.description',
             render: (h, props) => {
+                if (!props.currentValue) {
+                    return;
+                }
+
                 return h('div', {
                     class: { 'ql-editor': true },
                     domProps: {
