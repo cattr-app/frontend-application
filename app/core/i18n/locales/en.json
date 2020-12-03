@@ -154,8 +154,9 @@
     "total_time": "Total time",
     "total_spent": "Total Spent Time",
     "time": "Time",
-    "members": "Members",
     "auto_thin": "Automatic storage thinning",
+    "members": "Members",
+    "url": "URL",
     "statuses": {
       "any": "Any",
       "active": "Active",
@@ -187,7 +188,8 @@
       "project_name": "project name",
       "full_name": "full name",
       "name": "name",
-      "email": "e-mail"
+      "email": "e-mail",
+      "url": "URL"
     },
     "full_name": "Filter by full name",
     "email": "Filter by e-mail",

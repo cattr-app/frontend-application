@@ -158,6 +158,7 @@
                 &__item-link {
                     &::after {
                         bottom: -0.75em;
+                        height: 3px;
                     }
                 }
             }
