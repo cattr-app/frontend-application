@@ -241,6 +241,7 @@ export function init(context, router) {
         {
             label: 'field.description',
             key: 'description',
+            required: true,
             render: (h, props) => {
                 return h(VueEditor, {
                     props: {
@@ -304,7 +305,7 @@ export function init(context, router) {
             label: 'field.users',
             key: 'users',
             render: (h, props) => {
-                const value = typeof props.values.users !== 'undefined' ? props.values.users.map(user => user.id) : [];
+                const value = typeof props.values.users !== 'undefined' ? props.values.users.map(user => typeof user === 'object' ? user.id : +user) : [];
                 return h(UserSelect, {
                     props: {
                         value,
