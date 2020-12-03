@@ -156,6 +156,7 @@
     "time": "Время",
     "auto_thin": "Автоматическая очистка хранилища",
     "members": "Участники",
+    "url": "URL",
     "statuses": {
       "any": "Все",
       "active": "Активен",
@@ -187,7 +188,8 @@
       "project_name": "название проекта",
       "full_name": "имя",
       "name": "имя",
-      "email": "e-mail"
+      "email": "e-mail",
+      "url": "URL"
     },
     "full_name": "Фильтр по имени",
     "email": "Фильтр по e-mail",

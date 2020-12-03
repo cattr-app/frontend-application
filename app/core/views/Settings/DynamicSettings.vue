@@ -1,5 +1,7 @@
 <template>
     <div>
+        <h1 class="page-title settings__title">{{ $t(section.label) }}</h1>
+
         <template v-if="this.section && values">
             <component
                 :is="component"
@@ -344,15 +346,21 @@
 </script>
 
 <style lang="scss" scoped>
-    .settings__content {
-        width: 100%;
-
-        .data-entry {
-            margin-bottom: 1em;
+    .settings {
+        &__title {
+            font-size: 24px;
         }
 
-        .label {
-            font-weight: bold;
+        &__content {
+            width: 100%;
+
+            .data-entry {
+                margin-bottom: 1em;
+            }
+
+            .label {
+                font-weight: bold;
+            }
         }
     }
 
