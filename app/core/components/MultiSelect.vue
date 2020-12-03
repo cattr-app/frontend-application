@@ -120,7 +120,10 @@
                         if (query.length) {
                             this.lastQuery = query;
                         } else {
-                            if (window.event && window.event.type === 'input') {
+                            if (
+                                ['input', 'keypress'].includes(window?.event?.type) ||
+                                window?.event?.key === 'Backspace'
+                            ) {
                                 // If query changed by user typing, save query
                                 this.lastQuery = query;
                             } else {
