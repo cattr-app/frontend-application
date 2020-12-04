@@ -195,6 +195,10 @@
                 this.modal.show = false;
             },
             onKeyDown(e) {
+                if (!this.modal.show) {
+                    return;
+                }
+
                 if (e.key === 'ArrowLeft') {
                     e.preventDefault();
                     this.showPrevious();
