@@ -98,7 +98,7 @@
             },
             minutes() {
                 const minutes = [];
-                for (let i = 0; i < 60; i += 5) {
+                for (let i = 0; i < 60; i++) {
                     minutes.push(i);
                 }
 
