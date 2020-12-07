@@ -112,21 +112,21 @@
         },
         methods: {
             totalTimeOfSelectedIntervals() {
-                if (typeof this.intervals !== 'undefined') {
-                    return this.intervals
-                        .filter(interval => this.intervalIds.includes(interval.id))
-                        .map(interval => {
-                            const start = moment.utc(interval.start_at);
-                            const end = moment.utc(interval.end_at);
-                            return end.diff(start);
-                        })
-                        .reduce((total, curr) => total + curr, 0);
-                } else {
+                if (typeof this.screenshots !== 'undefined') {
                     return this.screenshots
                         .filter(screenshot => this.intervalIds.includes(screenshot.time_interval_id))
                         .map(screenshot => {
                             const start = moment.utc(screenshot.time_interval.start_at);
                             const end = moment.utc(screenshot.time_interval.end_at);
+                            return end.diff(start);
+                        })
+                        .reduce((total, curr) => total + curr, 0);
+                } else {
+                    return this.intervals
+                        .filter(interval => this.intervalIds.includes(interval.id))
+                        .map(interval => {
+                            const start = moment.utc(interval.start_at);
+                            const end = moment.utc(interval.end_at);
                             return end.diff(start);
                         })
                         .reduce((total, curr) => total + curr, 0);
