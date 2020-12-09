@@ -1,8 +1,9 @@
 <template>
-    <lazy-component v-if="lazy">
-        <img v-auth-image="url" @click="$emit('click', $event)" />
+    <img v-if="error" src="/none.png" />
+    <lazy-component v-else-if="lazy">
+        <img v-auth-image="url" @click="$emit('click', $event)" @error="handleError" />
     </lazy-component>
-    <img v-else v-auth-image="url" @click="$emit('click', $event)" />
+    <img v-else v-auth-image="url" @click="$emit('click', $event)" @error="handleError" />
 </template>
 
 <script>
@@ -25,8 +26,14 @@
             },
         },
         data() {
+            const url =
+                this.src.indexOf('http') === 0
+                    ? this.src
+                    : (process.env.VUE_APP_API_URL || `${window.location.origin}/api`) + '/' + this.src;
+
             return {
-                url: (process.env.VUE_APP_API_URL || `${window.location.origin}/api`) + '/' + this.src,
+                error: false,
+                url,
             };
         },
         methods: {
@@ -47,6 +54,9 @@
                             this.url = URL.createObjectURL(blob);
                         });
                 }
+            },
+            handleError() {
+                this.error = true;
             },
         },
         mounted() {

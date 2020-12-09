@@ -150,6 +150,10 @@
                 this.$emit('remove', this.screenshot.id);
             },
             getScreenshotPath(screenshot) {
+                if (screenshot.path === 'uploads/static/none.png') {
+                    return window.location.origin + '/none.png';
+                }
+
                 return config.screenshotPathProvider(screenshot);
             },
         },
