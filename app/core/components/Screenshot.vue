@@ -159,6 +159,10 @@
                 this.$emit('remove', this.screenshot);
             },
             getThumbnailPath(screenshot) {
+                if (screenshot.path === 'uploads/static/none.png') {
+                    return window.location.origin + '/none.png';
+                }
+
                 return config.thumbnailPathProvider(screenshot);
             },
         },
