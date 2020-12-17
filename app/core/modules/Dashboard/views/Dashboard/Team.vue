@@ -8,7 +8,7 @@
                     @change="onCalendarChange"
                 />
 
-                <UserSelect class="controls-row__item" :currentTasks="currentTasks" @change="onUsersChange" />
+                <UserSelect class="controls-row__item" @change="onUsersChange" />
 
                 <ProjectSelect class="controls-row__item" @change="onProjectsChange" />
 

@@ -59,7 +59,7 @@
                                     :size="25"
                                     :borderRadius="5"
                                     :user="user"
-                                    :isOnline="getUserTask(user.id) !== null"
+                                    :online="user.online"
                                 />
 
                                 <div class="user-name">{{ user.full_name }}</div>
@@ -110,7 +110,7 @@
                                     :size="25"
                                     :borderRadius="5"
                                     :user="user"
-                                    :isOnline="getUserTask(user.id) !== null"
+                                    :online="user.online"
                                 />
 
                                 <div class="user-name">{{ user.full_name }}</div>
@@ -137,12 +137,6 @@
             Preloader,
         },
         props: {
-            currentTasks: {
-                required: false,
-                default: () => {
-                    return {};
-                },
-            },
             size: {
                 type: String,
                 default: 'normal',
@@ -277,13 +271,6 @@
 
                 this.changed = true;
                 localStorage[localStorageKey] = JSON.stringify(this.userIDs);
-            },
-            getUserTask(userID) {
-                if (!this.currentTasks[userID]) {
-                    return null;
-                }
-
-                return this.currentTasks[userID];
             },
             selectAllActiveUsers() {
                 // If some users already selected we are going to clear it

@@ -329,7 +329,7 @@
                     }
 
                     const currentTask = this.currentTasks[user.id];
-                    if (currentTask) {
+                    if (user.online && currentTask) {
                         // Avatar active icon
                         this.canvas.add(
                             new fabric.Circle({
