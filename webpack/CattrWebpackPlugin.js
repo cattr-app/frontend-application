@@ -66,7 +66,6 @@ module.exports = class CattrWebpackPlugin {
                 join(stats.compilation.options.output.path, this.options.fileName),
                 JSON.stringify({
                     backend_path: env.API_URL,
-                    backend_prefix: env.API_VERSION,
                     frontend_version: process.env.npm_package_version,
                     frontend_plugins: manifestPlugins,
                 }),
