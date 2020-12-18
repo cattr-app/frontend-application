@@ -1,12 +1,12 @@
 <template>
     <div class="timeline">
         <div class="row">
-            <div class="col-5 pr-1">
+            <div class="col-5 col-xl-4 pr-1">
                 <div class="at-container sidebar">
                     <TimelineSidebar :active-task="activeTask" :isDataLoading="isDataLoading" />
                 </div>
             </div>
-            <div class="col-19">
+            <div class="col-19 col-xl-20">
                 <div class="controls-row flex-between">
                     <div class="flex">
                         <Calendar
@@ -24,7 +24,7 @@
 
                     <div class="flex">
                         <router-link
-                            v-if="$store.getters['user/user'].manual_time || $store.getters['user/user'].is_admin"
+                            v-if="$can('viewManualTime', 'dashboard')"
                             to="/time-intervals/new"
                             class="controls-row__item"
                         >
@@ -52,7 +52,6 @@
                         :events="userEvents"
                         :timezone="timezone"
                         @selectedIntervals="onIntervalsSelect"
-                        @outsideClick="clearIntervals"
                     />
                     <TimelineCalendarGraph
                         v-else
@@ -72,9 +71,11 @@
 
                     <time-interval-edit
                         :screenshots="selectedScreenshots"
+                        :intervals="selectedIntervals"
                         :selected-interval-ids="selectedIntervalIds"
                         @remove="onBulkRemove"
                         @edit="loadData"
+                        @close="clearIntervals"
                     ></time-interval-edit>
                 </div>
             </div>
@@ -84,7 +85,7 @@
 
 <script>
     import moment from 'moment';
-    import debounce from 'lodash/debounce';
+    import throttle from 'lodash/throttle';
     import { mapGetters, mapActions } from 'vuex';
     import Calendar from '@/components/Calendar';
     import TimelineSidebar from '../../components/TimelineSidebar';
@@ -92,7 +93,7 @@
     import TimelineCalendarGraph from '../../components/TimelineCalendarGraph';
     import TimelineScreenshots from '../../components/TimelineScreenshots';
     import TimezonePicker from '@/components/TimezonePicker';
-    import DashboardReportService from '@/service/reports/dashboardReportService';
+    import DashboardReportService from '@/services/reports/dashboard-report.service';
     import { getMimeType, downloadBlob } from '@/utils/file';
     import { getDateToday, getEndDay, getStartDay } from '@/utils/time';
     import { getStartOfDayInTimezone, getEndOfDayInTimezone } from '@/utils/time';
@@ -131,6 +132,7 @@
                 showExportModal: false,
                 selectedIntervalIds: [],
                 selectedScreenshots: [],
+                selectedIntervals: [],
                 sessionStorageKey: sessionStorageKey,
                 isDataLoading: false,
             };
@@ -187,7 +189,7 @@
             ...mapActions({
                 setTimezone: 'timeline/setTimezone',
             }),
-            loadData: debounce(async function(withLoadingIndicator = true) {
+            loadData: throttle(async function(withLoadingIndicator = true) {
                 this.isDataLoading = withLoadingIndicator;
 
                 if (!this.user || !this.user.id) {
@@ -228,6 +230,9 @@
                 this.selectedScreenshots = this.screenshots.filter(screenshot =>
                     this.selectedIntervalIds.includes(screenshot.time_interval.id),
                 );
+                this.selectedIntervals = Object.values(this.intervals).reduce((acc, curr) => {
+                    return [...acc, ...curr.intervals.filter(interval => event.ids.includes(interval.id))];
+                }, []);
             },
             async onExport(format) {
                 const mimetype = getMimeType(format);
@@ -286,6 +291,9 @@
                 this.selectedScreenshots = this.screenshots.filter(screenshot =>
                     intervalIds.includes(screenshot.time_interval_id),
                 );
+                this.selectedIntervals = Object.values(this.intervals).reduce((acc, curr) => {
+                    return [...acc, ...curr.intervals.filter(interval => intervalIds.includes(interval.id))];
+                }, []);
                 this.selectedIntervalIds = intervalIds;
             },
             clearIntervals() {
@@ -293,6 +301,7 @@
                     this.$refs.timelineScreenshots.clearSelectedIntervals();
                 }
                 this.selectedScreenshots = [];
+                this.selectedIntervals = [];
                 this.selectedIntervalIds = [];
             },
         },
@@ -366,13 +375,5 @@
 
     .pr-1 {
         padding-right: 1em;
-    }
-
-    ::v-deep {
-        .at-select {
-            &__selection {
-                border: 1px solid $gray-6;
-            }
-        }
     }
 </style>

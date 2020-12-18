@@ -1,6 +1,15 @@
 <template>
     <div class="at-select-wrapper">
-        <at-select ref="select" v-model="model" multiple filterable placeholder="" @click="onClick" @input="onChange">
+        <at-select
+            ref="select"
+            v-model="model"
+            multiple
+            filterable
+            placeholder=""
+            :size="size"
+            @click="onClick"
+            @input="onChange"
+        >
             <li v-if="showSelectAll" class="at-select__option" @click="selectAll">
                 {{ $t('control.select_all') }}
             </li>
@@ -25,7 +34,7 @@
 </template>
 
 <script>
-    import ResourceService from '../service/resource/resourceService';
+    import ResourceService from '../services/resource/resource.service';
 
     export default {
         props: {
@@ -51,6 +60,10 @@
                 type: String,
                 required: true,
             },
+            size: {
+                type: String,
+                default: 'normal',
+            },
         },
         data() {
             return {
@@ -74,17 +87,19 @@
                 }
             }
 
-            if (this.selected) {
+            if (Array.isArray(this.selected)) {
                 this.model = this.selected;
             }
 
-            this.$nextTick(function() {
+            this.$nextTick(() => {
                 this.model.forEach(modelValue => {
-                    this.$refs.select.$children.forEach(option => {
-                        if (option.value === modelValue) {
-                            option.selected = true;
-                        }
-                    });
+                    if (this.$refs.select && Object.prototype.hasOwnProperty.call(this.$refs.select, '$children')) {
+                        this.$refs.select.$children.forEach(option => {
+                            if (option.value === modelValue) {
+                                option.selected = true;
+                            }
+                        });
+                    }
                 });
             });
 
@@ -105,7 +120,16 @@
                         if (query.length) {
                             this.lastQuery = query;
                         } else {
-                            this.$refs.select.query = this.lastQuery;
+                            if (
+                                ['input', 'keypress'].includes(window?.event?.type) ||
+                                window?.event?.key === 'Backspace'
+                            ) {
+                                // If query changed by user typing, save query
+                                this.lastQuery = query;
+                            } else {
+                                // If query changed by clicking option and so on, restore query
+                                this.$refs.select.query = this.lastQuery;
+                            }
                         }
                     } else {
                         this.lastQuery = query;
@@ -114,9 +138,6 @@
             );
         },
         watch: {
-            selected() {
-                this.model = this.selected.hasOwnProperty('length') ? this.selected : [];
-            },
             model(value) {
                 if (this.inputHandler) {
                     this.inputHandler(value);
@@ -179,6 +200,11 @@
             position: absolute;
             z-index: 1;
             font-size: 0.9rem;
+        }
+
+        &--small ~ &__placeholder {
+            font-size: 11px;
+            padding: 5px 24px 0 8px;
         }
 
         &__clear {

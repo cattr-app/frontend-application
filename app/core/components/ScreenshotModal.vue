@@ -11,6 +11,11 @@
                 :is-blob="false"
                 :src="getScreenshotPath(screenshot)"
             />
+            <at-progress
+                class="screenshot__activity-bar"
+                :stroke-width="7"
+                :percent="screenshot.time_interval.activity_fill || 0"
+            />
         </a>
 
         <div v-if="showNavigation" class="modal-left">
@@ -22,32 +27,66 @@
         </div>
 
         <template v-slot:footer>
-            <at-button class="modal-remove" type="text" icon="icon-trash-2" @click="onRemove" />
+            <div class="row">
+                <div class="col">
+                    <div v-if="project" class="modal-field">
+                        <span class="modal-label">{{ $t('field.project') }}:</span>
+                        <span class="modal-value">
+                            <router-link :to="`/projects/view/${project.id}`">{{ project.name }}</router-link>
+                        </span>
+                    </div>
 
-            <div v-if="project" class="modal-field">
-                <span class="modal-label">{{ $t('field.project') }}:</span>
-                <span class="modal-value">
-                    <router-link :to="`/projects/view/${project.id}`">{{ project.name }}</router-link>
-                </span>
+                    <div v-if="task" class="modal-field">
+                        <span class="modal-label">{{ $t('field.task') }}:</span>
+                        <span class="modal-value">
+                            <router-link :to="`/tasks/view/${task.id}`">{{ task.task_name }}</router-link>
+                        </span>
+                    </div>
+
+                    <div v-if="user" class="modal-field">
+                        <span class="modal-label">{{ $t('field.user') }}:</span>
+                        <span class="modal-value">
+                            {{ user.full_name }}
+                        </span>
+                    </div>
+
+                    <div v-if="screenshot" class="modal-field">
+                        <span class="modal-label">{{ $t('field.created_at') }}:</span>
+                        <span class="modal-value">{{ formatDate(screenshot.time_interval.start_at) }}</span>
+                    </div>
+                </div>
+                <div class="col">
+                    <div v-if="screenshot.time_interval.activity_fill === null" class="screenshot__activity">
+                        {{ $t('tooltip.activity_progress.not_tracked') }}
+                    </div>
+                    <div v-else class="screenshot__activity">
+                        <div class="modal-field">
+                            <span class="modal-label">{{ $tc('tooltip.activity_progress.overall', 0) }}</span>
+                            <span class="modal-value">
+                                {{ screenshot.time_interval.activity_fill + '%' }}
+                            </span>
+                        </div>
+
+                        <div v-if="screenshot.time_interval.mouse_fill !== null" class="modal-field">
+                            <span class="modal-label">
+                                {{ $t('tooltip.activity_progress.just_mouse') }}
+                            </span>
+
+                            <span class="modal-value">
+                                {{ screenshot.time_interval.mouse_fill + '%' }}
+                            </span>
+                        </div>
+                        <div v-if="screenshot.time_interval.keyboard_fill !== null" class="modal-field">
+                            <span class="modal-label">{{ $t('tooltip.activity_progress.just_keyboard') }}</span>
+                            <span class="modal-value">
+                                {{ screenshot.time_interval.keyboard_fill + '%' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <div v-if="task" class="modal-field">
-                <span class="modal-label">{{ $t('field.task') }}:</span>
-                <span class="modal-value">
-                    <router-link :to="`/tasks/view/${task.id}`">{{ task.task_name }}</router-link>
-                </span>
-            </div>
-
-            <div v-if="user" class="modal-field">
-                <span class="modal-label">{{ $t('field.user') }}:</span>
-                <span class="modal-value">
-                    {{ user.full_name }}
-                </span>
-            </div>
-
-            <div v-if="screenshot" class="modal-field">
-                <span class="modal-label">{{ $t('field.created_at') }}:</span>
-                <span class="modal-value">{{ formatDate(screenshot.time_interval.start_at) }}</span>
+            <div class="row">
+                <at-button class="modal-remove" type="text" icon="icon-trash-2" @click="onRemove" />
             </div>
         </template>
     </at-modal>
@@ -56,7 +95,6 @@
 <script>
     import moment from 'moment';
     import AppImage from './AppImage';
-    import env from '_app/etc/env';
     import { mapGetters } from 'vuex';
 
     export function screenshotPathProvider(screenshot) {
@@ -95,7 +133,7 @@
         computed: {
             ...mapGetters('user', ['companyData']),
             baseURL() {
-                return (env.API_URL || `${window.location.origin}/api`) + '/';
+                return (process.env.VUE_APP_API_URL || `${window.location.origin}/api`) + '/';
             },
         },
         methods: {
@@ -112,6 +150,10 @@
                 this.$emit('remove', this.screenshot.id);
             },
             getScreenshotPath(screenshot) {
+                if (screenshot.path === 'uploads/static/none.png') {
+                    return window.location.origin + '/none.png';
+                }
+
                 return config.screenshotPathProvider(screenshot);
             },
         },
@@ -157,6 +199,18 @@
 
             .at-modal__close {
                 color: #b1b1be;
+            }
+
+            .at-progress-bar {
+                display: block;
+                &__wraper,
+                &__inner {
+                    border-radius: 0;
+                }
+            }
+
+            .at-progress__text {
+                display: none;
             }
         }
 

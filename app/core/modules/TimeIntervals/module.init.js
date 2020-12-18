@@ -1,6 +1,6 @@
-import TimeIntervalService from '@/service/resource/timeIntervalService';
-import UsersService from '@/service/resource/usersService';
-import TasksService from '@/service/resource/tasksService';
+import TimeIntervalService from '@/services/resource/time-interval.service';
+import UsersService from '@/services/resource/user.service';
+import TasksService from '@/services/resource/task.service';
 import LazySelect from './components/LazySelect';
 import DatetimeInput from './components/DatetimeInput';
 import moment from 'moment';
@@ -12,7 +12,7 @@ export const ModuleConfig = {
 };
 
 export function init(context, router) {
-    const crud = context.createCrud('time-intervals.crud-title', 'time-intervals', TimeIntervalService);
+    const crud = context.createCrud('time_intervals.crud_title', 'time-intervals', TimeIntervalService);
     const crudNewRoute = crud.new.getNewRouteName();
 
     crud.new.addToMetaProperties('permissions', 'time-intervals/create', crud.new.getRouterConfig());

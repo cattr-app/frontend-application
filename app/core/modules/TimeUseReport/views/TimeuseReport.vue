@@ -30,8 +30,8 @@
 
 <script>
     import List from './TimeUseReport/List';
-    import UsersService from '@/service/resource/usersService';
-    import TimeUseReportService from '@/service/reports/TimeUseReportService';
+    import UsersService from '@/services/resource/user.service';
+    import TimeUseReportService from '@/services/reports/time-use-report.service';
     import { formatDurationString } from '@/utils/time';
     import moment from 'moment';
     import Preloader from '@/components/Preloader';
@@ -145,15 +145,6 @@
         text-align: center;
         font-weight: bold;
         position: relative;
-    }
-
-    .timezone::v-deep {
-        .at-select {
-            &__selection,
-            &__selection:hover {
-                border: 1px solid $gray-6;
-            }
-        }
     }
 
     .total-time-row {

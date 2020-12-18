@@ -11,8 +11,8 @@
             class="popup"
         >
             <div v-if="hoverPopup.event">
-                {{ getProjectName(hoverPopup.event.project_id) }}
-                ({{ getTaskName(hoverPopup.event.task_id) }})
+                {{ getTaskName(hoverPopup.event.task.id) }}
+                ({{ getProjectName(hoverPopup.event.task.project_id) }})
             </div>
 
             <div v-if="hoverPopup.event">
@@ -44,12 +44,12 @@
             />
 
             <div v-if="clickPopup.event">
-                <router-link :to="`/projects/view/${clickPopup.event.project_id}`">
-                    {{ getProjectName(clickPopup.event.project_id) }}
+                <router-link :to="`/tasks/view/${clickPopup.event.task.id}`">
+                    {{ getTaskName(clickPopup.event.task.id) }}
                 </router-link>
 
-                <router-link :to="`/tasks/view/${clickPopup.event.task_id}`">
-                    ({{ getTaskName(clickPopup.event.task_id) }})
+                <router-link :to="`/projects/view/${clickPopup.event.task.project_id}`">
+                    ({{ getProjectName(clickPopup.event.task.project_id) }})
                 </router-link>
             </div>
 
@@ -73,12 +73,12 @@
 
 <script>
     import { fabric } from 'fabric';
-    import debounce from 'lodash/debounce';
+    import throttle from 'lodash/throttle';
     import moment from 'moment';
     import { formatDurationString } from '@/utils/time';
     import Screenshot from '@/components/Screenshot';
     import ScreenshotModal from '@/components/ScreenshotModal';
-    import ScreenshotService from '@/service/resource/screenshotService';
+    import ScreenshotService from '@/services/resource/screenshot.service';
     import { mapGetters } from 'vuex';
 
     const fabricObjectOptions = {
@@ -253,7 +253,7 @@
             getScreenshotByInterval(intervalID) {
                 return this.screenshots.find(screenshot => screenshot.time_interval_id === intervalID);
             },
-            draw: debounce(function() {
+            draw: throttle(function() {
                 this.canvas.clear();
 
                 const width = this.canvas.getWidth();
@@ -275,6 +275,9 @@
                     }).on('mousedown', () => this.$emit('outsideClick')),
                 );
 
+                if (!this.$refs.canvasWrapper) {
+                    return;
+                }
                 const { width: canvasWidth } = this.$refs.canvasWrapper.getBoundingClientRect();
                 const maxLeftOffset = canvasWidth - popupWidth + 2 * canvasPadding;
 
@@ -332,11 +335,11 @@
                 // Intervals
                 this.events.forEach(event => {
                     const startOfDay = moment.tz(event.start_at, this.timezone).startOf('day');
-                    const secondsFromMidnight = moment.utc(event.start_at).diff(startOfDay, 'seconds');
-                    const duration = moment.utc(event.end_at).diff(event.start_at, 'seconds');
+                    const secondsFromMidnight = moment.utc(event.start_at).diff(startOfDay, 'm', true);
+                    const duration = Math.ceil(moment.utc(event.end_at).diff(event.start_at, 'm'));
 
-                    const left = Math.floor((secondsFromMidnight * columnWidth) / 3600);
-                    const width = Math.ceil((duration * columnWidth) / 3600);
+                    const left = Math.floor((secondsFromMidnight * columnWidth) / 60);
+                    const width = Math.ceil((Math.ceil(duration / 10) * 10 * columnWidth) / 60);
 
                     const rect = new fabric.Rect({
                         left,
@@ -421,6 +424,7 @@
             onClick(e) {
                 if (
                     e.target &&
+                    e.target.parentElement &&
                     !e.target.parentElement.classList.contains(this.canvas.wrapperEl.classList) &&
                     !e.target.closest('.time-interval-edit-panel') &&
                     !e.target.closest('.screenshot') &&
@@ -428,14 +432,15 @@
                     !e.target.closest('.at-modal') &&
                     !e.target.closest('.popup')
                 ) {
-                    this.$emit('outsideClick');
-
                     if (this.clickPopup.show) {
                         this.clickPopup.show = false;
                     }
                 }
             },
-            onResize: debounce(function() {
+            onResize: throttle(function() {
+                if (!this.$refs.canvasWrapper) {
+                    return;
+                }
                 const { width } = this.$refs.canvasWrapper.getBoundingClientRect();
                 this.canvas.setWidth(width);
 

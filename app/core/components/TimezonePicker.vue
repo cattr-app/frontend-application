@@ -1,19 +1,30 @@
 <template>
-    <at-select
-        ref="select"
-        :value="typeof value === 'object' ? '' : value"
-        filterable
-        :placeholder="$t('control.select')"
-        @on-change="inputHandler($event)"
-    >
-        <at-option v-for="(zone, index) in zones" :key="index" :value="zone.value">{{ zone.label }} </at-option>
-    </at-select>
+    <div class="at-select" :class="{ 'at-select--visible': visible }">
+        <v-select
+            ref="select"
+            v-model="model"
+            class="timezone-select"
+            :options="paginated"
+            :filterable="false"
+            :placeholder="$t('control.select')"
+            @open="onOpen"
+            @close="onClose"
+            @search="query => (search = query)"
+        >
+            <template #list-footer>
+                <li v-show="hasNextPage" ref="load" class="vs__dropdown-option">
+                    Loading...
+                </li>
+            </template>
+        </v-select>
+        <i class="icon icon-chevron-down at-select__arrow"></i>
+    </div>
 </template>
 
 <script>
     import moment from 'moment';
     import 'moment-timezone';
-    import { getZones, getCountryName } from '../utils/time';
+    import vSelect from 'vue-select';
 
     export default {
         props: {
@@ -22,66 +33,109 @@
                 required: true,
             },
         },
+        components: {
+            vSelect,
+        },
+        data() {
+            return {
+                timezones: [],
+                limit: 10,
+                search: '',
+                observer: null,
+                visible: false,
+            };
+        },
         computed: {
-            zones() {
-                return getZones().reduce((total, { iso, zones }) => {
-                    const countryName = getCountryName(iso);
+            model: {
+                get() {
+                    return {
+                        value: this.value,
+                        label: this.formatTimezone(this.value),
+                    };
+                },
+                set(option) {
+                    if (!option) return;
 
-                    return total.concat(
-                        zones.map(zoneName => {
-                            const shortZoneName = zoneName
-                                .replace(/_/g, ' ')
-                                .split('/')
-                                .pop();
-                            const offset = moment.tz(zoneName).format('Z');
+                    this.$emit('onTimezoneChange', option.value);
+                },
+            },
+            filtered() {
+                if (!this.timezones || !this.timezones.length) return [];
 
-                            if (zones.length === 1) {
-                                return {
-                                    value: zoneName,
-                                    label: `${countryName} (GMT${offset})`,
-                                };
-                            }
-
-                            return {
-                                value: zoneName,
-                                label: `${countryName} - ${shortZoneName} (GMT${offset})`,
-                            };
-                        }),
-                    );
-                }, []);
+                return this.timezones.filter(timezone =>
+                    timezone.label.toLowerCase().includes(this.search.toLowerCase()),
+                );
+            },
+            paginated() {
+                return this.filtered.slice(0, this.limit);
+            },
+            hasNextPage() {
+                return this.paginated.length < this.filtered.length;
             },
         },
         methods: {
             inputHandler(value) {
                 this.$emit('onTimezoneChange', value);
             },
-            openItemsInOptions: async function() {
-                await this.$nextTick();
-                if (this.$refs.select !== undefined) {
-                    this.$refs.select.$children.forEach(option => {
-                        option.hidden = false;
-                    });
+            async onOpen() {
+                if (this.hasNextPage) {
+                    await this.$nextTick();
+                    this.observer.observe(this.$refs.load);
+                }
+                this.visible = true;
+            },
+            onClose() {
+                this.visible = false;
+                this.observer.disconnect();
+            },
+            async infiniteScroll([{ isIntersecting, target }]) {
+                if (isIntersecting) {
+                    const ul = target.offsetParent;
+                    const scrollTop = target.offsetParent.scrollTop;
+                    this.limit += 10;
+                    await this.$nextTick();
+                    ul.scrollTop = scrollTop;
                 }
             },
+            setTimezones() {
+                if (this.timezones.length > 1) return;
+
+                moment.tz.names().map(timezoneName => {
+                    if (this.timezones.some(t => t.value === timezoneName)) {
+                        return;
+                    }
+
+                    this.timezones.push({
+                        value: timezoneName,
+                        label: this.formatTimezone(timezoneName),
+                    });
+                });
+            },
+            formatTimezone(timezone) {
+                return `${timezone} (GMT${moment.tz(timezone).format('Z')})`;
+            },
+        },
+        created() {
+            this.timezones.push({
+                value: this.value,
+                label: this.formatTimezone(this.value),
+            });
+            this.setTimezones();
         },
         mounted() {
-            this.openItemsInOptions();
-        },
-        beforeUpdate() {
-            this.openItemsInOptions();
+            this.observer = new IntersectionObserver(this.infiniteScroll);
         },
     };
 </script>
 
 <style lang="scss" scoped>
-    ::v-deep {
-        .at-select {
-            &__selection {
-                min-width: 240px;
-            }
+    .timezone-select {
+        min-width: 240px;
 
-            &__input {
-                padding-right: $spacing-04;
+        &::v-deep {
+            .vs__dropdown-menu {
+                width: auto;
+                min-width: 100%;
             }
         }
     }

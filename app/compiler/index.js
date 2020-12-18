@@ -1,26 +1,8 @@
 /** @typedef {import('@vue/cli-service/lib/PluginAPI')} PluginAPI */
 
 const fs = require('fs'),
-    isObject = require('lodash/isObject');
-
-const iterator = (moduleList, fdArray) => {
-    Object.keys(moduleList).forEach(moduleName => {
-        if (isObject(moduleList[moduleName])) {
-            const moduleConfig = moduleList[moduleName];
-
-            if (
-                moduleConfig.type === 'package' &&
-                (moduleConfig.hasOwnProperty('enabled') ? moduleConfig.enabled : true)
-            ) {
-                fdArray.push(`    () => require('${moduleConfig.ref}'),`);
-                console.log(`${moduleName} => added package as static require dependency`);
-            }
-        }
-    });
-
-    return fdArray;
-};
-
+    isObject = require('lodash/isObject'),
+    merge = require('lodash/merge');
 /**
  *
  * @param {PluginAPI} api
@@ -41,17 +23,27 @@ module.exports = (api, options) => {
 
         let fdArray = ['export default ['];
 
-        fdArray = iterator(moduleList, fdArray);
-
         if (fs.existsSync(api.resolve(`app/etc/modules.${process.env.NODE_ENV}.json`))) {
-            moduleList = require(api.resolve(`app/etc/modules.${process.env.NODE_ENV}.json`));
-            fdArray = iterator(moduleList, fdArray);
+            moduleList = merge(moduleList, require(api.resolve(`app/etc/modules.${process.env.NODE_ENV}.json`)));
         }
 
         if (fs.existsSync(api.resolve('app/etc/modules.local.json'))) {
-            moduleList = require(api.resolve('app/etc/modules.local.json'));
-            fdArray = iterator(moduleList, fdArray);
+            moduleList = merge(moduleList, require(api.resolve('app/etc/modules.local.json')));
         }
+
+        Object.keys(moduleList).forEach(moduleName => {
+            if (isObject(moduleList[moduleName])) {
+                const moduleConfig = moduleList[moduleName];
+
+                if (
+                    moduleConfig.type === 'package' &&
+                    (moduleConfig.hasOwnProperty('enabled') ? moduleConfig.enabled : true)
+                ) {
+                    fdArray.push(`    () => require('${moduleConfig.ref}'),`);
+                    console.log(`${moduleName} => added package as static require dependency`);
+                }
+            }
+        });
 
         fdArray.push('];');
 

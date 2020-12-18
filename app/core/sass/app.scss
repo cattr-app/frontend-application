@@ -6,6 +6,7 @@
 @import '~vue2-datepicker/index.css';
 @import '~vue-multiselect/dist/vue-multiselect.min.css';
 @import "~vue-select/src/scss/vue-select.scss";
+@import '~quill/dist/quill.core.css';
 
 @import "includes/components";
 @import "includes/variables";
@@ -17,5 +18,4 @@
 @import "includes/crud";
 
 // Some beauty
-@import "includes/projects";
 @import "includes/tasks";

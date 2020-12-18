@@ -3,16 +3,52 @@
         <AppImage
             :is-blob="false"
             :src="getThumbnailPath(screenshot)"
-            class="screenshot-image"
+            class="screenshot__image"
             :lazy="lazyImage"
             @click="onShow"
         />
 
-        <div v-if="showText" class="screenshot-text">
-            <span v-if="task && showTask" class="screenshot-task" :title="task.task_name">
-                {{ task.task_name }}
+        <at-tooltip>
+            <template slot="content">
+                <div v-if="screenshot.time_interval.activity_fill === null" class="screenshot__activity">
+                    {{ $t('tooltip.activity_progress.not_tracked') }}
+                </div>
+                <div v-else class="screenshot__activity">
+                    <span v-if="screenshot.time_interval.activity_fill !== null" class="screenshot__overall-activity">
+                        {{
+                            $tc('tooltip.activity_progress.overall', screenshot.time_interval.activity_fill, {
+                                percent: screenshot.time_interval.activity_fill,
+                            })
+                        }}
+                    </span>
+                    <div class="screenshot__device-activity">
+                        <span v-if="screenshot.time_interval.mouse_fill !== null">
+                            {{
+                                $tc('tooltip.activity_progress.mouse', screenshot.time_interval.mouse_fill, {
+                                    percent: screenshot.time_interval.mouse_fill,
+                                })
+                            }}
+                        </span>
+                        <span v-if="screenshot.time_interval.keyboard_fill !== null">{{
+                            $tc('tooltip.activity_progress.keyboard', screenshot.time_interval.keyboard_fill, {
+                                percent: screenshot.time_interval.keyboard_fill,
+                            })
+                        }}</span>
+                    </div>
+                </div>
+            </template>
+            <at-progress
+                class="screenshot__activity-bar"
+                :stroke-width="5"
+                :percent="screenshot.time_interval.activity_fill || 0"
+            />
+        </at-tooltip>
+
+        <div v-if="showText" class="screenshot__text">
+            <span v-if="task && showTask" class="screenshot__task" :title="`${task.task_name} (${task.project.name})`">
+                {{ task.task_name }} ({{ task.project.name }})
             </span>
-            <span class="screenshot-time">{{ screenshotTime }}</span>
+            <span class="screenshot__time">{{ screenshotTime }}</span>
         </div>
 
         <ScreenshotModal
@@ -123,6 +159,10 @@
                 this.$emit('remove', this.screenshot);
             },
             getThumbnailPath(screenshot) {
+                if (screenshot.path === 'uploads/static/none.png') {
+                    return window.location.origin + '/none.png';
+                }
+
                 return config.thumbnailPathProvider(screenshot);
             },
         },
@@ -131,18 +171,21 @@
 
 <style lang="scss" scoped>
     .screenshot {
-        display: flex;
-        flex-flow: column;
-
-        &-image {
+        &__image {
             border-radius: 5px;
             cursor: pointer;
             width: 100%;
-            height: 100%;
-            object-fit: cover;
+            line-height: 0;
+            overflow: hidden;
+
+            &::v-deep {
+                img {
+                    height: 150px;
+                }
+            }
         }
 
-        &-text {
+        &__text {
             align-items: baseline;
             color: #59566e;
             display: flex;
@@ -152,14 +195,32 @@
             justify-content: space-between;
         }
 
-        &-task {
+        &__activity {
+            text-align: center;
+        }
+
+        &__device-activity {
+            white-space: nowrap;
+        }
+
+        &__task {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
 
-        &-time {
-            margin-left: 0.5em;
+        &::v-deep {
+            .at-tooltip {
+                width: 100%;
+
+                &__trigger {
+                    width: 100%;
+                }
+            }
+
+            .at-progress__text {
+                display: none;
+            }
         }
     }
 </style>

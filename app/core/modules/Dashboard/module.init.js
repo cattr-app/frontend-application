@@ -1,3 +1,7 @@
+import Vue from 'vue';
+import store from '@/store';
+import './policies';
+
 export const ModuleConfig = {
     routerPrefix: 'dashboard',
     loadOrder: 20,
@@ -15,6 +19,19 @@ export function init(context) {
         },
         children: [
             {
+                path: '',
+                beforeEnter: (to, from, next) => {
+                    if (
+                        Vue.prototype.$can('viewTeamTab', 'dashboard') &&
+                        (!localStorage.getItem('dashboard.tab') || localStorage.getItem('dashboard.tab') === 'team')
+                    ) {
+                        return next({ name: 'dashboard.team' });
+                    }
+
+                    return next({ name: 'dashboard.timeline' });
+                },
+            },
+            {
                 path: 'timeline',
                 alias: '/timeline',
                 name: 'dashboard.timeline',
@@ -29,7 +46,7 @@ export function init(context) {
                 name: 'dashboard.team',
                 component: () => import(/* webpackChunkName: "dashboard" */ './views/Dashboard/Team.vue'),
                 meta: {
-                    permissions: ['dashboard/manager_access'],
+                    checkPermission: () => Vue.prototype.$can('viewTeamTab', 'dashboard'),
                 },
             },
         ],
@@ -38,7 +55,7 @@ export function init(context) {
     context.addNavbarEntry({
         label: 'navigation.dashboard',
         to: {
-            name: 'dashboard',
+            path: '/dashboard',
         },
     });
 

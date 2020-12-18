@@ -1,10 +1,10 @@
 import moment from 'moment';
 import 'moment-timezone';
-import ProjectService from '@/service/resource/projectService';
+import ProjectService from '@/services/resource/project.service';
 import i18n from '@/i18n';
-import UserAvatar from '@/components/UserAvatar';
 import { formatDurationString } from '@/utils/time';
 import { ModuleLoaderInterceptor } from '@/moduleLoader';
+import TeamAvatars from './components/TeamAvatars.vue';
 
 export const ModuleConfig = {
     routerPrefix: 'projects',
@@ -196,34 +196,14 @@ export function init(context) {
             key: 'name',
         },
         {
-            title: 'field.team',
+            title: 'field.members',
             key: 'users',
             render: (h, { item }) => {
-                const users = item.users || [];
-
-                return h(
-                    'div',
-                    { class: 'projects-grid__initials-row' },
-                    users.map(user => {
-                        return h(
-                            'AtTooltip',
-                            {
-                                props: {
-                                    placement: 'top',
-                                    content: user.full_name,
-                                },
-                            },
-                            [
-                                h(UserAvatar, {
-                                    props: {
-                                        user,
-                                        showTooltip: true,
-                                    },
-                                }),
-                            ],
-                        );
-                    }),
-                );
+                return h(TeamAvatars, {
+                    props: {
+                        users: item.users || [],
+                    },
+                });
             },
         },
         {
@@ -249,30 +229,19 @@ export function init(context) {
         },
     ]);
 
-    // TODO when assign users will be ready -- uncomment it
-    // const assignRouteName = context.getModuleRouteName() + '.assign';
-    // console.log(context);
-    // context.addRoute([{
-    //     path:  `/${context.routerPrefix}/assign/:id`,
-    //     name: assignRouteName,
-    //     component: () => import('./views/UsersAssign.vue'),
-    //     meta: {
-    //         auth: true,
-    //     },
-    // }]);
-
-    grid.addAction([
+    const assignRouteName = context.getModuleRouteName() + '.members';
+    context.addRoute([
         {
-            title: 'Assign Users',
-            icon: 'icon-user',
-            onClick: (router, params) => {
-                // TODO uncomment this as well
-                // router.push({ name: assignRouteName, params: { id: params.item.id } });
-            },
-            renderCondition: () => {
-                return false; // TODO
+            path: `/${context.routerPrefix}/:id/members`,
+            name: assignRouteName,
+            component: () => import('./views/ProjectMembers.vue'),
+            meta: {
+                auth: true,
             },
         },
+    ]);
+
+    grid.addAction([
         {
             title: 'control.view',
             icon: 'icon-eye',
@@ -285,13 +254,23 @@ export function init(context) {
             },
         },
         {
+            title: 'projects.members',
+            icon: 'icon-users',
+            onClick: (router, { item }) => {
+                router.push({ name: assignRouteName, params: { id: item.id } });
+            },
+            renderCondition({ $can }, item) {
+                return $can('updateMembers', 'project', item);
+            },
+        },
+        {
             title: 'control.edit',
             icon: 'icon-edit',
             onClick: (router, { item }, context) => {
                 context.onEdit(item);
             },
-            renderCondition: ({ $store }, item) => {
-                return $store.getters['user/can']('projects/edit', item.id);
+            renderCondition: ({ $can }, item) => {
+                return $can('update', 'project', item);
             },
         },
         {
@@ -301,8 +280,8 @@ export function init(context) {
             onClick: (router, { item }, context) => {
                 context.onDelete(item);
             },
-            renderCondition: ({ $store }, item) => {
-                return $store.getters['user/can']('projects/remove', item.id);
+            renderCondition: ({ $can }, item) => {
+                return $can('delete', 'project', item);
             },
         },
     ]);
@@ -310,13 +289,13 @@ export function init(context) {
     grid.addPageControls([
         {
             label: 'control.create',
-            renderCondition: ({ $store }) => {
-                return $store.getters['user/can']('projects/create');
-            },
             type: 'primary',
             icon: 'icon-edit',
             onClick: ({ $router }) => {
                 $router.push({ name: crudNewRoute });
+            },
+            renderCondition: ({ $can }) => {
+                return $can('create', 'project');
             },
         },
     ]);

@@ -1,4 +1,4 @@
-import MessageService from '../../service/message';
+import MessageService from '../../services/message.service';
 
 const state = {
     message: null,

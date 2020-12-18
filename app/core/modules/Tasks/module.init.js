@@ -1,10 +1,12 @@
-import TasksService from '@/service/resource/tasksService';
-import ProjectsService from '@/service/resource/projectService';
-import UsersService from '@/service/resource/usersService';
+import TasksService from '@/services/resource/task.service';
+import ProjectsService from '@/services/resource/project.service';
+import UsersService from '@/services/resource/user.service';
 import { ModuleLoaderInterceptor } from '@/moduleLoader';
 import UserAvatar from '@/components/UserAvatar';
 import i18n from '@/i18n';
 import { formatDate, formatDurationString } from '@/utils/time';
+import { VueEditor } from 'vue2-editor';
+import ResourceSelect from '@/components/ResourceSelect';
 
 export const ModuleConfig = {
     routerPrefix: 'tasks',
@@ -100,25 +102,42 @@ export function init(context, router) {
                     return h('span', data.currentValue.full_name);
                 }
 
-                return h(
-                    'router-link',
-                    {
-                        props: {
-                            to: {
-                                name: routes.usersView,
-                                params: { id: data.currentValue.id },
+                if (data.currentValue && data.currentValue.id) {
+                    return h(
+                        'router-link',
+                        {
+                            props: {
+                                to: {
+                                    name: routes.usersView,
+                                    params: { id: data.currentValue.id },
+                                },
                             },
                         },
-                    },
-                    data.currentValue.full_name,
-                );
+                        data.currentValue.full_name,
+                    );
+                }
+
+                return h('span', i18n.t('tasks.unassigned'));
             },
         },
         {
             key: 'description',
             label: 'field.description',
             render: (h, props) => {
-                return h('pre', {}, props.currentValue);
+                if (!props.currentValue) {
+                    return;
+                }
+
+                return h('div', {
+                    class: { 'ql-editor': true },
+                    domProps: {
+                        innerHTML: props.currentValue,
+                    },
+                    style: {
+                        padding: 0,
+                        'overflow-y': 'hidden',
+                    },
+                });
             },
         },
         {
@@ -218,8 +237,57 @@ export function init(context, router) {
         {
             label: 'field.description',
             key: 'description',
-            type: 'textarea',
-            placeholder: 'field.description',
+            render: (h, props) => {
+                return h(VueEditor, {
+                    props: {
+                        useMarkdownShortcuts: true,
+                        editorToolbar: [
+                            [
+                                {
+                                    header: [false, 1, 2, 3, 4, 5, 6],
+                                },
+                            ],
+                            ['bold', 'italic', 'underline', 'strike'],
+                            [
+                                {
+                                    list: 'ordered',
+                                },
+                                {
+                                    list: 'bullet',
+                                },
+                                {
+                                    list: 'check',
+                                },
+                            ],
+                            [
+                                {
+                                    indent: '-1',
+                                },
+                                {
+                                    indent: '+1',
+                                },
+                            ],
+                            [
+                                {
+                                    color: [],
+                                },
+                                {
+                                    background: [],
+                                },
+                            ],
+                            ['link'],
+                            ['clean'],
+                        ],
+                        value: props.values.description,
+                        placeholder: i18n.t('field.description'),
+                    },
+                    on: {
+                        input: function(text) {
+                            props.inputHandler(text);
+                        },
+                    },
+                });
+            },
         },
         {
             label: 'field.important',
@@ -231,10 +299,25 @@ export function init(context, router) {
         {
             label: 'field.user',
             key: 'user_id',
-            type: 'resource-select',
-            service: new UsersService(),
-            required: true,
-            default: ({ getters }) => getters['user/user'].id,
+            render: (h, data) => {
+                let value = '';
+                if (typeof data.currentValue === 'number' || typeof data.currentValue === 'string') {
+                    value = data.currentValue;
+                }
+
+                return h(ResourceSelect, {
+                    props: {
+                        service: new UsersService(),
+                        value,
+                        clearable: true,
+                    },
+                    on: {
+                        input(value) {
+                            data.inputHandler(value);
+                        },
+                    },
+                });
+            },
         },
         {
             label: 'field.priority',
@@ -354,6 +437,42 @@ export function init(context, router) {
         },
     ]);
 
+    grid.addFilterField([
+        {
+            key: 'project_id',
+            label: 'tasks.projects',
+            fieldOptions: { type: 'project-select' },
+        },
+        {
+            key: 'user_id',
+            label: 'tasks.users',
+            fieldOptions: { type: 'user-select' },
+        },
+        {
+            key: 'active',
+            label: 'tasks.status',
+            placeholder: 'tasks.statuses.any',
+            saveToQuery: true,
+            fieldOptions: {
+                type: 'select',
+                options: [
+                    {
+                        value: '',
+                        label: 'tasks.statuses.any',
+                    },
+                    {
+                        value: '1',
+                        label: 'tasks.statuses.open',
+                    },
+                    {
+                        value: '0',
+                        label: 'tasks.statuses.closed',
+                    },
+                ],
+            },
+        },
+    ]);
+
     grid.addAction([
         {
             title: 'control.view',
@@ -372,11 +491,8 @@ export function init(context, router) {
             onClick: (router, { item }, context) => {
                 context.onEdit(item);
             },
-            renderCondition: ({ $store }, item) => {
-                const userCan = $store.getters['user/can']('tasks/edit', item.project_id);
-                const fromIntegration = typeof item.integration !== 'undefined';
-
-                return userCan && !fromIntegration;
+            renderCondition: ({ $can }, item) => {
+                return $can('update', 'task', item);
             },
         },
         {
@@ -386,33 +502,13 @@ export function init(context, router) {
             onClick: async (router, { item }, context) => {
                 context.onDelete(item);
             },
-            renderCondition: ({ $store }, item) => {
-                const userCan = $store.getters['user/can']('tasks/remove', item.project_id);
-                const fromIntegration = typeof item.integration !== 'undefined';
-
-                return userCan && !fromIntegration;
+            renderCondition: ({ $can }, item) => {
+                return $can('delete', 'task', item);
             },
         },
     ]);
 
     grid.addPageControls([
-        {
-            key: 'isActive',
-            frontedType: 'checkbox',
-            label: 'control.show_active',
-            onChange: data => {
-                if (data.values.isActive) {
-                    data.$set(data.queryParams, 'active', ['=', data.values.isActive]);
-                } else {
-                    data.$delete(data.queryParams, 'active');
-                }
-
-                data.fetchData();
-            },
-            renderCondition: ({ $store }) => {
-                return $store.getters['user/canInAnyProject']('tasks/create');
-            },
-        },
         {
             label: 'control.create',
             type: 'primary',
@@ -420,8 +516,8 @@ export function init(context, router) {
             onClick: ({ $router }) => {
                 $router.push({ name: crudNewRoute });
             },
-            renderCondition: ({ $store }) => {
-                return $store.getters['user/canInAnyProject']('tasks/create');
+            renderCondition: ({ $can }) => {
+                return $can('create', 'task');
             },
         },
     ]);

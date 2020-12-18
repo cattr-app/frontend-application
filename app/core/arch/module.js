@@ -11,10 +11,12 @@ import Store from '@/store';
 export default class Module {
     routes = [];
     navEntries = [];
+    navEntriesDropdown = {};
+    navEntriesMenuDropdown = [];
     settingsSections = [];
     companySections = [];
-    navEntriesDropdown = {};
     locales = {};
+    pluralizationRules = {};
     additionalFields = [];
 
     constructor(routerPrefix, moduleName) {
@@ -99,10 +101,14 @@ export default class Module {
     /**
      * Add navbar entry
      */
-    addNavbarEntry() {
-        Array.from(arguments).forEach(p => {
+    addNavbarEntry(...args) {
+        Array.from(args).forEach(p => {
             this.navEntries.push(
-                new NavbarEntry(p.label, p.to, p.hasOwnProperty('displayCondition') ? p.displayCondition : () => true),
+                new NavbarEntry({
+                    label: p.label,
+                    to: p.to,
+                    displayCondition: p.hasOwnProperty('displayCondition') ? p.displayCondition : () => true,
+                }),
             );
         });
     }
@@ -110,18 +116,34 @@ export default class Module {
     /**
      * Add navbar Dropdown Entry
      */
-    addNavbarEntryDropDown() {
-        Array.from(arguments).forEach(p => {
+    addNavbarEntryDropDown(...args) {
+        Array.from(args).forEach(p => {
             if (!this.navEntriesDropdown.hasOwnProperty(p.section)) {
                 this.navEntriesDropdown[p.section] = [];
             }
             this.navEntriesDropdown[p.section].push(
-                new NavbarEntry(
-                    p.label,
-                    p.to,
-                    p.hasOwnProperty('displayCondition') ? p.displayCondition : () => true,
-                    p.section,
-                ),
+                new NavbarEntry({
+                    label: p.label,
+                    to: p.to,
+                    displayCondition: p.hasOwnProperty('displayCondition') ? p.displayCondition : () => true,
+                    section: p.section,
+                }),
+            );
+        });
+    }
+
+    /**
+     * Add to user menu entry of the navbar
+     */
+    addUserMenuEntry(...args) {
+        Array.from(args).forEach(a => {
+            this.navEntriesMenuDropdown.push(
+                new NavbarEntry({
+                    label: a.label,
+                    to: a.to,
+                    displayCondition: a.hasOwnProperty('displayCondition') ? a.displayCondition : () => true,
+                    icon: a.icon,
+                }),
             );
         });
     }
@@ -129,8 +151,8 @@ export default class Module {
     /**
      * Create new section with provided params
      */
-    addSettingsSection() {
-        Array.from(arguments).forEach(({ route, accessCheck, scope, order, component }) => {
+    addSettingsSection(...args) {
+        Array.from(args).forEach(({ route, accessCheck, scope, order, component }) => {
             const { path, name, meta, children } = route;
             const section = new SettingsSection(path, name, meta, accessCheck, scope, order, component, children);
             this.settingsSections.push(section);
@@ -140,8 +162,8 @@ export default class Module {
     /**
      * Create new section with provided params
      */
-    addCompanySection() {
-        Array.from(arguments).forEach(({ route, accessCheck, scope, order, component }) => {
+    addCompanySection(...args) {
+        Array.from(args).forEach(({ route, accessCheck, scope, order, component }) => {
             const { path, name, meta, children } = route;
             const section = new SettingsSection(path, name, meta, accessCheck, scope, order, component, children);
             this.companySections.push(section);
@@ -157,6 +179,13 @@ export default class Module {
      */
     addLocalizationData(locales) {
         this.locales = locales;
+    }
+
+    /**
+     * Add pluralization rules
+     */
+    addPluralizationRules(rules) {
+        this.pluralizationRules = rules;
     }
 
     /**
@@ -230,6 +259,15 @@ export default class Module {
     }
 
     /**
+     * Get Navigation Menu Dropdown entries array
+     *
+     * @returns {Array<Object>}
+     */
+    getNavbarMenuEntriesDropDown() {
+        return this.navEntriesMenuDropdown;
+    }
+
+    /**
      * Get module-scoped routes for Vue Router
      *
      * @returns {Array<Object>}
@@ -245,6 +283,15 @@ export default class Module {
      */
     getLocalizationData() {
         return this.locales;
+    }
+
+    /**
+     * Get pluralization rules
+     *
+     * @returns {Object}
+     */
+    getPluralizationRules() {
+        return this.pluralizationRules;
     }
 
     /**

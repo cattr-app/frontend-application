@@ -3,12 +3,23 @@ if (process.env.NODE_ENV === undefined) {
 }
 
 const webpack = require('webpack');
-const env = require('./app/etc/env');
-const resolve = require('path').resolve;
+const { resolve } = require('path');
+const { existsSync } = require('fs');
 const isDevMod = process.env.NODE_ENV === 'development';
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const SentryPlugin = require('@sentry/webpack-plugin');
+const CattrWebpackPlugin = require('./webpack/CattrWebpackPlugin');
+
+let env = require(resolve(__dirname, 'app', 'etc', 'env.js'));
+
+if (existsSync(resolve(__dirname, 'app', 'etc', `env.${process.env.NODE_ENV}.js`))) {
+    env = { ...env, ...require(resolve(__dirname, 'app', 'etc', `env.${process.env.NODE_ENV}.js`)) };
+}
+
+if (existsSync(resolve(__dirname, 'app', 'etc', 'env.local.js'))) {
+    env = { ...env, ...require(resolve(__dirname, 'app', 'etc', 'env.local.js')) };
+}
 
 Object.keys(env).forEach(p => {
     process.env[`VUE_APP_${p}`] = env[p];
@@ -23,7 +34,7 @@ module.exports = {
         sourceMap: isDevMod,
         loaderOptions: {
             scss: {
-                sourceMap: true,
+                sourceMap: false,
                 prependData: `
                     @import "~@/sass/includes/variables";
                 `,
@@ -57,6 +68,7 @@ module.exports = {
             maxEntrypointSize: 2000000,
         },
         plugins: [
+            new CattrWebpackPlugin(),
             new MiniCssExtractPlugin({
                 filename: '[name].css',
                 chunkFilename: '[id].css',

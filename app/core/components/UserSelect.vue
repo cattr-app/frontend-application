@@ -1,6 +1,6 @@
 <template>
-    <div class="user-select" :class="{ 'at-select--visible': showPopup }" @click.stop="togglePopup">
-        <at-input class="user-select-input" :readonly="true" :value="inputValue"></at-input>
+    <div class="user-select" :class="{ 'at-select--visible': showPopup }" @click="togglePopup">
+        <at-input class="user-select-input" :readonly="true" :value="inputValue" :size="size" />
 
         <span
             v-show="userIDs.length"
@@ -59,7 +59,7 @@
                                     :size="25"
                                     :borderRadius="5"
                                     :user="user"
-                                    :isOnline="getUserTask(user.id) !== null"
+                                    :online="user.online"
                                 />
 
                                 <div class="user-name">{{ user.full_name }}</div>
@@ -110,7 +110,7 @@
                                     :size="25"
                                     :borderRadius="5"
                                     :user="user"
-                                    :isOnline="getUserTask(user.id) !== null"
+                                    :online="user.online"
                                 />
 
                                 <div class="user-name">{{ user.full_name }}</div>
@@ -125,7 +125,7 @@
 
 <script>
     import UserAvatar from './UserAvatar';
-    import UsersService from '../service/resource/usersService';
+    import UsersService from '../services/resource/user.service';
     import Preloader from '@/components/Preloader';
 
     const localStorageKey = 'user-select.users';
@@ -137,11 +137,9 @@
             Preloader,
         },
         props: {
-            currentTasks: {
-                required: false,
-                default: () => {
-                    return {};
-                },
+            size: {
+                type: String,
+                default: 'normal',
             },
         },
         data() {
@@ -249,6 +247,9 @@
                 }
             },
             hidePopup() {
+                if (this.$el.contains(event.target)) {
+                    return;
+                }
                 this.showPopup = false;
 
                 if (this.changed) {
@@ -270,13 +271,6 @@
 
                 this.changed = true;
                 localStorage[localStorageKey] = JSON.stringify(this.userIDs);
-            },
-            getUserTask(userID) {
-                if (!this.currentTasks[userID]) {
-                    return null;
-                }
-
-                return this.currentTasks[userID];
             },
             selectAllActiveUsers() {
                 // If some users already selected we are going to clear it
@@ -335,7 +329,6 @@
 
         &::v-deep {
             .at-input__original {
-                border: 1px solid #eeeef5;
                 border-radius: 5px;
 
                 padding-right: $spacing-08;

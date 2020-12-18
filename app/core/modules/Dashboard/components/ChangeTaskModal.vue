@@ -69,8 +69,8 @@
 
 <script>
     import ResourceSelect from '@/components/ResourceSelect';
-    import ProjectService from '@/service/resource/projectService';
-    import TasksService from '@/service/resource/tasksService';
+    import ProjectService from '@/services/resource/project.service';
+    import TasksService from '@/services/resource/task.service';
     import { ValidationObserver, ValidationProvider } from 'vee-validate';
     import UserAvatar from '@/components/UserAvatar';
 
@@ -149,8 +149,13 @@
                 }
 
                 requestAnimationFrame(() => {
-                    this.$refs.project.reset();
-                    this.$refs.task.reset();
+                    if (Object.prototype.hasOwnProperty.call(this.$refs, 'project') && this.$refs.project) {
+                        this.$refs.project.reset();
+                    }
+
+                    if (Object.prototype.hasOwnProperty.call(this.$refs, 'task') && this.$refs.project) {
+                        this.$refs.task.reset();
+                    }
                 });
             },
         },

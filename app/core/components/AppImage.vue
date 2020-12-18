@@ -1,13 +1,13 @@
 <template>
-    <lazy-component v-if="lazy">
-        <img v-auth-image="url" @click="$emit('click', $event)" />
+    <img v-if="error" src="/none.png" />
+    <lazy-component v-else-if="lazy">
+        <img v-auth-image="url" @click="$emit('click', $event)" @error="handleError" />
     </lazy-component>
-    <img v-else v-auth-image="url" @click="$emit('click', $event)" />
+    <img v-else v-auth-image="url" @click="$emit('click', $event)" @error="handleError" />
 </template>
 
 <script>
     import axios from 'axios';
-    import env from '_app/etc/env';
 
     export default {
         name: 'AppImage',
@@ -26,8 +26,14 @@
             },
         },
         data() {
+            const url =
+                this.src.indexOf('http') === 0
+                    ? this.src
+                    : (process.env.VUE_APP_API_URL || `${window.location.origin}/api`) + '/' + this.src;
+
             return {
-                url: (env.API_URL || `${window.location.origin}/api`) + '/' + this.src,
+                error: false,
+                url,
             };
         },
         methods: {
@@ -40,7 +46,7 @@
                 if (this.src) {
                     axios
                         .get(this.src, {
-                            baseURL: (env.API_URL || `${window.location.origin}/api`) + '/',
+                            baseURL: (process.env.VUE_APP_API_URL || `${window.location.origin}/api`) + '/',
                             responseType: 'blob',
                         })
                         .then(response => {
@@ -48,6 +54,9 @@
                             this.url = URL.createObjectURL(blob);
                         });
                 }
+            },
+            handleError() {
+                this.error = true;
             },
         },
         mounted() {
@@ -66,7 +75,7 @@
                 if (this.isBlob) {
                     this.load();
                 } else {
-                    this.url = (env.API_URL || `${window.location.origin}/api`) + '/' + this.src;
+                    this.url = (process.env.VUE_APP_API_URL || `${window.location.origin}/api`) + '/' + this.src;
                 }
             },
         },

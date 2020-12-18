@@ -4,56 +4,56 @@
 
         <div
             v-show="hoverPopup.show && !clickPopup.show"
-            class="popup"
             :style="{
                 left: `${hoverPopup.x - 30}px`,
                 bottom: `${height - hoverPopup.y + 10}px`,
             }"
+            class="popup"
         >
             <div v-if="hoverPopup.event">
-                {{ getProjectName(hoverPopup.event.project_id) }}
-                ({{ getTaskName(hoverPopup.event.task_id) }})
+                {{ getTaskName(hoverPopup.event.task.id) }}
+                ({{ getProjectName(hoverPopup.event.task.project_id) }})
             </div>
 
             <div v-if="hoverPopup.event">
                 {{ formatDuration(hoverPopup.event.duration) }}
             </div>
 
-            <a class="corner" :style="{ left: `${hoverPopup.borderX}px` }"></a>
+            <a :style="{ left: `${hoverPopup.borderX}px` }" class="corner"></a>
         </div>
 
         <div
             v-show="clickPopup.show"
-            class="popup"
             :style="{
                 left: `${clickPopup.x - 30}px`,
                 bottom: `${height - clickPopup.y + 10}px`,
             }"
+            class="popup"
         >
             <div v-if="clickPopup.event && getScreenshotByInterval(clickPopup.intervalID)">
                 <Screenshot
-                    :lazyImage="false"
-                    :screenshot="getScreenshotByInterval(clickPopup.intervalID)"
-                    :project="getProject(clickPopup.event.project_id)"
-                    :task="getTask(clickPopup.event.task_id)"
-                    :user="getUser(clickPopup.event.user_id)"
-                    :showText="false"
                     :disableModal="true"
+                    :lazyImage="false"
+                    :project="getProject(clickPopup.event.task.project_id)"
+                    :screenshot="getScreenshotByInterval(clickPopup.intervalID)"
+                    :showText="false"
+                    :task="getTask(clickPopup.event.task.id)"
+                    :user="getUser(clickPopup.event.user_id)"
                     @click="showPopup"
                 />
             </div>
 
             <div v-if="clickPopup.event">
-                <router-link :to="`/projects/view/${clickPopup.event.project_id}`">
-                    {{ getProjectName(clickPopup.event.project_id) }}
+                <router-link :to="`/tasks/view/${clickPopup.event.task.id}`">
+                    {{ getTaskName(clickPopup.event.task.id) }}
                 </router-link>
 
-                <router-link :to="`/tasks/view/${clickPopup.event.task_id}`">
-                    ({{ getTaskName(clickPopup.event.task_id) }})
+                <router-link :to="`/projects/view/${clickPopup.event.task.project_id}`">
+                    ({{ getProjectName(clickPopup.event.task.project_id) }})
                 </router-link>
             </div>
 
-            <a class="corner" :style="{ left: `${clickPopup.borderX}px` }"></a>
+            <a :style="{ left: `${clickPopup.borderX}px` }" class="corner"></a>
         </div>
 
         <ScreenshotModal
@@ -73,14 +73,14 @@
 
 <script>
     import { fabric } from 'fabric';
-    import debounce from 'lodash/debounce';
+    import throttle from 'lodash/throttle';
     import moment from 'moment';
     import 'moment-timezone';
     import { mapGetters } from 'vuex';
     import Screenshot from '@/components/Screenshot';
     import ScreenshotModal from '@/components/ScreenshotModal';
     import { formatDurationString } from '@/utils/time';
-    import ScreenshotService from '@/service/resource/screenshotService';
+    import ScreenshotService from '@/services/resource/screenshot.service';
 
     const fabricObjectOptions = {
         editable: false,
@@ -195,6 +195,10 @@
                 this.modal.show = false;
             },
             onKeyDown(e) {
+                if (!this.modal.show) {
+                    return;
+                }
+
                 if (e.key === 'ArrowLeft') {
                     e.preventDefault();
                     this.showPrevious();
@@ -284,7 +288,7 @@
             getScreenshotByInterval(intervalID) {
                 return this.screenshots.find(screenshot => screenshot.time_interval_id === intervalID);
             },
-            draw: debounce(function() {
+            draw: throttle(function() {
                 this.canvas.clear();
 
                 const width = this.canvas.getWidth();
@@ -373,11 +377,11 @@
                     if (userEvents) {
                         userEvents.forEach(event => {
                             const startOfDay = moment.tz(event.start_at, this.timezone).startOf('day');
-                            const secondsFromMidnight = moment.utc(event.start_at).diff(startOfDay, 'seconds');
-                            const duration = moment.utc(event.end_at).diff(event.start_at, 'seconds');
+                            const secondsFromMidnight = moment.utc(event.start_at).diff(startOfDay, 'm', true);
+                            const duration = Math.ceil(moment.utc(event.end_at).diff(event.start_at, 'm'));
 
-                            const left = Math.floor((secondsFromMidnight * columnWidth) / 3600);
-                            const width = Math.ceil((duration * columnWidth) / 3600);
+                            const left = Math.floor((secondsFromMidnight * columnWidth) / 60);
+                            const width = Math.ceil((Math.ceil(duration / 10) * 10 * columnWidth) / 60);
 
                             const rect = new fabric.Rect({
                                 left,
@@ -474,7 +478,7 @@
 
                 this.canvas.requestRenderAll();
             }, 100),
-            onResize: debounce(function() {
+            onResize: throttle(function() {
                 if (!this.$refs.canvasWrapper) {
                     return;
                 }
@@ -534,39 +538,39 @@
         }
 
         .popup {
-            position: absolute;
-            display: block;
-
             background: #ffffff;
-
             border: 0;
+
             border-radius: 20px;
 
             box-shadow: 0px 7px 64px rgba(0, 0, 0, 0.07);
-
-            width: 270px;
+            display: block;
 
             padding: 10px;
 
+            position: absolute;
+
             text-align: center;
+
+            width: 270px;
 
             z-index: 3;
 
             & .corner {
-                content: ' ';
+                border-left: 15px solid transparent;
 
-                position: absolute;
+                border-right: 15px solid transparent;
+                border-top: 10px solid #ffffff;
+
+                bottom: -10px;
+                content: ' ';
                 display: block;
 
-                border-top: 10px solid #ffffff;
-                border-left: 15px solid transparent;
-                border-right: 15px solid transparent;
-
-                left: 15px;
-                bottom: -10px;
-
-                width: 0;
                 height: 0;
+                left: 15px;
+
+                position: absolute;
+                width: 0;
 
                 z-index: 1;
             }

@@ -8,7 +8,7 @@
                     @change="onCalendarChange"
                 />
 
-                <UserSelect class="controls-row__item" :currentTasks="currentTasks" @change="onUsersChange" />
+                <UserSelect class="controls-row__item" @change="onUsersChange" />
 
                 <ProjectSelect class="controls-row__item" @change="onProjectsChange" />
 
@@ -17,7 +17,7 @@
 
             <div class="flex">
                 <router-link
-                    v-if="$store.getters['user/user'].manual_time || $store.getters['user/user'].is_admin"
+                    v-if="$can('viewManualTime', 'dashboard')"
                     to="/time-intervals/new"
                     class="controls-row__item"
                 >
@@ -58,7 +58,6 @@
                             :events="events"
                             :timezone="timezone"
                             @selectedIntervals="onSelectedIntervals"
-                            @outsideClick="clearIntervals"
                         />
                         <TeamTableGraph
                             v-else
@@ -72,9 +71,11 @@
 
                     <time-interval-edit
                         :screenshots="selectedScreenshots"
+                        :intervals="selectedIntervals"
                         :selected-interval-ids="selectedIntervalIds"
                         @remove="onBulkRemove"
                         @edit="load"
+                        @close="clearIntervals"
                     ></time-interval-edit>
                 </div>
                 <preloader v-if="isDataLoading" class="team__loader" :is-transparent="true"></preloader>
@@ -86,7 +87,7 @@
 <script>
     import moment from 'moment';
     import 'moment-timezone';
-    import debounce from 'lodash/debounce';
+    import throttle from 'lodash/throttle';
     import { mapActions, mapGetters } from 'vuex';
     import Calendar from '@/components/Calendar';
     import UserSelect from '@/components/UserSelect';
@@ -95,8 +96,8 @@
     import TeamDayGraph from '../../components/TeamDayGraph';
     import TeamTableGraph from '../../components/TeamTableGraph';
     import TimezonePicker from '@/components/TimezonePicker';
-    import DashboardReportService from '@/service/reports/dashboardReportService';
-    import ProjectService from '@/service/resource/projectService';
+    import DashboardReportService from '@/services/reports/dashboard-report.service';
+    import ProjectService from '@/services/resource/project.service';
     import { downloadBlob, getMimeType } from '@/utils/file';
     import { getDateToday, getEndDay, getEndOfDayInTimezone, getStartDay, getStartOfDayInTimezone } from '@/utils/time';
     import ExportDropdown from '@/components/ExportDropdown';
@@ -137,6 +138,7 @@
                 showExportModal: false,
                 selectedIntervalIds: [],
                 selectedScreenshots: [],
+                selectedIntervals: [],
                 sessionStorageKey: sessionStorageKey,
                 isDataLoading: false,
             };
@@ -256,7 +258,7 @@
             ...mapActions({
                 setTimezone: 'timeline/setTimezone',
             }),
-            load: debounce(async function(withLoadingIndicator = true) {
+            load: throttle(async function(withLoadingIndicator = true) {
                 this.isDataLoading = withLoadingIndicator;
                 if (!this.userIDs.length || !this.projectIDs.length) {
                     this.isDataLoading = false;
@@ -346,6 +348,9 @@
                 this.selectedScreenshots = this.screenshots.filter(screenshot =>
                     this.selectedIntervalIds.includes(screenshot.time_interval_id),
                 );
+                this.selectedIntervals = Object.values(this.intervals).reduce((acc, curr) => {
+                    return [...acc, ...curr.intervals.filter(interval => event.ids.includes(interval.id))];
+                }, []);
             },
             onBulkRemove() {
                 this.recalculateStatistic(this.selectedScreenshots);
@@ -376,6 +381,7 @@
             },
             clearIntervals() {
                 this.selectedScreenshots = [];
+                this.selectedIntervals = [];
                 this.selectedIntervalIds = [];
             },
 
@@ -488,14 +494,6 @@
         &::v-deep .at-btn__text {
             color: #2e2ef9;
             font-size: 25px;
-        }
-    }
-
-    ::v-deep {
-        .at-select {
-            &__selection {
-                border: 1px solid $gray-6;
-            }
         }
     }
 

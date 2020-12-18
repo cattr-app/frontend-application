@@ -4,6 +4,7 @@ import { getModuleList, ModuleLoaderInterceptor } from '../moduleLoader';
 import merge from 'lodash/merge';
 import veeValidateEn from 'vee-validate/dist/locale/en.json';
 import veeValidateRu from 'vee-validate/dist/locale/ru.json';
+import moment from 'moment';
 
 export function getLangCookie() {
     const v = document.cookie.match('(^|;) ?lang=([^;]*)(;|$)');
@@ -35,6 +36,8 @@ let messages = {
     ru: require('./locales/ru'),
 };
 
+let pluralizationRules = {};
+
 ModuleLoaderInterceptor.on('loaded', () => {
     const modules = Object.values(getModuleList()).map(i => {
         return i.moduleInstance;
@@ -43,6 +46,7 @@ ModuleLoaderInterceptor.on('loaded', () => {
     modules.forEach(m => {
         const moduleMessages = m.getLocalizationData();
         merge(messages, moduleMessages);
+        merge(pluralizationRules, m.getPluralizationRules());
     });
 });
 
@@ -55,11 +59,16 @@ merge(messages, {
     },
 });
 
+merge(pluralizationRules, require('./pluralizationRules'));
+
+moment.locale(getLangCookie() || getUserLang());
+
 const i18n = new VueI18n({
     locale: getLangCookie() || getUserLang(),
     fallbackLocale: 'en',
     silentFallbackWarn: true,
     messages,
+    pluralizationRules,
 });
 
 export default i18n;

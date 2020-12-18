@@ -1,5 +1,5 @@
 import Store from '../store';
-import { getModuleList, ModuleLoaderInterceptor } from '../moduleLoader';
+import { getModuleList, ModuleLoaderInterceptor } from '@/moduleLoader';
 
 /**
  * Initialising setting parent route
@@ -12,22 +12,15 @@ ModuleLoaderInterceptor.on('loaded', router => {
     const settingsModules = modules.filter(m => m.moduleInstance.routerPrefix === 'settings');
 
     function initSettingsSections(to, from, next) {
-        if (
-            !Store.getters['settings/sections'].length ||
-            !Store.getters['settings/sections'].find(section => section.scope === 'settings')
-        ) {
-            settingsModules.forEach(m => m.moduleInstance.initSettingsSections());
-        }
+        Store.dispatch('settings/clearSections');
+        settingsModules.forEach(m => m.moduleInstance.initSettingsSections());
+
         next();
     }
 
     function initCompanySections(to, from, next) {
-        if (
-            !Store.getters['settings/sections'].length ||
-            !Store.getters['settings/sections'].find(section => section.scope === 'company')
-        ) {
-            settingsModules.forEach(m => m.moduleInstance.initCompanySections());
-        }
+        Store.dispatch('settings/clearSections');
+        settingsModules.forEach(m => m.moduleInstance.initCompanySections());
 
         if (!Object.keys(Store.getters['user/user']).length) {
             Store.watch(

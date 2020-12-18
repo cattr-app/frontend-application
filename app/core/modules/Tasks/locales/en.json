@@ -12,7 +12,16 @@
       "low": "Low",
       "normal": "Normal",
       "high": "High"
-    }
+    },
+    "projects": "Projects",
+    "users": "Users",
+    "status": "Status",
+    "statuses": {
+      "any": "Any",
+      "open": "Open",
+      "closed": "Closed"
+    },
+    "unassigned": "Unassigned"
   },
   "field": {
     "source": "Source"

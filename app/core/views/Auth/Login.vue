@@ -43,9 +43,7 @@
                     <router-link class="link" to="/auth/password/reset">{{ $t('auth.forgot_password') }}</router-link>
                 </validation-observer>
             </div>
-            <a class="login__slogan" href="https://cattr.app">
-                {{ slogan() }}
-            </a>
+            <a class="login__slogan" href="https://cattr.app" v-html="slogan" />
         </div>
         <div class="hero col-16"></div>
     </div>
@@ -55,6 +53,7 @@
     import { ValidationObserver } from 'vee-validate';
     import VueRecaptcha from 'vue-recaptcha';
     import AuthInput from './AuthInput';
+    import sloganGenerator from '../../helpers/sloganGenerator';
     import has from 'lodash/has';
 
     export const config = { authInput: AuthInput };
@@ -78,7 +77,6 @@
                 recaptchaKey: null,
                 error: null,
                 isLoading: false,
-                slogans: ['Cattr - a free open source time tracker', 'Manage your time with ease'],
             };
         },
 
@@ -86,21 +84,18 @@
             config() {
                 return config;
             },
+            slogan() {
+                return sloganGenerator();
+            },
         },
 
         mounted() {
             if (this.$store.getters['user/isLoggedIn']) {
-                this.$router.push({ name: 'index' });
+                this.$router.push({ name: 'dashboard' });
             }
         },
 
         methods: {
-            slogan() {
-                const countSlogans = this.slogans.length - 1;
-                const indexSlogan = this.getRandomIntInclusive(0, countSlogans);
-                return this.slogans[indexSlogan];
-            },
-
             getRandomIntInclusive(min, max) {
                 min = Math.ceil(min);
                 max = Math.floor(max);
@@ -135,8 +130,6 @@
                     }
 
                     await apiService.attemptLogin(this.user);
-                    await apiService.getAllowedRules();
-                    await apiService.getProjectRules();
                     await apiService.getCompanyData();
 
                     this.error = null;

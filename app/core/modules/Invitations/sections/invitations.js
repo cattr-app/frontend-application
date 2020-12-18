@@ -1,9 +1,9 @@
+import Vue from 'vue';
 import cloneDeep from 'lodash/cloneDeep';
-import axios from '@/config/app';
 import Store from '@/store';
 import i18n from '@/i18n';
 import { formatDate } from '@/utils/time';
-import InvitationService from '../services/invitationService';
+import InvitationService from '../services/invitation.service';
 import InvitationForm from '../components/InvitationForm';
 import Invitations from '../views/Invitations';
 
@@ -112,14 +112,7 @@ export default (context, router) => {
     ]);
 
     return {
-        accessCheck: async () => {
-            let user = Store.getters['user/user'];
-            if (Object.keys(user).length) {
-                return user.is_admin === 1;
-            }
-
-            return (await axios.get('/auth/me')).data.user.is_admin === 1;
-        },
+        accessCheck: async () => Vue.prototype.$can('viewAny', 'invitation'),
         scope: 'company',
         order: 20,
         component: Invitations,

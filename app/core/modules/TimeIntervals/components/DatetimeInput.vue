@@ -98,7 +98,7 @@
             },
             minutes() {
                 const minutes = [];
-                for (let i = 0; i < 60; i += 5) {
+                for (let i = 0; i < 60; i++) {
                     minutes.push(i);
                 }
 
@@ -182,34 +182,6 @@
 </script>
 
 <style lang="scss" scoped>
-    .input {
-        background: #ffffff;
-        width: 330px;
-        height: 40px;
-        border: 1px solid #c5d9e8;
-        border-radius: 5px;
-        cursor: pointer;
-
-        &:hover {
-            border: 1px solid #79a1eb;
-        }
-
-        &::v-deep {
-            .at-input__original {
-                border: 0;
-                background: transparent;
-            }
-
-            .at-input__original {
-                cursor: pointer;
-            }
-        }
-    }
-
-    .datetimeinput {
-        display: inline-block;
-    }
-
     .datepicker-wrapper {
         position: absolute;
         width: 400px;

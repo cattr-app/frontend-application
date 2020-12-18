@@ -1,16 +1,13 @@
 <template>
     <at-select v-if="roles.length > 0" ref="select" class="role-select" :value="value" @on-change="inputHandler">
-        <at-tooltip
-            v-for="(role, index) in roles"
-            :key="index"
-            :content="$t('users.roles-description.' + role.name)"
-            placement="left-top"
-            class="custom-tooltip-roles"
-        >
-            <at-option :key="index" :value="role.id">
-                {{ $t('users.role.' + role.name) }}
-            </at-option>
-        </at-tooltip>
+        <at-option v-for="(role, index) in roles" :key="index" :value="role.id" :label="$t('users.role.' + role.name)">
+            <div>{{ $t('users.role.' + role.name) }}</div>
+            <div class="role-select__description">
+                <slot :name="['role-description', role.name]">
+                    {{ $t('users.roles-description.' + role.name) }}
+                </slot>
+            </div>
+        </at-option>
     </at-select>
 </template>
 
@@ -38,7 +35,7 @@
         async created() {
             await this.getRoles();
 
-            if (this.$refs.select !== undefined) {
+            if (this.$refs.select && Object.prototype.hasOwnProperty.call(this.$refs.select, '$children')) {
                 this.$refs.select.$children.forEach(option => {
                     option.hidden = false;
                 });
@@ -49,18 +46,10 @@
 
 <style lang="scss" scoped>
     .role-select {
-        ::v-deep {
-            .at-select__dropdown.at-select__dropdown--bottom {
-                overflow-y: visible !important;
-            }
-        }
-        .custom-tooltip-roles {
-            display: flex;
-            flex-direction: column;
-            overflow: visible;
-            .at-tooltip--right {
-                z-index: 1000;
-            }
+        &__description {
+            white-space: normal;
+            opacity: 0.6;
+            font-size: 0.7rem;
         }
     }
 </style>

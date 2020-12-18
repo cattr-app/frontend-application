@@ -5,6 +5,7 @@
         :selected="selectedProjectIds"
         :service="projectService"
         name="projects"
+        :size="size"
         @onOptionsLoad="onLoad"
     >
     </multi-select>
@@ -12,7 +13,7 @@
 
 <script>
     import MultiSelect from './MultiSelect';
-    import ProjectService from '../service/resource/projectService';
+    import ProjectService from '../services/resource/project.service';
 
     const localStorageKey = 'amazingcat.local.storage.project_select';
 
@@ -20,6 +21,12 @@
         name: 'ProjectSelect',
         components: {
             MultiSelect,
+        },
+        props: {
+            size: {
+                type: String,
+                default: 'normal',
+            },
         },
         data() {
             return {

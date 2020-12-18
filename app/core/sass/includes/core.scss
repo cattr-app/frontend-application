@@ -23,7 +23,7 @@ body {
   border: 1px solid #EEEEF5;
   box-sizing: border-box;
   box-shadow: 0px 0px 100px rgba(63, 51, 86, 0.05);
-  border-radius: 20px;
+  border-radius: $border-radius-lger;
 
   &__inner {
     padding: $spacing-06;
@@ -47,7 +47,9 @@ body {
       margin-left: auto;
     }
 
-    .at-select__selection {
+    .at-input__original,
+    .at-select__selection,
+    .vs__dropdown-toggle {
       border: 1px solid #eeeef5;
     }
   }

@@ -1,16 +1,22 @@
 <template>
-    <div :class="classes">
+    <div class="container">
         <h1 class="page-title">{{ $t('navigation.settings') }}</h1>
-        <div class="at-container">
-            <at-menu v-if="sections" class="settings__menu" router mode="horizontal">
-                <template v-for="(section, key) in sections">
-                    <at-menu-item v-if="section.access" :key="key" :to="{ name: section.pathName }">
-                        {{ $t(section.label) }}
-                    </at-menu-item>
-                </template>
-            </at-menu>
-            <div class="settings__content">
-                <router-view></router-view>
+        <div class="at-container settings">
+            <div class="row">
+                <div class="col-5">
+                    <at-menu v-if="sections" class="settings__menu" router mode="vertical">
+                        <template v-for="(section, key) in sections">
+                            <at-menu-item v-if="section.access" :key="key" :to="{ name: section.pathName }">
+                                {{ $t(section.label) }}
+                            </at-menu-item>
+                        </template>
+                    </at-menu>
+                </div>
+                <div class="col-19">
+                    <div class="settings__content">
+                        <router-view />
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -20,10 +26,6 @@
     export default {
         name: 'Settings',
         computed: {
-            classes() {
-                const route = this.$route.name.split('.').pop();
-                return ['settings', `settings--${route}`];
-            },
             sections() {
                 return this.$store.getters['settings/sections']
                     .filter(section => section.scope === 'settings')
@@ -35,23 +37,33 @@
 
 <style lang="scss" scoped>
     .settings {
-        margin: 0 15%;
+        &::v-deep {
+            .page-title {
+                font-size: 24px;
+            }
+        }
 
         &__menu {
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-
-            border-bottom: 1px solid $gray-4;
-
-            width: 100%;
+            padding: $layout-01 0;
+            height: 100%;
+            border-top-left-radius: $border-radius-lger;
+            border-bottom-left-radius: $border-radius-lger;
         }
 
         &__content {
-            background: $color-white;
-            padding: $spacing-06;
+            padding: $spacing-05 $spacing-06 $spacing-08;
 
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
+            &::v-deep {
+                .at-container,
+                .at-container__inner,
+                .crud {
+                    all: unset;
+
+                    &__table {
+                        margin-bottom: $layout-01;
+                    }
+                }
+            }
         }
     }
 </style>
