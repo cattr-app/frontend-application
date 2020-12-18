@@ -1,3 +1,4 @@
+import LanguageSelector from '@/components/LanguageSelector';
 import TimezonePicker from '@/components/TimezonePicker';
 import CompanyService from '../services/company.service';
 import ColorSelect from '../components/ColorSelect';
@@ -136,6 +137,26 @@ export default {
                         placeholder: 'field.auto_thin',
                     },
                     tooltipValue: 'tooltip.auto_thin',
+                },
+                {
+                    label: 'settings.company_language',
+                    key: 'language',
+                    render: (h, props) => {
+                        if (typeof props.currentValue === 'object') {
+                            props.currentValue = 'en';
+                        }
+
+                        return h(LanguageSelector, {
+                            props: {
+                                value: props.currentValue,
+                            },
+                            on: {
+                                setLanguage(lang) {
+                                    props.inputHandler(lang);
+                                },
+                            },
+                        });
+                    },
                 },
             ],
         },
