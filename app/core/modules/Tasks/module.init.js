@@ -314,6 +314,7 @@ export function init(context, router) {
                     typeof props.values.users !== 'undefined'
                         ? props.values.users.map(user => (typeof user === 'object' ? user.id : +user))
                         : [];
+
                 return h(UserSelect, {
                     props: {
                         value,
@@ -450,7 +451,7 @@ export function init(context, router) {
             fieldOptions: { type: 'project-select' },
         },
         {
-            key: 'users.user_id',
+            key: 'users.id',
             label: 'tasks.users',
             fieldOptions: { type: 'user-select' },
         },
