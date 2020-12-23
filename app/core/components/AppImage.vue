@@ -53,6 +53,11 @@
             load() {
                 if (this.error) return;
 
+                if(this.src === 'none'){
+                    this.error = true;
+                    return;
+                }
+
                 this.loaded = false;
 
                 if (this.url) {
@@ -91,6 +96,7 @@
         },
         watch: {
             src() {
+                this.error = false;
                 this.load();
             },
         },
