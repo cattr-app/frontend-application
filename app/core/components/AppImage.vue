@@ -29,7 +29,11 @@
             const url =
                 this.src.indexOf('http') === 0
                     ? this.src
-                    : (process.env.VUE_APP_API_URL || `${window.location.origin}/api`) + '/' + this.src;
+                    : (process.env.VUE_APP_API_URL !== 'null'
+                          ? process.env.VUE_APP_API_URL
+                          : `${window.location.origin}/api`) +
+                      '/' +
+                      this.src;
 
             return {
                 error: false,

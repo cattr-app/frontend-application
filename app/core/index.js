@@ -44,12 +44,6 @@ if (process.env.NODE_ENV === 'development') {
 
 localModuleLoader(router);
 
-if (process.env.VUE_APP_GET_SCREENSHOTS_BY_ID) {
-    // Modify screenshot paths
-    screenshot.config.thumbnailPathProvider = screenshot => `uploads/screenshots/thumbs/${screenshot.id}`;
-    screenshotModal.config.screenshotPathProvider = screenshot => `uploads/screenshots/${screenshot.id}`;
-}
-
 const app = new Vue({
     router,
     store,
