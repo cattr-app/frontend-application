@@ -1,13 +1,21 @@
 <template>
-    <img v-if="error" src="/none.png" />
-    <lazy-component v-else-if="lazy">
-        <img v-auth-image="url" @click="$emit('click', $event)" @error="handleError" />
-    </lazy-component>
-    <img v-else v-auth-image="url" @click="$emit('click', $event)" @error="handleError" />
+    <div>
+        <transition appear mode="out-in" name="fade">
+            <Skeleton v-if="!loaded" />
+            <template v-else>
+                <img v-if="error" src="@/assets/none.png" alt="Empty image" />
+                <lazy-component v-else-if="lazy">
+                    <img :src="url" alt="screenshot" @click="$emit('click', $event)" @error="handleError" />
+                </lazy-component>
+                <img v-else :src="url" alt="screenshot" @click="$emit('click', $event)" @error="handleError" />
+            </template>
+        </transition>
+    </div>
 </template>
 
 <script>
-    import axios from 'axios';
+    import axios from '@/config/app';
+    import { Skeleton } from 'vue-loading-skeleton';
 
     export default {
         name: 'AppImage',
@@ -16,32 +24,37 @@
                 type: String,
                 required: true,
             },
-            isBlob: {
-                type: Boolean,
-                default: true,
-            },
             lazy: {
                 type: Boolean,
                 default: false,
             },
         },
         data() {
-            const url =
+            const baseUrl =
                 this.src.indexOf('http') === 0
-                    ? this.src
+                    ? ''
                     : (process.env.VUE_APP_API_URL !== 'null'
                           ? process.env.VUE_APP_API_URL
-                          : `${window.location.origin}/api`) +
-                      '/' +
-                      this.src;
+                          : `${window.location.origin}/api`) + '/';
+
+            const url = baseUrl + this.src;
 
             return {
-                error: false,
+                error: this.src === 'none',
+                loaded: this.src === 'none',
                 url,
+                baseUrl,
             };
+        },
+        components: {
+            Skeleton,
         },
         methods: {
             load() {
+                if (this.error) return;
+
+                this.loaded = false;
+
                 if (this.url) {
                     URL.revokeObjectURL(this.url);
                     this.url = null;
@@ -50,12 +63,16 @@
                 if (this.src) {
                     axios
                         .get(this.src, {
-                            baseURL: (process.env.VUE_APP_API_URL || `${window.location.origin}/api`) + '/',
                             responseType: 'blob',
                         })
-                        .then(response => {
-                            const blob = response.data;
-                            this.url = URL.createObjectURL(blob);
+                        .then(({ data }) => {
+                            this.url = URL.createObjectURL(data);
+                        })
+                        .catch(() => {
+                            this.error = true;
+                        })
+                        .finally(() => {
+                            this.loaded = true;
                         });
                 }
             },
@@ -64,9 +81,7 @@
             },
         },
         mounted() {
-            if (this.isBlob) {
-                this.load();
-            }
+            this.load();
         },
         beforeDestroy() {
             if (this.url) {
@@ -76,11 +91,7 @@
         },
         watch: {
             src() {
-                if (this.isBlob) {
-                    this.load();
-                } else {
-                    this.url = (process.env.VUE_APP_API_URL || `${window.location.origin}/api`) + '/' + this.src;
-                }
+                this.load();
             },
         },
     };
@@ -91,5 +102,14 @@
         width: 100%;
         object-fit: cover;
         background-color: $gray-5;
+    }
+
+    .fade-enter-active,
+    .fade-leave-active {
+        transition: opacity 0.4s;
+    }
+    .fade-enter,
+    .fade-leave-to {
+        opacity: 0;
     }
 </style>

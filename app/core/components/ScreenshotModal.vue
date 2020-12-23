@@ -8,7 +8,6 @@
             <AppImage
                 v-if="screenshot && screenshot.id"
                 class="modal-screenshot"
-                :is-blob="false"
                 :src="getScreenshotPath(screenshot)"
             />
             <at-progress
@@ -151,7 +150,7 @@
             },
             getScreenshotPath(screenshot) {
                 if (screenshot.path === 'uploads/static/none.png') {
-                    return window.location.origin + '/none.png';
+                    return 'none';
                 }
 
                 return config.screenshotPathProvider(screenshot);
@@ -163,6 +162,10 @@
 <style lang="scss" scoped>
     .modal {
         &::v-deep {
+            .pu-skeleton {
+                height: 70vh;
+            }
+
             .at-modal__mask {
                 background: rgba(#151941, 0.7);
             }
