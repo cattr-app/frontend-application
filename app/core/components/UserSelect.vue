@@ -150,7 +150,7 @@
         },
         data() {
             let userIDs = [];
-            if (typeof this.value !== 'undefined') {
+            if (typeof this.value !== 'undefined' && this.value.length) {
                 userIDs = this.value;
             } else {
                 if (localStorage.getItem(localStorageKey)) {
