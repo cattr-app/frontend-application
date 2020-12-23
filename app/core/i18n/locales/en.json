@@ -11,29 +11,24 @@
   },
   "setup": {
     "process": {
-      "account": "Acccount creating",
-      "database": "Backend setup",
-      "permission": "Magic",
-      "status":{
-        "title": "Process status",
-        "success":"Success",
-        "error": "Error"
-      },
-      "info_without_docker": "Пожалуйста внесите изменения в конфиг файлов для корректной работы сервиса. Обратите внимание, что пути нужно заменить на ваши существующие.",
+      "info_without_docker": "Please, change configuration of your server according to examples below. Note, that you should replace path with your actual path to Cattr.",
       "important_information": "Important information",
       "title_supervisor": "Config of Supervisor",
       "title_cron": "Config of Cron",
       "end_install": "Start use Cattr",
-      "end_message": "Installation completed"
+      "button_process": "Installing",
+      "config_confirmation": "I've installed required configuration files",
+      "title": "Setting up",
+      "subtitle": "Please, do not close or reload this tab until we will be ready"
     },
     "step_description": {
-      "database": "Setting of database",
-      "company": "Settings of company",
+      "welcome": "Welcome",
+      "database_settings": "Setting of database",
+      "company_settings": "Settings of company",
       "account": "Create account",
       "permission": "Permission",
-      "backend-connect": "Backend Connect",
-      "recaptcha": "Setting of reCAPTCHA",
-      "congratulation": "Congratulation"
+      "backend_ping": "Backend Connect",
+      "recaptcha": "Setting of reCAPTCHA"
     },
     "buttons": {
       "next": "Next",
@@ -45,20 +40,25 @@
       "unchecked": "Disabled"
     },
     "header": {
-      "backend-connect": {
+      "welcome": {
+        "title": "Welcome to Cattr",
+        "subtitle": "This is a quick setup",
+        "language": "Please, select your company language"
+      },
+      "backend_ping": {
         "title": "Backend connect",
         "subtitle": "Check connection with backend",
         "success": "Success",
         "error": "Connection refused",
         "process": "Wait process",
-        "status": "Backend status"
+        "status": "Backend status",
+        "server_url": "I'll try to find my server at: {serverUrl}",
+        "wrong_url": "Wrong url?",
+        "building_when": "URL should be set up on frontend building",
+        "read_more": "You can read more in {0}",
+        "documentation": "documentation"
       },
-      "congratulation": {
-        "title": "Congratulation",
-        "subtitle": "Apply settings",
-        "get_statistic": "Allow sending anonymous of a statistic"
-      },
-      "database": {
+      "database_settings": {
         "title": "Setting of database",
         "subtitle": "Set MySQL setting",
         "success": "Success",
@@ -68,9 +68,11 @@
         "database": "Database name",
         "username":"User name",
         "password":"Password",
-        "status": "Database status"
+        "status": "Database status",
+        "docker_title": "Cattr is running inside official Docker container",
+        "docker_subtitle": "You do not need to set up database connection settings"
       },
-      "company": {
+      "company_settings": {
         "title": "Settings of company",
         "subtitle": "Set company settings",
         "language": "Language",

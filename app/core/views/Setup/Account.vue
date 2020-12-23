@@ -1,29 +1,29 @@
 <template>
-    <validation-observer class="account">
+    <validation-observer ref="validate" class="account">
         <validation-provider v-slot="{ errors }" rules="required|email" :name="$t('setup.header.account.email')">
-            <h6>{{ $t('setup.header.account.email') }}</h6>
+            <h6 v-t="'setup.header.account.email'" />
             <at-input
                 v-model="accountParams.email"
-                name="Password"
+                name="Email"
                 :status="errors.length > 0 ? 'error' : ''"
                 :placeholder="$t('setup.header.account.email')"
                 icon=""
                 type="text"
             />
-            <p>{{ errors[0] }}</p>
+            <p v-html="errors[0]" />
         </validation-provider>
 
         <validation-provider v-slot="{ errors }" rules="required" :name="$t('setup.header.account.password')">
-            <h6>{{ $t('setup.header.account.password') }}</h6>
+            <h6 v-t="'setup.header.account.password'" />
             <at-input
                 v-model="accountParams.password"
                 name="Password"
                 :status="errors.length > 0 ? 'error' : ''"
                 :placeholder="$t('setup.header.account.password')"
                 icon=""
-                type="text"
+                type="password"
             />
-            <p>{{ errors[0] }}</p>
+            <p v-html="errors[0]" />
         </validation-provider>
     </validation-observer>
 </template>
@@ -32,7 +32,7 @@
     import { ValidationObserver, ValidationProvider } from 'vee-validate';
 
     export default {
-        name: 'account',
+        name: 'Account',
         components: {
             ValidationProvider,
             ValidationObserver,
@@ -50,25 +50,34 @@
             };
         },
         created() {
-            if (this.storage['account'].hasOwnProperty('accountParams')) {
-                this.accountParams = this.storage['account'].accountParams;
-                this.$emit('setState', { account: { status: this.status, accountParams: this.accountParams } });
-            } else {
-                this.$emit('setState', { account: { status: this.status } });
-            }
+            this.accountParams = {
+                ...this.accountParams,
+                ...this.storage,
+            };
+
+            this.$emit('setStatus', this.status);
         },
         watch: {
             accountParams: {
-                handler(val) {
-                    if (val.email && val.password) {
-                        this.$emit('setState', { account: { status: 'finish', accountParams: val } });
+                handler() {
+                    if ('validate' in this.$refs) {
+                        this.$refs.validate.validate().then(validated => {
+                            if (validated) {
+                                this.status = 'finish';
 
-                        return;
+                                this.$emit('updateStorage', this.accountParams);
+                            } else {
+                                this.status = 'process';
+                            }
+
+                            this.$emit('setStatus', this.status);
+                        });
                     }
-
-                    this.$emit('setState', { account: { status: 'process' } });
                 },
                 deep: true,
+            },
+            storage(val) {
+                this.accountParams = val;
             },
         },
     };

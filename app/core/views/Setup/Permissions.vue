@@ -1,7 +1,7 @@
 <template>
     <div class="permission">
         <div class="permission__header">
-            <at-checkbox v-model="permission" label="Shenzhen" @on-change="handlPermission"></at-checkbox>
+            <at-checkbox v-model="permission" label="Shenzhen" @on-change="handlePermission"/>
             <u>Получать, проверять обновления для модулей и их совместимость</u>
         </div>
         <div v-if="permission" class="permission__registor">
@@ -14,7 +14,7 @@
                     :message="message"
                     show-icon
                 />
-                <at-checkbox v-model="permission" label="Shenzhen" @on-change="handlPermission"></at-checkbox>
+                <at-checkbox v-model="permission" label="Shenzhen" @on-change="handlePermission" />
                 <span>Разрешить отправку анонимной статистики</span>
                 <at-button type="info" @click="onRegistration">{{
                     $t('setup.header.permission.registration')
@@ -43,7 +43,7 @@
             onRegistration() {
                 this.showStatusRegistration = true;
             },
-            handlPermission(val) {
+            handlePermission(val) {
                 if (!val) {
                     this.permission = val;
                     this.status = 'finish';

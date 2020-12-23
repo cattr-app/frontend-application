@@ -100,7 +100,7 @@ const routes = [
         meta: {
             auth: false,
         },
-        component: () => import(/* webpackChunkName: "Setup" */ '../views/Setup/Setup.vue'),
+        component: () => import(/* webpackChunkName: "Setup" */ '../views/Setup.vue'),
     },
 ];
 
@@ -112,14 +112,7 @@ const router = new VueRouter({
 
 router.beforeEach(async (to, from, next) => {
     // Close pending requests when switching pages
-    Store.dispatch('httpRequest/cancelPendingRequests');
-    if (!Store.getters['httpRequest/getStatusOfInstalling']) {
-        await Store.dispatch('httpRequest/checkInstalled');
-    }
-
-    if (!Store.getters['httpRequest/getStatusOfInstalling'] && to.name !== 'setup') {
-        return next({ name: 'setup' });
-    }
+    await Store.dispatch('httpRequest/cancelPendingRequests');
 
     if (to.matched.some(record => record.meta.auth || typeof record.meta.auth === 'undefined')) {
         if (!Store.getters['user/loggedIn']) {

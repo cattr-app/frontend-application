@@ -8,36 +8,16 @@ export default class ApiService extends StoreService {
         super(context);
     }
 
-    async chechStatusBackend() {
-        return await axios.get('installation/status/backend', { ignoreCancel: true });
-    }
-
     /**
      * @param params
      * @returns {Promise<AxiosResponse<T>>}
      */
     async checkConnectionDatabase(params) {
-        return await axios.post('installation/status/database', params);
+        return await axios.post('setup/database', params);
     }
 
-    async setEnvFile(params) {
-        return await axios.post('installation/change/env', params);
-    }
-
-    async setConfig(params) {
-        return await axios.post('installation/set/config', params);
-    }
-
-    async getStatusOfInstalling() {
-        return await axios.get('installation/status');
-    }
-
-    async registrationInCollector(params) {
-        return await axios.post('installation/registration/collector', params);
-    }
-
-    async registrationAdmin(params) {
-        return await axios.post('installation/registration/admin', params);
+    async finishSetup(params) {
+        return await axios.put('setup/save', params);
     }
 
     token() {
@@ -132,4 +112,15 @@ export default class ApiService extends StoreService {
 
         return data.data;
     }
+
+    async status() {
+        try {
+            const { data } = await axios.get('/status');
+            return data;
+        } catch (e) {
+            return { cattr: false };
+        }
+    }
+
+    serverUrl = axios.defaults.baseURL;
 }

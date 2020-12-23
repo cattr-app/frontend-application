@@ -1,16 +1,15 @@
-import ApiService from '@/service/api';
+import ApiService from '@/services/api';
 
 const state = {
     cancelTokens: [],
-    isInstall: false,
 };
 
 const getters = {
     cancelTokens(state) {
         return state.cancelTokens;
     },
-    getStatusOfInstalling(state) {
-        return state.isInstall;
+    getInstallationStatus(state) {
+        return state.isInstalled;
     },
 };
 
@@ -20,9 +19,6 @@ const mutations = {
     },
     clearCancelTokens(state) {
         state.cancelTokens = [];
-    },
-    changeStatusInstall(state, status) {
-        state.isInstall = status;
     },
 };
 
@@ -36,9 +32,9 @@ const actions = {
 
         context.commit('clearCancelTokens');
     },
-    async checkInstalled(context) {
-        const { status } = (await new ApiService().getStatusOfInstalling()).data;
-        context.commit('changeStatusInstall', status);
+    async getInstallationStatus() {
+        const { installed } = await new ApiService().status();
+        return installed || false;
     },
 };
 

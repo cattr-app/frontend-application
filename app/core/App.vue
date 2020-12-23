@@ -2,7 +2,7 @@
     <div id="app">
         <component :is="config.beforeLayout" />
         <component :is="layout">
-            <router-view :key="$route.path"></router-view>
+            <router-view :key="$route.path" />
         </component>
     </div>
 </template>
@@ -10,13 +10,22 @@
 <script>
     import * as Sentry from '@sentry/browser';
     import { getLangCookie, setLangCookie } from './i18n';
-    import Vue from 'vue';
 
     export const config = { beforeLayout: null };
 
     export default {
         name: 'App',
         async created() {
+            if (!(await this.$store.dispatch('httpRequest/getInstallationStatus'))) {
+                if (this.$route.name !== 'setup') {
+                    await this.$router.replace({ name: 'setup' });
+                    return;
+                }
+            } else if (this.$route.name === 'setup') {
+                await this.$router.replace('/');
+                return;
+            }
+
             const userApi = this.$store.getters['user/apiService'];
             if (userApi.token()) {
                 try {
