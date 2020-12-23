@@ -53,7 +53,7 @@
             load() {
                 if (this.error) return;
 
-                if(this.src === 'none'){
+                if (this.src === 'none') {
                     this.error = true;
                     return;
                 }
