@@ -329,13 +329,6 @@
                 this.userSelectTab = name;
             },
         },
-        watch: {
-            value(value) {
-                if (typeof value !== 'undefined') {
-                    this.userIDs = value;
-                }
-            },
-        },
     };
 </script>
 
