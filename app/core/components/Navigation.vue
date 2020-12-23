@@ -101,14 +101,14 @@
                         title: this.$t('navigation.about'),
                         icon: 'icon-info',
                     },
-                    {
-                        name: 'desktop-login',
-                        to: {
-                            name: 'desktop-login',
-                        },
-                        title: this.$t('navigation.client-login'),
-                        icon: 'icon-log-in',
-                    },
+                    // {
+                    //     name: 'desktop-login',
+                    //     to: {
+                    //         name: 'desktop-login',
+                    //     },
+                    //     title: this.$t('navigation.client-login'),
+                    //     icon: 'icon-log-in',
+                    // },
                 ];
                 this.modules.forEach(m => {
                     const entriesDropdown = m.getNavbarMenuEntriesDropDown();
