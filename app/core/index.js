@@ -11,11 +11,8 @@ import AtComponents from '@amazingcat/at-ui';
 import Dialog from 'vue-dialog-loading';
 import DatePicker from 'vue2-datepicker';
 import moment from 'vue-moment';
-import VueAuthImage from 'vue-auth-image';
 import i18n from './i18n';
 import VueLazyload from 'vue-lazyload';
-import * as screenshot from '@/components/Screenshot';
-import * as screenshotModal from '@/components/ScreenshotModal';
 import './plugins/vee-validate';
 import './plugins/sentry';
 import './policies';
@@ -30,7 +27,6 @@ Vue.use(AtComponents);
 Vue.use(moment);
 Vue.use(Dialog);
 Vue.use(DatePicker);
-Vue.use(VueAuthImage);
 Vue.use(VueLazyload, {
     lazyComponent: true,
 });
