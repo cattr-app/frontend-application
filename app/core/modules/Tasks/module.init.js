@@ -1,4 +1,5 @@
 import TasksService from '@/services/resource/task.service';
+import PriorityService from '@/services/resource/priority.service';
 import ProjectsService from '@/services/resource/project.service';
 import UsersService from '@/services/resource/user.service';
 import { ModuleLoaderInterceptor } from '@/moduleLoader';
@@ -34,7 +35,7 @@ export function init(context, router) {
     });
 
     const crud = context.createCrud('tasks.crud-title', 'tasks', TasksService, {
-        with: 'priority, project, user',
+        with: 'priority, project, users',
     });
 
     const crudViewRoute = crud.view.getViewRouteName();
@@ -52,7 +53,7 @@ export function init(context, router) {
     crud.edit.addToMetaProperties('permissions', 'tasks/edit', crud.edit.getRouterConfig());
 
     const grid = context.createGrid('tasks.grid-title', 'tasks', TasksService, {
-        with: 'priority, project, user',
+        with: 'priority, project, users',
         is_active: true,
     });
     grid.addToMetaProperties('navigation', navigation, grid.getRouterConfig());
@@ -322,24 +323,26 @@ export function init(context, router) {
         {
             label: 'field.priority',
             key: 'priority_id',
-            type: 'select',
-            options: [
-                {
-                    value: 1,
-                    label: 'tasks.priority.low',
-                },
-                {
-                    value: 2,
-                    label: 'tasks.priority.normal',
-                },
-                {
-                    value: 3,
-                    label: 'tasks.priority.high',
-                },
-            ],
-            initialValue: 2,
+            render: (h, data) => {
+                let value = '';
+                if (typeof data.currentValue === 'number' || typeof data.currentValue === 'string') {
+                    value = data.currentValue;
+                }
+
+                return h(ResourceSelect, {
+                    props: {
+                        service: new PriorityService(),
+                        value,
+                        clearable: false,
+                    },
+                    on: {
+                        input(value) {
+                            data.inputHandler(value);
+                        },
+                    },
+                });
+            },
             required: true,
-            default: 2,
         },
         {
             label: 'field.active',
@@ -354,6 +357,24 @@ export function init(context, router) {
     crud.edit.addField(fieldsToFill);
     crud.new.addField(fieldsToFill);
 
+    const makeCellBg = (h, cell, item) => {
+        if (typeof item.priority !== 'undefined' && item.priority !== null && item.priority.color !== null) {
+            return h('span', {}, [
+                cell,
+                h(
+                    'span',
+                    {
+                        class: ['at-table__cell-bg'],
+                        style: { background: item.priority.color },
+                    },
+                    [],
+                ),
+            ]);
+        }
+
+        return cell;
+    };
+
     grid.addColumn([
         {
             title: 'field.task',
@@ -364,7 +385,7 @@ export function init(context, router) {
                     classes.push('tasks-grid__task--inactive');
                 }
 
-                return h(
+                const cell = h(
                     'span',
                     {
                         class: classes,
@@ -372,6 +393,8 @@ export function init(context, router) {
                     },
                     item.task_name,
                 );
+
+                return makeCellBg(h, cell, item);
             },
         },
         {
@@ -384,7 +407,7 @@ export function init(context, router) {
                     projectName = item.project.name;
                 }
 
-                return h(
+                const cell = h(
                     'span',
                     {
                         class: 'tasks-grid__project',
@@ -392,6 +415,8 @@ export function init(context, router) {
                     },
                     projectName,
                 );
+
+                return makeCellBg(h, cell, item);
             },
         },
         {
@@ -400,10 +425,10 @@ export function init(context, router) {
             render: (h, { item }) => {
                 const user = item.user;
                 if (!user) {
-                    return null;
+                    return makeCellBg(h, null, item);
                 }
 
-                return h('div', { class: 'flex' }, [
+                const cell = h('div', { class: 'flex' }, [
                     h(
                         'AtTooltip',
                         {
@@ -422,9 +447,17 @@ export function init(context, router) {
                         ],
                     ),
                 ]);
+
+                return makeCellBg(h, cell, item);
             },
         },
     ]);
+
+    grid.addToMetaProperties(
+        'gridData.actionsFilter',
+        (h, cell, { item }) => makeCellBg(h, cell, item),
+        grid.getRouterConfig(),
+    );
 
     grid.addFilter([
         {
