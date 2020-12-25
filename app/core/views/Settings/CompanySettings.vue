@@ -27,13 +27,7 @@
         name: 'CompanySettings',
         computed: {
             containerClass() {
-                let container = 'container';
-
-                if (this.$route.name.split('.').pop() === 'users') {
-                    container = 'container-fluid';
-                }
-
-                return container;
+                return 'container';
             },
             sections() {
                 return this.$store.getters['settings/sections']
