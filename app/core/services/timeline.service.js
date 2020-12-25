@@ -166,38 +166,22 @@ export default class TimelineService extends StoreService {
      * @param userIDs
      * @param projectIDs
      */
-    loadLatestIntervals(userIDs, projectIDs) {
+    async loadLatestIntervals(userIDs, projectIDs) {
         const endAt = moment();
         const startAt = endAt.clone().subtract(10, 'minutes');
-        return this.timeIntervalService
-            .getDashboardIntervals(userIDs, projectIDs, startAt, endAt)
-            .then(response => {
-                if (typeof response !== 'undefined') {
-                    const data = response.data.userIntervals;
-                    this.context.dispatch('setLatestIntervals', data);
+        try {
+            const response = await this.timeIntervalService.getDashboardIntervals(userIDs, projectIDs, startAt, endAt);
+            if (typeof response !== 'undefined') {
+                const data = response.data.userIntervals;
+                this.context.dispatch('setLatestIntervals', data);
+            }
 
-                    if (!data) {
-                        return;
-                    }
-                }
-            })
-            .then(tasks => {
-                const uniqueProjectIDs = new Set();
-                if (tasks) {
-                    Object.keys(tasks).forEach(taskID => {
-                        const task = tasks[taskID];
-                        uniqueProjectIDs.add(task.project_id);
-                    });
-                }
-
-                const projectIDs = [...uniqueProjectIDs];
-                return this.loadProjects(projectIDs, 'setLatestProjects');
-            })
-            .catch(e => {
-                if (!axios.isCancel(e)) {
-                    throw e;
-                }
-            });
+            return response;
+        } catch (e) {
+            if (!axios.isCancel(e)) {
+                throw e;
+            }
+        }
     }
 
     unloadIntervals() {
