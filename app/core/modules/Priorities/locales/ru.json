@@ -1,2 +1,12 @@
 {
+    "navigation": {
+      "priorities": "Приоритеты"
+    },
+    "priorities": {
+      "grid-title": "Приоритеты",
+      "crud-title": "Приоритет"
+    },
+    "field": {
+      "color": "Цвет"
+    }
 }
