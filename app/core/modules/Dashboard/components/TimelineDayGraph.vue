@@ -339,7 +339,7 @@
                     const duration = Math.ceil(moment.utc(event.end_at).diff(event.start_at, 'm'));
 
                     const left = Math.floor((secondsFromMidnight * columnWidth) / 60);
-                    const width = Math.ceil((Math.ceil(duration / 10) * 10 * columnWidth) / 60);
+                    const width = Math.max(Math.ceil((Math.ceil(duration / 10) * 10 * columnWidth) / 60), 2);
 
                     const rect = new fabric.Rect({
                         left,

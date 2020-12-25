@@ -1,7 +1,7 @@
 <template>
     <div class="screenshot" @click="$emit('click', $event)">
         <AppImage
-            :is-blob="false"
+            :is-blob="true"
             :src="getThumbnailPath(screenshot)"
             class="screenshot__image"
             :lazy="lazyImage"
@@ -160,7 +160,7 @@
             },
             getThumbnailPath(screenshot) {
                 if (screenshot.path === 'uploads/static/none.png') {
-                    return window.location.origin + '/none.png';
+                    return 'none';
                 }
 
                 return config.thumbnailPathProvider(screenshot);
@@ -179,6 +179,10 @@
             overflow: hidden;
 
             &::v-deep {
+                .pu-skeleton {
+                    height: 100px;
+                }
+
                 img {
                     height: 150px;
                 }

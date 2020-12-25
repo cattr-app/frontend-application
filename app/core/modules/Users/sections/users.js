@@ -1,5 +1,4 @@
 import cloneDeep from 'lodash/cloneDeep';
-import axios from '@/config/app';
 import TimezonePicker from '@/components/TimezonePicker';
 import CoreUsersService from '@/services/resource/user.service';
 import RoleSelect from '@/components/RoleSelect';
@@ -431,17 +430,15 @@ export default (context, router) => {
 
     grid.addAction([
         {
-            title: 'control.view',
+            //title: 'control.view',
             icon: 'icon-eye',
             onClick: (router, { item }, context) => {
                 context.onView(item);
             },
-            renderCondition({ $can }) {
-                return true;
-            },
+            renderCondition: ({ $can }) => true,
         },
         {
-            title: 'control.edit',
+            //title: 'control.edit',
             icon: 'icon-edit',
             onClick: (router, { item }, context) => {
                 context.onEdit(item);
