@@ -1,7 +1,6 @@
 import TasksService from '@/services/resource/task.service';
 import PriorityService from '@/services/resource/priority.service';
 import ProjectsService from '@/services/resource/project.service';
-import UsersService from '@/services/resource/user.service';
 import { ModuleLoaderInterceptor } from '@/moduleLoader';
 import UserAvatar from '@/components/UserAvatar';
 import UserSelect from '@/components/UserSelect';
@@ -93,7 +92,7 @@ export function init(context, router) {
                     return null;
                 }
 
-                return h('span', i18n.t(`tasks.priority.${currentValue.name.toLowerCase()}`));
+                return h('span', currentValue.name);
             },
         },
         {
@@ -350,7 +349,7 @@ export function init(context, router) {
                     },
                 });
             },
-            required: true,
+            required: false,
         },
         {
             label: 'field.active',

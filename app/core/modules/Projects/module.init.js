@@ -1,9 +1,11 @@
 import moment from 'moment';
 import 'moment-timezone';
+import PriorityService from '@/services/resource/priority.service';
 import ProjectService from '@/services/resource/project.service';
 import i18n from '@/i18n';
 import { formatDurationString } from '@/utils/time';
 import { ModuleLoaderInterceptor } from '@/moduleLoader';
+import ResourceSelect from '@/components/ResourceSelect';
 import TeamAvatars from './components/TeamAvatars.vue';
 
 export const ModuleConfig = {
@@ -53,7 +55,7 @@ export function init(context) {
     crud.edit.addToMetaProperties('permissions', 'projects/edit', crud.edit.getRouterConfig());
 
     const grid = context.createGrid('projects.grid-title', 'projects', ProjectService, {
-        with: ['users'],
+        with: ['users', 'defaultPriority'],
         withCount: ['tasks'],
     });
     grid.addToMetaProperties('navigation', navigation, grid.getRouterConfig());
@@ -85,6 +87,17 @@ export function init(context) {
             key: 'total_spent_time',
             label: 'field.total_spent',
             render: (h, props) => h('span', formatDurationString(props.currentValue)),
+        },
+        {
+            key: 'default_priority',
+            label: 'field.default_priority',
+            render: (h, { currentValue }) => {
+                if (!currentValue) {
+                    return null;
+                }
+
+                return h('span', currentValue.name);
+            },
         },
         {
             key: 'workers',
@@ -183,6 +196,30 @@ export function init(context) {
             key: 'important',
             type: 'checkbox',
             default: 0,
+        },
+        {
+            label: 'field.default_priority',
+            key: 'default_priority_id',
+            render: (h, data) => {
+                let value = '';
+                if (typeof data.currentValue === 'number' || typeof data.currentValue === 'string') {
+                    value = data.currentValue;
+                }
+
+                return h(ResourceSelect, {
+                    props: {
+                        service: new PriorityService(),
+                        value,
+                        clearable: false,
+                    },
+                    on: {
+                        input(value) {
+                            data.inputHandler(value);
+                        },
+                    },
+                });
+            },
+            required: false,
         },
     ];
 
