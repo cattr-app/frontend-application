@@ -8,6 +8,7 @@ if (process.env.NODE_ENV === 'development') {
 axios.defaults.baseURL =
     (process.env.VUE_APP_API_URL !== 'null' ? process.env.VUE_APP_API_URL : `${window.location.origin}/api`) + '/';
 axios.defaults.headers.common['X-REQUESTED-WITH'] = 'XMLHttpRequest';
+axios.defaults.headers.common['X-CATTR-CLIENT'] = window.location.host;
 
 httpInterceptor.setup();
 

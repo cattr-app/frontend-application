@@ -1,3 +1,5 @@
+import ApiService from '@/services/api';
+
 const state = {
     cancelTokens: [],
 };
@@ -5,6 +7,9 @@ const state = {
 const getters = {
     cancelTokens(state) {
         return state.cancelTokens;
+    },
+    getInstallationStatus(state) {
+        return state.isInstalled;
     },
 };
 
@@ -26,6 +31,10 @@ const actions = {
         });
 
         context.commit('clearCancelTokens');
+    },
+    async getInstallationStatus() {
+        const { installed } = await new ApiService().status();
+        return installed || false;
     },
 };
 

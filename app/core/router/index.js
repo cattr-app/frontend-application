@@ -94,6 +94,14 @@ const routes = [
         name: 'desktop-login',
         component: () => import(/* webpackChunkName: "DesktopLogin" */ '../views/DesktopLogin.vue'),
     },
+    {
+        path: '/setup',
+        name: 'setup',
+        meta: {
+            auth: false,
+        },
+        component: () => import(/* webpackChunkName: "Setup" */ '../views/Setup.vue'),
+    },
 ];
 
 const router = new VueRouter({
@@ -102,15 +110,23 @@ const router = new VueRouter({
     routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
     // Close pending requests when switching pages
-    Store.dispatch('httpRequest/cancelPendingRequests');
+    await Store.dispatch('httpRequest/cancelPendingRequests');
 
     if (to.matched.some(record => record.meta.auth || typeof record.meta.auth === 'undefined')) {
         if (!Store.getters['user/loggedIn']) {
             return next({ name: 'auth.login' });
         }
     } else if (to.matched.some(record => !record.meta.auth) && !Store.getters['user/loggedIn']) {
+        return next();
+    }
+
+    if (to.name === 'setup') {
+        if (Store.getters['httpRequest/getStatusOfInstalling']) {
+            next({ name: 'forbidden' });
+        }
+
         return next();
     }
 

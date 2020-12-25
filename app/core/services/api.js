@@ -8,6 +8,18 @@ export default class ApiService extends StoreService {
         super(context);
     }
 
+    /**
+     * @param params
+     * @returns {Promise<AxiosResponse<T>>}
+     */
+    async checkConnectionDatabase(params) {
+        return await axios.post('setup/database', params);
+    }
+
+    async finishSetup(params) {
+        return await axios.put('setup/save', params);
+    }
+
     token() {
         return this.context.getters['token'];
     }
@@ -100,4 +112,15 @@ export default class ApiService extends StoreService {
 
         return data.data;
     }
+
+    async status() {
+        try {
+            const { data } = await axios.get('/status');
+            return data;
+        } catch (e) {
+            return { cattr: false };
+        }
+    }
+
+    serverUrl = axios.defaults.baseURL;
 }

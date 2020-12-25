@@ -5,7 +5,7 @@
                 <div class="box">
                     <div class="top">
                         <div class="static-message">
-                            <div class="logo"></div>
+                            <div class="logo" />
                         </div>
                         <h1 class="login__title">Cattr</h1>
                     </div>
@@ -24,7 +24,7 @@
             </div>
             <a class="login__slogan" href="https://cattr.app" v-html="slogan" />
         </div>
-        <div class="hero col-16"></div>
+        <div class="hero col-16" />
     </div>
 </template>
 
