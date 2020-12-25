@@ -163,8 +163,6 @@
                 'timePerDay',
                 'users',
                 'latestIntervals',
-                'latestTasks',
-                'latestProjects',
                 'timezone',
             ]),
             graphUsers() {
@@ -210,7 +208,7 @@
                     const { intervals } = this.latestIntervals[userID];
                     if (intervals.length) {
                         const interval = intervals[intervals.length - 1];
-                        const task = this.latestTasks[interval.task_id];
+                        const task = interval.task;
                         if (task) {
                             return {
                                 ...result,
@@ -230,11 +228,9 @@
                 return Object.keys(this.latestIntervals).reduce((result, userID) => {
                     const task = this.currentTasks[userID];
                     if (task) {
-                        const project = this.latestProjects[task.project_id];
-
                         return {
                             ...result,
-                            [userID]: project,
+                            [userID]: task.project,
                         };
                     }
 
