@@ -34,7 +34,7 @@
                 },
             };
         },
-        mounted() {
+        created() {
             this.data = { ...this.data, ...this.storage };
 
             if (!this.data.language) {

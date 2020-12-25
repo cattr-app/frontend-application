@@ -8,9 +8,6 @@ const getters = {
     cancelTokens(state) {
         return state.cancelTokens;
     },
-    getInstallationStatus(state) {
-        return state.isInstalled;
-    },
 };
 
 const mutations = {

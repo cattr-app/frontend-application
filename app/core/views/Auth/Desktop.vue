@@ -11,14 +11,14 @@
                     </div>
                     <template v-if="error">
                         <div>
-                            <at-alert type="error" class="login__error" :message="$t('auth.desktop_error')" />
+                            <at-alert :message="$t('auth.desktop_error')" class="login__error" type="error" />
                         </div>
-                        <at-button class="login__btn" type="primary" @click="commonLogin">{{
-                            $t('auth.switch_to_common')
-                        }}</at-button>
+                        <at-button class="login__btn" type="primary" @click="commonLogin"
+                            >{{ $t('auth.switch_to_common') }}
+                        </at-button>
                     </template>
                     <template v-else>
-                        <at-alert type="info" class="login__error" :message="$t('auth.desktop_working')" />
+                        <at-alert :message="$t('auth.desktop_working')" class="login__error" type="info" />
                     </template>
                 </div>
             </div>
@@ -168,18 +168,9 @@
                     const apiService = this.$store.getters['user/apiService'];
                     apiService
                         .attemptDesktopLogin(query[1])
-                        .then(() => {
-                            apiService.getAllowedRules().then(() => {
-                                apiService.getProjectRules().then(() => {
-                                    apiService.getCompanyData().then(() => {
-                                        this.finish(false);
-                                    });
-                                });
-                            });
-                        })
-                        .catch(() => {
-                            this.finish();
-                        });
+                        .then(() => apiService.getCompanyData())
+                        .then(() => this.finish(false))
+                        .catch(() => this.finish());
                 }
             }
         },
