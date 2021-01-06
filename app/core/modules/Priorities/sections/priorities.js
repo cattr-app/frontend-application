@@ -2,6 +2,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import Store from '@/store';
 import PriorityService from '../services/priority.service';
 import Priorities from '../views/Priorities';
+import ColorInput from '../components/ColorInput';
 
 export default (context, router) => {
     const prioritiesContext = cloneDeep(context);
@@ -38,9 +39,19 @@ export default (context, router) => {
         {
             label: 'field.color',
             key: 'color',
-            type: 'input',
             required: false,
-            placeholder: 'field.color',
+            render: (h, data) => {
+                return h(ColorInput, {
+                    props: {
+                        value: data.currentValue,
+                    },
+                    on: {
+                        change(value) {
+                            data.inputHandler(value);
+                        },
+                    },
+                });
+            },
         },
     ];
 
