@@ -15,8 +15,6 @@ const state = {
     screenshots: [],
     users: [],
     latestIntervals: {},
-    latestTasks: {},
-    latestProjects: {},
     timezone: moment.tz.guess(),
 };
 
@@ -28,8 +26,6 @@ const getters = {
     screenshots: state => state.screenshots,
     users: state => state.users,
     latestIntervals: state => state.latestIntervals,
-    latestTasks: state => state.latestTasks,
-    latestProjects: state => state.latestProjects,
     events: state => {
         if (!state.intervals) {
             return {};
@@ -156,12 +152,6 @@ const mutations = {
     setLatestIntervals(state, intervals) {
         state.latestIntervals = intervals;
     },
-    setLatestTasks(state, tasks) {
-        state.latestTasks = tasks;
-    },
-    setLatestProjects(state, projects) {
-        state.latestProjects = projects;
-    },
     setTimezone(state, timezone) {
         state.timezone = timezone;
     },
@@ -203,12 +193,6 @@ const actions = {
     },
     setLatestIntervals({ commit }, intervals) {
         commit('setLatestIntervals', intervals);
-    },
-    setLatestTasks({ commit }, tasks) {
-        commit('setLatestTasks', tasks);
-    },
-    setLatestProjects({ commit }, projects) {
-        commit('setLatestProjects', projects);
     },
     setTimezone({ commit }, timezone) {
         commit('setTimezone', timezone);

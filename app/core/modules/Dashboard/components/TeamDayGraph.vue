@@ -4,11 +4,11 @@
 
         <div
             v-show="hoverPopup.show && !clickPopup.show"
-            class="popup"
             :style="{
                 left: `${hoverPopup.x - 30}px`,
                 bottom: `${height - hoverPopup.y + 10}px`,
             }"
+            class="popup"
         >
             <div v-if="hoverPopup.event">
                 {{ getTaskName(hoverPopup.event.task.id) }}
@@ -19,26 +19,26 @@
                 {{ formatDuration(hoverPopup.event.duration) }}
             </div>
 
-            <a class="corner" :style="{ left: `${hoverPopup.borderX}px` }"></a>
+            <a :style="{ left: `${hoverPopup.borderX}px` }" class="corner"></a>
         </div>
 
         <div
             v-show="clickPopup.show"
-            class="popup"
             :style="{
                 left: `${clickPopup.x - 30}px`,
                 bottom: `${height - clickPopup.y + 10}px`,
             }"
+            class="popup"
         >
             <div v-if="clickPopup.event && getScreenshotByInterval(clickPopup.intervalID)">
                 <Screenshot
+                    :disableModal="true"
                     :lazyImage="false"
-                    :screenshot="getScreenshotByInterval(clickPopup.intervalID)"
                     :project="getProject(clickPopup.event.task.project_id)"
+                    :screenshot="getScreenshotByInterval(clickPopup.intervalID)"
+                    :showText="false"
                     :task="getTask(clickPopup.event.task.id)"
                     :user="getUser(clickPopup.event.user_id)"
-                    :showText="false"
-                    :disableModal="true"
                     @click="showPopup"
                 />
             </div>
@@ -53,7 +53,7 @@
                 </router-link>
             </div>
 
-            <a class="corner" :style="{ left: `${clickPopup.borderX}px` }"></a>
+            <a :style="{ left: `${clickPopup.borderX}px` }" class="corner"></a>
         </div>
 
         <ScreenshotModal
@@ -377,11 +377,11 @@
                     if (userEvents) {
                         userEvents.forEach(event => {
                             const startOfDay = moment.tz(event.start_at, this.timezone).startOf('day');
-                            const secondsFromMidnight = moment.utc(event.start_at).diff(startOfDay, 'seconds');
-                            const duration = moment.utc(event.end_at).diff(event.start_at, 'seconds');
+                            const secondsFromMidnight = moment.utc(event.start_at).diff(startOfDay, 'm', true);
+                            const duration = Math.ceil(moment.utc(event.end_at).diff(event.start_at, 'm'));
 
-                            const left = Math.floor((secondsFromMidnight * columnWidth) / 3600);
-                            const width = Math.ceil((duration * columnWidth) / 3600);
+                            const left = Math.floor((secondsFromMidnight * columnWidth) / 60);
+                            const width = Math.max(Math.ceil((Math.ceil(duration / 10) * 10 * columnWidth) / 60), 2);
 
                             const rect = new fabric.Rect({
                                 left,
@@ -538,39 +538,39 @@
         }
 
         .popup {
-            position: absolute;
-            display: block;
-
             background: #ffffff;
-
             border: 0;
+
             border-radius: 20px;
 
             box-shadow: 0px 7px 64px rgba(0, 0, 0, 0.07);
-
-            width: 270px;
+            display: block;
 
             padding: 10px;
 
+            position: absolute;
+
             text-align: center;
+
+            width: 270px;
 
             z-index: 3;
 
             & .corner {
-                content: ' ';
+                border-left: 15px solid transparent;
 
-                position: absolute;
+                border-right: 15px solid transparent;
+                border-top: 10px solid #ffffff;
+
+                bottom: -10px;
+                content: ' ';
                 display: block;
 
-                border-top: 10px solid #ffffff;
-                border-left: 15px solid transparent;
-                border-right: 15px solid transparent;
-
-                left: 15px;
-                bottom: -10px;
-
-                width: 0;
                 height: 0;
+                left: 15px;
+
+                position: absolute;
+                width: 0;
 
                 z-index: 1;
             }

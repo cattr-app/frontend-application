@@ -335,11 +335,11 @@
                 // Intervals
                 this.events.forEach(event => {
                     const startOfDay = moment.tz(event.start_at, this.timezone).startOf('day');
-                    const secondsFromMidnight = moment.utc(event.start_at).diff(startOfDay, 'seconds');
-                    const duration = moment.utc(event.end_at).diff(event.start_at, 'seconds');
+                    const secondsFromMidnight = moment.utc(event.start_at).diff(startOfDay, 'm', true);
+                    const duration = Math.ceil(moment.utc(event.end_at).diff(event.start_at, 'm'));
 
-                    const left = Math.floor((secondsFromMidnight * columnWidth) / 3600);
-                    const width = Math.ceil((duration * columnWidth) / 3600);
+                    const left = Math.floor((secondsFromMidnight * columnWidth) / 60);
+                    const width = Math.max(Math.ceil((Math.ceil(duration / 10) * 10 * columnWidth) / 60), 2);
 
                     const rect = new fabric.Rect({
                         left,

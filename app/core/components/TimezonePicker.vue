@@ -9,7 +9,7 @@
             :placeholder="$t('control.select')"
             @open="onOpen"
             @close="onClose"
-            @search="query => (search = query)"
+            @search="search = $event"
         >
             <template #list-footer>
                 <li v-show="hasNextPage" ref="load" class="vs__dropdown-option">
@@ -104,6 +104,8 @@
                     if (this.timezones.some(t => t.value === timezoneName)) {
                         return;
                     }
+
+                    if (typeof timezoneName !== 'string') return;
 
                     this.timezones.push({
                         value: timezoneName,

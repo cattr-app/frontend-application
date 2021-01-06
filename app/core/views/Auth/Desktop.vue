@@ -5,26 +5,26 @@
                 <div class="box">
                     <div class="top">
                         <div class="static-message">
-                            <div class="logo"></div>
+                            <div class="logo" />
                         </div>
                         <h1 class="login__title">Cattr</h1>
                     </div>
                     <template v-if="error">
                         <div>
-                            <at-alert type="error" class="login__error" :message="$t('auth.desktop_error')" />
+                            <at-alert :message="$t('auth.desktop_error')" class="login__error" type="error" />
                         </div>
-                        <at-button class="login__btn" type="primary" @click="commonLogin">{{
-                            $t('auth.switch_to_common')
-                        }}</at-button>
+                        <at-button class="login__btn" type="primary" @click="commonLogin"
+                            >{{ $t('auth.switch_to_common') }}
+                        </at-button>
                     </template>
                     <template v-else>
-                        <at-alert type="info" class="login__error" :message="$t('auth.desktop_working')" />
+                        <at-alert :message="$t('auth.desktop_working')" class="login__error" type="info" />
                     </template>
                 </div>
             </div>
             <a class="login__slogan" href="https://cattr.app" v-html="slogan" />
         </div>
-        <div class="hero col-16"></div>
+        <div class="hero col-16" />
     </div>
 </template>
 
@@ -168,18 +168,9 @@
                     const apiService = this.$store.getters['user/apiService'];
                     apiService
                         .attemptDesktopLogin(query[1])
-                        .then(() => {
-                            apiService.getAllowedRules().then(() => {
-                                apiService.getProjectRules().then(() => {
-                                    apiService.getCompanyData().then(() => {
-                                        this.finish(false);
-                                    });
-                                });
-                            });
-                        })
-                        .catch(() => {
-                            this.finish();
-                        });
+                        .then(() => apiService.getCompanyData())
+                        .then(() => this.finish(false))
+                        .catch(() => this.finish());
                 }
             }
         },

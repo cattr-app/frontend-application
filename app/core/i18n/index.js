@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import VueI18n from 'vue-i18n';
-import { getModuleList, ModuleLoaderInterceptor } from '../moduleLoader';
+import { getModuleList, ModuleLoaderInterceptor } from '@/moduleLoader';
 import merge from 'lodash/merge';
 import veeValidateEn from 'vee-validate/dist/locale/en.json';
 import veeValidateRu from 'vee-validate/dist/locale/ru.json';

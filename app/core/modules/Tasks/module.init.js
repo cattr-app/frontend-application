@@ -3,6 +3,7 @@ import ProjectsService from '@/services/resource/project.service';
 import UsersService from '@/services/resource/user.service';
 import { ModuleLoaderInterceptor } from '@/moduleLoader';
 import UserAvatar from '@/components/UserAvatar';
+import UserSelect from '@/components/UserSelect';
 import i18n from '@/i18n';
 import { formatDate, formatDurationString } from '@/utils/time';
 import { VueEditor } from 'vue2-editor';
@@ -34,7 +35,7 @@ export function init(context, router) {
     });
 
     const crud = context.createCrud('tasks.crud-title', 'tasks', TasksService, {
-        with: 'priority, project, user',
+        with: 'priority, project, users',
     });
 
     const crudViewRoute = crud.view.getViewRouteName();
@@ -52,7 +53,7 @@ export function init(context, router) {
     crud.edit.addToMetaProperties('permissions', 'tasks/edit', crud.edit.getRouterConfig());
 
     const grid = context.createGrid('tasks.grid-title', 'tasks', TasksService, {
-        with: 'priority, project, user',
+        with: 'priority, project, users',
         is_active: true,
     });
     grid.addToMetaProperties('navigation', navigation, grid.getRouterConfig());
@@ -95,29 +96,37 @@ export function init(context, router) {
             },
         },
         {
-            key: 'user',
-            label: 'field.user',
+            key: 'users',
+            label: 'field.users',
             render: (h, data) => {
                 if (!router.app.$store.getters['user/user'].is_admin) {
-                    return h('span', data.currentValue.full_name);
-                }
-
-                if (data.currentValue && data.currentValue.id) {
                     return h(
-                        'router-link',
-                        {
-                            props: {
-                                to: {
-                                    name: routes.usersView,
-                                    params: { id: data.currentValue.id },
-                                },
-                            },
-                        },
-                        data.currentValue.full_name,
+                        'ul',
+                        {},
+                        data.currentValue.map(item => h('li', item.full_name)),
                     );
                 }
 
-                return h('span', i18n.t('tasks.unassigned'));
+                return h(
+                    'ul',
+                    {},
+                    data.currentValue.map(item =>
+                        h('li', {}, [
+                            h(
+                                'router-link',
+                                {
+                                    props: {
+                                        to: {
+                                            name: routes.usersView,
+                                            params: { id: item.id },
+                                        },
+                                    },
+                                },
+                                item.full_name,
+                            ),
+                        ]),
+                    ),
+                );
             },
         },
         {
@@ -237,6 +246,7 @@ export function init(context, router) {
         {
             label: 'field.description',
             key: 'description',
+            required: true,
             render: (h, props) => {
                 return h(VueEditor, {
                     props: {
@@ -297,23 +307,21 @@ export function init(context, router) {
             initialValue: false,
         },
         {
-            label: 'field.user',
-            key: 'user_id',
-            render: (h, data) => {
-                let value = '';
-                if (typeof data.currentValue === 'number' || typeof data.currentValue === 'string') {
-                    value = data.currentValue;
-                }
+            label: 'field.users',
+            key: 'users',
+            render: (h, props) => {
+                const value =
+                    typeof props.values.users !== 'undefined'
+                        ? props.values.users.map(user => (typeof user === 'object' ? user.id : +user))
+                        : [];
 
-                return h(ResourceSelect, {
+                return h(UserSelect, {
                     props: {
-                        service: new UsersService(),
                         value,
-                        clearable: true,
                     },
                     on: {
-                        input(value) {
-                            data.inputHandler(value);
+                        change: function(value) {
+                            props.inputHandler(value);
                         },
                     },
                 });
@@ -395,33 +403,32 @@ export function init(context, router) {
             },
         },
         {
-            title: 'field.user',
-            key: 'user',
+            title: 'field.users',
+            key: 'users',
             render: (h, { item }) => {
-                const user = item.user;
-                if (!user) {
-                    return null;
-                }
-
-                return h('div', { class: 'flex' }, [
-                    h(
-                        'AtTooltip',
-                        {
-                            props: {
-                                placement: 'top',
-                                content: user.full_name,
-                            },
-                        },
-                        [
-                            h(UserAvatar, {
+                return h(
+                    'div',
+                    { class: 'flex' },
+                    item.users.map(user =>
+                        h(
+                            'AtTooltip',
+                            {
                                 props: {
-                                    user,
-                                    showTooltip: true,
+                                    placement: 'top',
+                                    content: user.full_name,
                                 },
-                            }),
-                        ],
+                            },
+                            [
+                                h(UserAvatar, {
+                                    props: {
+                                        user,
+                                        showTooltip: true,
+                                    },
+                                }),
+                            ],
+                        ),
                     ),
-                ]);
+                );
             },
         },
     ]);
@@ -444,7 +451,7 @@ export function init(context, router) {
             fieldOptions: { type: 'project-select' },
         },
         {
-            key: 'user_id',
+            key: 'users.id',
             label: 'tasks.users',
             fieldOptions: { type: 'user-select' },
         },
