@@ -66,6 +66,30 @@ export default (context, router) => {
         {
             title: 'field.color',
             key: 'color',
+            render(h, { item }) {
+                return h(
+                    'span',
+                    {
+                        style: {
+                            display: 'flex',
+                            alignItems: 'center',
+                        },
+                    },
+                    [
+                        h('span', {
+                            style: {
+                                display: 'inline-block',
+                                background: item.color,
+                                borderRadius: '4px',
+                                width: '16px',
+                                height: '16px',
+                                margin: '0 4px 0 0',
+                            },
+                        }),
+                        h('span', {}, [item.color]),
+                    ],
+                );
+            },
         },
     ]);
 
