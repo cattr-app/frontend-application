@@ -1,8 +1,7 @@
 import TimezonePicker from '@/components/TimezonePicker';
 import CompanyService from '../services/company.service';
-import PriorityService from '@/services/resource/priority.service';
 import ColorSelect from '../components/ColorSelect';
-import ResourceSelect from '@/components/ResourceSelect';
+import PrioritySelect from '@/components/PrioritySelect';
 import Store from '@/store';
 
 export default {
@@ -148,9 +147,8 @@ export default {
                             value = props.currentValue;
                         }
 
-                        return h(ResourceSelect, {
+                        return h(PrioritySelect, {
                             props: {
-                                service: new PriorityService(),
                                 value,
                                 clearable: true,
                             },

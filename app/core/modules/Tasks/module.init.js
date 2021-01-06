@@ -1,13 +1,12 @@
 import TasksService from '@/services/resource/task.service';
-import PriorityService from '@/services/resource/priority.service';
 import ProjectsService from '@/services/resource/project.service';
 import { ModuleLoaderInterceptor } from '@/moduleLoader';
 import UserAvatar from '@/components/UserAvatar';
 import UserSelect from '@/components/UserSelect';
+import PrioritySelect from '@/components/PrioritySelect';
 import i18n from '@/i18n';
 import { formatDate, formatDurationString } from '@/utils/time';
 import { VueEditor } from 'vue2-editor';
-import ResourceSelect from '@/components/ResourceSelect';
 
 export const ModuleConfig = {
     routerPrefix: 'tasks',
@@ -336,9 +335,8 @@ export function init(context, router) {
                     value = data.currentValue;
                 }
 
-                return h(ResourceSelect, {
+                return h(PrioritySelect, {
                     props: {
-                        service: new PriorityService(),
                         value,
                         clearable: false,
                     },
