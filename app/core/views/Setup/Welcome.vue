@@ -34,11 +34,12 @@
                 },
             };
         },
-        mounted() {
+        created() {
             this.data = { ...this.data, ...this.storage };
 
             if (!this.data.language) {
                 this.$set(this.data, 'language', getLangCookie());
+                this.$emit('updateStorage', this.data);
             }
 
             this.$emit('setStatus', 'finish');
