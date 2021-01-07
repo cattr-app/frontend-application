@@ -501,7 +501,7 @@
                     columns.push({
                         title: this.$t('field.actions'),
                         render: (h, params) => {
-                            return h(
+                            let cell = h(
                                 'div',
                                 {
                                     class: 'actions-column',
@@ -531,6 +531,12 @@
                                     }
                                 }),
                             );
+
+                            if (typeof gridData.actionsFilter !== 'undefined') {
+                                return gridData.actionsFilter(h, cell, params);
+                            }
+
+                            return cell;
                         },
                     });
                 }
@@ -754,9 +760,22 @@
                     padding-bottom: $spacing-05;
                     border-bottom: 2px solid $blue-3;
 
+                    position: relative;
+                    z-index: 0;
+
                     &:last-child {
                         max-width: unset;
                     }
+                }
+
+                &__cell-bg {
+                    position: absolute;
+                    display: block;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    z-index: -1;
                 }
 
                 .actions-column {
@@ -780,6 +799,16 @@
         &_sortable {
             &::v-deep .at-table__cell.at-table__column {
                 cursor: pointer !important;
+            }
+        }
+
+        &::v-deep {
+            .primary-border .at-btn--primary {
+                border-color: white;
+            }
+
+            .error-border .at-btn--error {
+                border-color: white;
             }
         }
     }

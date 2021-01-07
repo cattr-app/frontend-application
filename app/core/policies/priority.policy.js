@@ -1,6 +1,6 @@
 import { hasRole } from '@/utils/user';
 
-export default class InvitationPolicy {
+export default class PriorityPolicy {
     static viewAny(user) {
         return hasRole(user, 'admin');
     }

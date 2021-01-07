@@ -1,6 +1,7 @@
 import TimezonePicker from '@/components/TimezonePicker';
 import CompanyService from '../services/company.service';
 import ColorSelect from '../components/ColorSelect';
+import PrioritySelect from '@/components/PrioritySelect';
 import Store from '@/store';
 
 export default {
@@ -136,6 +137,28 @@ export default {
                         placeholder: 'field.auto_thin',
                     },
                     tooltipValue: 'tooltip.auto_thin',
+                },
+                {
+                    label: 'field.default_priority',
+                    key: 'default_priority_id',
+                    render: (h, props) => {
+                        let value = '';
+                        if (typeof props.currentValue === 'number' || typeof props.currentValue === 'string') {
+                            value = props.currentValue;
+                        }
+
+                        return h(PrioritySelect, {
+                            props: {
+                                value,
+                                clearable: true,
+                            },
+                            on: {
+                                input(value) {
+                                    props.inputHandler(value);
+                                },
+                            },
+                        });
+                    },
                 },
             ],
         },

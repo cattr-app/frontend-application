@@ -8,5 +8,8 @@
     "amount_of_tasks": "Нет задач | 1 задача | {count} задач(и)",
     "project_members": "Участники",
     "members": "Участники"
+  },
+  "field": {
+    "default_priority": "Приоритет по-умолчанию"
   }
 }
