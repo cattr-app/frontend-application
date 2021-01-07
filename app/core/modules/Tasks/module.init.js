@@ -5,6 +5,7 @@ import UserAvatar from '@/components/UserAvatar';
 import UserSelect from '@/components/UserSelect';
 import PrioritySelect from '@/components/PrioritySelect';
 import i18n from '@/i18n';
+import { getTextColor } from '@/utils/color';
 import { formatDate, formatDurationString } from '@/utils/time';
 import { VueEditor } from 'vue2-editor';
 
@@ -362,6 +363,12 @@ export function init(context, router) {
     crud.edit.addField(fieldsToFill);
     crud.new.addField(fieldsToFill);
 
+    const getCellStyle = item => {
+        return typeof item.priority !== 'undefined' && item.priority !== null
+            ? { color: getTextColor(item.priority.color) }
+            : {};
+    };
+
     const makeCellBg = (h, cell, item) => {
         if (typeof item.priority !== 'undefined' && item.priority !== null && item.priority.color !== null) {
             return h('span', {}, [
@@ -394,6 +401,7 @@ export function init(context, router) {
                     'span',
                     {
                         class: classes,
+                        style: getCellStyle(item),
                         attrs: { title: item.task_name },
                     },
                     item.task_name,
@@ -416,6 +424,7 @@ export function init(context, router) {
                     'span',
                     {
                         class: 'tasks-grid__project',
+                        style: getCellStyle(item),
                         attrs: { title: projectName },
                     },
                     projectName,

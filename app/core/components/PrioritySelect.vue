@@ -1,5 +1,5 @@
 <template>
-    <div class="priority-select" :style="{ background: color, color: textColor(color) }">
+    <div class="priority-select" :style="{ background: color, color: getTextColor(color) }">
         <at-select
             v-if="options.length"
             ref="select"
@@ -14,7 +14,7 @@
                 :label="ucfirst(option.label)"
                 :value="option.value"
             >
-                <span class="option" :style="{ background: option.color, color: textColor(option.color) }">
+                <span class="option" :style="{ background: option.color, color: getTextColor(option.color) }">
                     <span class="option-text">
                         {{ ucfirst(option.label) }}
                     </span>
@@ -26,7 +26,7 @@
 </template>
 
 <script>
-    import * as convert from 'color-convert';
+    import { getTextColor } from '@/utils/color';
     import { ucfirst } from '@/utils/string';
     import PriorityService from '@/services/resource/priority.service';
 
@@ -75,18 +75,7 @@
         },
         methods: {
             ucfirst,
-            textColor(background) {
-                if (background === 'transparent') {
-                    return 'black';
-                }
-
-                const hsl = convert.hex.hsl(background);
-                if (hsl === null) {
-                    return 'black';
-                }
-
-                return hsl[2] > 50 ? 'black' : 'white';
-            },
+            getTextColor,
         },
         computed: {
             model: {
