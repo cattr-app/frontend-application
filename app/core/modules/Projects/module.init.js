@@ -95,7 +95,32 @@ export function init(context) {
                     return null;
                 }
 
-                return h('span', currentValue.name);
+                if (!currentValue.color) {
+                    return h('span', {}, [currentValue.name]);
+                }
+
+                return h(
+                    'span',
+                    {
+                        style: {
+                            display: 'flex',
+                            alignItems: 'center',
+                        },
+                    },
+                    [
+                        h('span', {
+                            style: {
+                                display: 'inline-block',
+                                background: currentValue.color,
+                                borderRadius: '4px',
+                                width: '16px',
+                                height: '16px',
+                                margin: '0 4px 0 0',
+                            },
+                        }),
+                        h('span', {}, [currentValue.name]),
+                    ],
+                );
             },
         },
         {
