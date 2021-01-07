@@ -801,6 +801,16 @@
                 cursor: pointer !important;
             }
         }
+
+        &::v-deep {
+            .primary-border .at-btn--primary {
+                border-color: white;
+            }
+
+            .error-border .at-btn--error {
+                border-color: white;
+            }
+        }
     }
 
     .preloader {
