@@ -27,6 +27,7 @@
     "@sentry/integrations": "^5.17.0",
     "axios": "^0.19.0",
     "axios-concurrency": "^1.0.3",
+    "color-convert": "^2.0.1",
     "core-js": "^3.6.5",
     "cross-env": "^6.0.3",
     "dotenv": "^8.2.0",
