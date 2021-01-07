@@ -32,10 +32,8 @@
                     </template>
                 </at-input>
                 <div class="color-readiness__color">
-                    <input
-                        id="input-color"
-                        type="color"
-                        class="at-input__original"
+                    <ColorInput
+                        class="color-input at-input__original"
                         :value="config.color"
                         @change="setColor(config, $event)"
                     />
@@ -55,6 +53,8 @@
 </template>
 
 <script>
+    import ColorInput from './ColorInput';
+
     const defaultInterval = { color: '#3ba8da', start: 0, end: 0.1 };
 
     export default {
@@ -62,6 +62,9 @@
             colorsConfig: {
                 required: true,
             },
+        },
+        components: {
+            ColorInput,
         },
         data() {
             return {};
@@ -231,7 +234,7 @@
                 return parseInt(config.start * 100);
             },
             setColor(config, event) {
-                this.$set(config, 'color', event.target.value);
+                this.$set(config, 'color', event);
             },
             reset() {
                 this.$emit('reset');
@@ -241,7 +244,7 @@
 </script>
 
 <style lang="scss" scoped>
-    #input-color[type='color'] {
+    .color-input {
         width: 170px;
         height: 40px;
         cursor: pointer;

@@ -1,13 +1,13 @@
 import TasksService from '@/services/resource/task.service';
 import ProjectsService from '@/services/resource/project.service';
-import UsersService from '@/services/resource/user.service';
 import { ModuleLoaderInterceptor } from '@/moduleLoader';
 import UserAvatar from '@/components/UserAvatar';
 import UserSelect from '@/components/UserSelect';
+import PrioritySelect from '@/components/PrioritySelect';
 import i18n from '@/i18n';
+import { getTextColor } from '@/utils/color';
 import { formatDate, formatDurationString } from '@/utils/time';
 import { VueEditor } from 'vue2-editor';
-import ResourceSelect from '@/components/ResourceSelect';
 
 export const ModuleConfig = {
     routerPrefix: 'tasks',
@@ -92,7 +92,32 @@ export function init(context, router) {
                     return null;
                 }
 
-                return h('span', i18n.t(`tasks.priority.${currentValue.name.toLowerCase()}`));
+                if (!currentValue.color) {
+                    return h('span', {}, [currentValue.name]);
+                }
+
+                return h(
+                    'span',
+                    {
+                        style: {
+                            display: 'flex',
+                            alignItems: 'center',
+                        },
+                    },
+                    [
+                        h('span', {
+                            style: {
+                                display: 'inline-block',
+                                background: currentValue.color,
+                                borderRadius: '4px',
+                                width: '16px',
+                                height: '16px',
+                                margin: '0 4px 0 0',
+                            },
+                        }),
+                        h('span', {}, [currentValue.name]),
+                    ],
+                );
             },
         },
         {
@@ -330,24 +355,25 @@ export function init(context, router) {
         {
             label: 'field.priority',
             key: 'priority_id',
-            type: 'select',
-            options: [
-                {
-                    value: 1,
-                    label: 'tasks.priority.low',
-                },
-                {
-                    value: 2,
-                    label: 'tasks.priority.normal',
-                },
-                {
-                    value: 3,
-                    label: 'tasks.priority.high',
-                },
-            ],
-            initialValue: 2,
-            required: true,
-            default: 2,
+            render: (h, data) => {
+                let value = '';
+                if (typeof data.currentValue === 'number' || typeof data.currentValue === 'string') {
+                    value = data.currentValue;
+                }
+
+                return h(PrioritySelect, {
+                    props: {
+                        value,
+                        clearable: false,
+                    },
+                    on: {
+                        input(value) {
+                            data.inputHandler(value);
+                        },
+                    },
+                });
+            },
+            required: false,
         },
         {
             label: 'field.active',
@@ -362,6 +388,30 @@ export function init(context, router) {
     crud.edit.addField(fieldsToFill);
     crud.new.addField(fieldsToFill);
 
+    const getCellStyle = item => {
+        return typeof item.priority !== 'undefined' && item.priority !== null
+            ? { color: getTextColor(item.priority.color) }
+            : {};
+    };
+
+    const makeCellBg = (h, cell, item) => {
+        if (typeof item.priority !== 'undefined' && item.priority !== null && item.priority.color !== null) {
+            return h('span', {}, [
+                cell,
+                h(
+                    'span',
+                    {
+                        class: ['at-table__cell-bg'],
+                        style: { background: item.priority.color },
+                    },
+                    [],
+                ),
+            ]);
+        }
+
+        return cell;
+    };
+
     grid.addColumn([
         {
             title: 'field.task',
@@ -372,14 +422,17 @@ export function init(context, router) {
                     classes.push('tasks-grid__task--inactive');
                 }
 
-                return h(
+                const cell = h(
                     'span',
                     {
                         class: classes,
+                        style: getCellStyle(item),
                         attrs: { title: item.task_name },
                     },
                     item.task_name,
                 );
+
+                return makeCellBg(h, cell, item);
             },
         },
         {
@@ -392,23 +445,29 @@ export function init(context, router) {
                     projectName = item.project.name;
                 }
 
-                return h(
+                const cell = h(
                     'span',
                     {
                         class: 'tasks-grid__project',
+                        style: getCellStyle(item),
                         attrs: { title: projectName },
                     },
                     projectName,
                 );
+
+                return makeCellBg(h, cell, item);
             },
         },
         {
             title: 'field.users',
             key: 'users',
             render: (h, { item }) => {
-                return h(
-                    'div',
-                    { class: 'flex' },
+                const user = item.user;
+                if (!user) {
+                    return makeCellBg(h, null, item);
+                }
+
+                const cell = h('div', { class: 'flex' }, [
                     item.users.map(user =>
                         h(
                             'AtTooltip',
@@ -419,19 +478,48 @@ export function init(context, router) {
                                 },
                             },
                             [
-                                h(UserAvatar, {
-                                    props: {
-                                        user,
-                                        showTooltip: true,
+                                h(
+                                    UserAvatar,
+                                    {
+                                        props: {
+                                            placement: 'top',
+                                            content: user.full_name,
+                                        },
                                     },
-                                }),
+                                    [
+                                        h(UserAvatar, {
+                                            props: {
+                                                user,
+                                                showTooltip: true,
+                                            },
+                                        }),
+                                    ],
+                                ),
                             ],
                         ),
                     ),
-                );
+                ]);
+
+                return makeCellBg(h, cell, item);
             },
         },
     ]);
+
+    grid.addToMetaProperties(
+        'gridData.actionsFilter',
+        (h, cell, { item }) => {
+            if (typeof item.priority !== 'undefined' && item.priority !== null) {
+                if (/^#6C6CFF$/i.test(item.priority.color)) {
+                    cell = h('span', { class: 'primary-border' }, [cell]);
+                } else if (/^#FF5569$/i.test(item.priority.color)) {
+                    cell = h('span', { class: 'error-border' }, [cell]);
+                }
+            }
+
+            return makeCellBg(h, cell, item);
+        },
+        grid.getRouterConfig(),
+    );
 
     grid.addFilter([
         {

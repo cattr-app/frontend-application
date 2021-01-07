@@ -8,5 +8,8 @@
     "amount_of_tasks": "No tasks | 1 task | {count} tasks",
     "project_members": "Project members",
     "members": "Members"
+  },
+  "field": {
+    "default_priority": "Default priority"
   }
 }
