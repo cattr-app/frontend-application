@@ -1,5 +1,5 @@
 <template>
-    <div class="priority-select" :style="{ background: color }">
+    <div class="priority-select" :style="{ background: color, color: textColor(color) }">
         <at-select
             v-if="options.length"
             ref="select"
@@ -14,7 +14,11 @@
                 :label="ucfirst(option.label)"
                 :value="option.value"
             >
-                <span class="option" :style="{ background: option.color }">{{ ucfirst(option.label) }}</span>
+                <span class="option" :style="{ background: option.color, color: textColor(option.color) }">
+                    <span class="option-text">
+                        {{ ucfirst(option.label) }}
+                    </span>
+                </span>
             </at-option>
         </at-select>
         <at-input v-else disabled></at-input>
@@ -22,6 +26,7 @@
 </template>
 
 <script>
+    import * as convert from 'color-convert';
     import { ucfirst } from '@/utils/string';
     import PriorityService from '@/services/resource/priority.service';
 
@@ -70,6 +75,18 @@
         },
         methods: {
             ucfirst,
+            textColor(background) {
+                if (background === 'transparent') {
+                    return 'black';
+                }
+
+                const hsl = convert.hex.hsl(background);
+                if (hsl === null) {
+                    return 'black';
+                }
+
+                return hsl[2] > 50 ? 'black' : 'white';
+            },
         },
         computed: {
             model: {
@@ -102,6 +119,10 @@
 
         & /deep/ .at-select__dropdown .at-select__option {
             padding: 0;
+        }
+
+        & /deep/ .at-select {
+            color: inherit;
         }
     }
 
