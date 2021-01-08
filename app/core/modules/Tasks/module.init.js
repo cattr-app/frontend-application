@@ -36,7 +36,7 @@ export function init(context, router) {
     });
 
     const crud = context.createCrud('tasks.crud-title', 'tasks', TasksService, {
-        with: 'priority, project, users',
+        with: 'priority, project, users, status',
     });
 
     const crudViewRoute = crud.view.getViewRouteName();
@@ -61,10 +61,22 @@ export function init(context, router) {
 
     const fieldsToShow = [
         {
-            key: 'active',
+            key: 'status',
+            label: 'field.status',
+            render: (h, { currentValue }) => {
+                return h('span', typeof currentValue !== 'undefined' && currentValue !== null ? currentValue.name : '');
+            },
+        },
+        {
+            key: 'status',
             label: 'field.active',
             render: (h, { currentValue }) => {
-                return h('span', currentValue ? i18n.t('control.yes') : i18n.t('control.no'));
+                return h(
+                    'span',
+                    typeof currentValue !== 'undefined' && currentValue !== null && currentValue.active
+                        ? i18n.t('control.yes')
+                        : i18n.t('control.no'),
+                );
             },
         },
         {
