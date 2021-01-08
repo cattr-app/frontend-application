@@ -15,6 +15,10 @@ export default class StatusService extends ResourceService {
     }
 
     save(data, isNew = false) {
+        if (typeof data.active === 'undefined') {
+            data.active = true;
+        }
+
         return axios.post(`statuses/${isNew ? 'create' : 'edit'}`, data);
     }
 
