@@ -10,9 +10,10 @@
             @click="onClick"
             @input="onChange"
         >
-            <li v-if="showSelectAll" class="at-select__option" @click="selectAll">
+            <li v-if="showSelectAll" class="at-select__option" @click="selectAll()">
                 {{ $t('control.select_all') }}
             </li>
+            <slot name="before-options"></slot>
             <at-option
                 v-for="option of options"
                 :key="option.id"
@@ -74,11 +75,7 @@
         },
         async created() {
             try {
-                const { data } = await this.service.getAll();
-                const all = data.map(option => ({
-                    value: option.id,
-                    label: option[this.service.getOptionLabelKey()],
-                }));
+                const all = await this.service.getOptionList();
                 this.options.push(...all);
                 this.$emit('onOptionsLoad', this.options);
             } catch ({ response }) {
@@ -145,10 +142,11 @@
             },
         },
         methods: {
-            selectAll() {
+            selectAll(predicate = () => true) {
                 const query = this.$refs.select.query.toUpperCase();
                 this.model = this.options
                     .filter(({ label }) => label.toUpperCase().indexOf(query) !== -1)
+                    .filter(predicate)
                     .map(({ value }) => value);
             },
             clearSelect() {

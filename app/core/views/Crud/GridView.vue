@@ -66,6 +66,15 @@
                                 @change="onProjectsChange(filter.key, $event)"
                             />
 
+                            <StatusSelect
+                                v-else-if="filter.fieldOptions && filter.fieldOptions.type === 'status-select'"
+                                :key="filter.key"
+                                v-model="filterFieldsModel[filter.key]"
+                                size="small"
+                                class="crud__popup-filter"
+                                @change="onStatusesChange(filter.key, $event)"
+                            />
+
                             <at-input
                                 v-else
                                 :key="filter.key"
@@ -130,6 +139,7 @@
 <script>
     import Preloader from '@/components/Preloader';
     import ProjectSelect from '@/components/ProjectSelect';
+    import StatusSelect from '@/components/StatusSelect';
     import UserSelect from '@/components/UserSelect';
 
     const defaultItemsPerPage = 10;
@@ -139,6 +149,7 @@
         components: {
             Preloader,
             ProjectSelect,
+            StatusSelect,
             UserSelect,
         },
         data() {
@@ -290,6 +301,15 @@
                 this.filterFieldsData();
             },
             onProjectsChange(key, data) {
+                if (data.length > 0) {
+                    this.filterFieldsModel[key] = ['=', data];
+                } else {
+                    this.filterFieldsModel[key] = '';
+                }
+
+                this.filterFieldsData();
+            },
+            onStatusesChange(key, data) {
                 if (data.length > 0) {
                     this.filterFieldsModel[key] = ['=', data];
                 } else {
