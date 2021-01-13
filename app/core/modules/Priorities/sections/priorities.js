@@ -2,7 +2,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import Store from '@/store';
 import PriorityService from '../services/priority.service';
 import Priorities from '../views/Priorities';
-import ColorInput from '../../Settings/components/ColorInput';
+import ColorInput from '@/components/ColorInput';
 
 export default (context, router) => {
     const prioritiesContext = cloneDeep(context);

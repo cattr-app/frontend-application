@@ -53,7 +53,7 @@
 </template>
 
 <script>
-    import ColorInput from './ColorInput';
+    import ColorInput from '@/components/ColorInput';
 
     const defaultInterval = { color: '#3ba8da', start: 0, end: 0.1 };
 

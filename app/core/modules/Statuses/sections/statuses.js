@@ -3,6 +3,7 @@ import i18n from '@/i18n';
 import Store from '@/store';
 import StatusService from '../services/statuse.service';
 import Statuses from '../views/Statuses';
+import ColorInput from '@/components/ColorInput';
 
 export default (context, router) => {
     const statusesContext = cloneDeep(context);
@@ -54,6 +55,23 @@ export default (context, router) => {
                 });
             },
         },
+        {
+            label: 'field.color',
+            key: 'color',
+            required: false,
+            render: (h, data) => {
+                return h(ColorInput, {
+                    props: {
+                        value: typeof data.currentValue === 'string' ? data.currentValue : 'transparent',
+                    },
+                    on: {
+                        change(value) {
+                            data.inputHandler(value);
+                        },
+                    },
+                });
+            },
+        },
     ];
 
     crud.edit.addField(fieldsToFill);
@@ -69,6 +87,34 @@ export default (context, router) => {
             key: 'active',
             render(h, { item }) {
                 return h('span', [i18n.t('control.' + (!item.active ? 'yes' : 'no'))]);
+            },
+        },
+        {
+            title: 'field.color',
+            key: 'color',
+            render(h, { item }) {
+                return h(
+                    'span',
+                    {
+                        style: {
+                            display: 'flex',
+                            alignItems: 'center',
+                        },
+                    },
+                    [
+                        h('span', {
+                            style: {
+                                display: 'inline-block',
+                                background: item.color,
+                                borderRadius: '4px',
+                                width: '16px',
+                                height: '16px',
+                                margin: '0 4px 0 0',
+                            },
+                        }),
+                        h('span', {}, [item.color]),
+                    ],
+                );
             },
         },
     ]);

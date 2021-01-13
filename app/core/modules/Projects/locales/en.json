@@ -7,9 +7,12 @@
     "crud-title": "Project",
     "amount_of_tasks": "No tasks | 1 task | {count} tasks",
     "project_members": "Project members",
-    "members": "Members"
+    "members": "Members",
+    "enable_status": "Enable status in project",
+    "override_color": "Override color"
   },
   "field": {
-    "default_priority": "Default priority"
+    "default_priority": "Default priority",
+    "statuses": "Statuses"
   }
 }
