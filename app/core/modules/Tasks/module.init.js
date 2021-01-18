@@ -462,13 +462,13 @@ export function init(context, router) {
             title: 'field.users',
             key: 'users',
             render: (h, { item }) => {
-                const user = item.user;
-                if (!user) {
+                const users = item.users;
+                if (!users) {
                     return makeCellBg(h, null, item);
                 }
 
-                const cell = h('div', { class: 'flex' }, [
-                    item.users.map(user =>
+                const cell = h('div', { class: ['flex', 'flex-gap', 'flex-wrap'] }, [
+                    users.map(user =>
                         h(
                             'AtTooltip',
                             {
@@ -478,23 +478,11 @@ export function init(context, router) {
                                 },
                             },
                             [
-                                h(
-                                    UserAvatar,
-                                    {
-                                        props: {
-                                            placement: 'top',
-                                            content: user.full_name,
-                                        },
+                                h(UserAvatar, {
+                                    props: {
+                                        user,
                                     },
-                                    [
-                                        h(UserAvatar, {
-                                            props: {
-                                                user,
-                                                showTooltip: true,
-                                            },
-                                        }),
-                                    ],
-                                ),
+                                }),
                             ],
                         ),
                     ),

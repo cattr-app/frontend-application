@@ -7,8 +7,8 @@
             :customStyle="styles"
             :backgroundColor="backgroundColor"
             :src="src"
-        ></vue-avatar>
-        <div v-show="online" class="avatar__online-status"></div>
+        />
+        <div v-show="user.online" class="avatar__online-status" />
     </div>
 </template>
 
@@ -30,9 +30,6 @@
             user: {
                 type: Object,
                 required: true,
-            },
-            online: {
-                type: Boolean,
             },
         },
         components: {
