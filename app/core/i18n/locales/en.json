@@ -11,24 +11,24 @@
   },
   "setup": {
     "process": {
-      "info_without_docker": "Please, change configuration of your server according to examples below. Note, that you should replace path with your actual path to Cattr.",
+      "info_without_docker": "Please, change your server's settings according to examples below. Note, that you should replace paths with the path to your Cattr installed.",
       "important_information": "Important information",
-      "title_supervisor": "Config of Supervisor",
-      "title_cron": "Config of Cron",
+      "title_supervisor": "Supervisor configuration",
+      "title_cron": "Cron configuration",
       "end_install": "Start use Cattr",
       "button_process": "Installing",
-      "config_confirmation": "I've installed required configuration files",
-      "title": "Setting up",
-      "subtitle": "Please, do not close or reload this tab until we will be ready"
+      "config_confirmation": "The required configuration files are changed accordingly",
+      "title": "Cattr install",
+      "subtitle": "Please, do not close or reload this tab until the installation is completed"
     },
     "step_description": {
       "welcome": "Welcome",
-      "database_settings": "Setting of database",
-      "company_settings": "Settings of company",
+      "database_settings": "Database configuration",
+      "company_settings": "Company configuration",
       "account": "Create account",
-      "permission": "Permission",
-      "backend_ping": "Backend Connect",
-      "recaptcha": "Setting of reCAPTCHA"
+      "permission": "Permissions",
+      "backend_ping": "Connection to backend server",
+      "recaptcha": "reCAPTCHA configuration"
     },
     "buttons": {
       "next": "Next",
@@ -46,21 +46,21 @@
         "language": "Please, select your company language"
       },
       "backend_ping": {
-        "title": "Backend connect",
-        "subtitle": "Check connection with backend",
+        "title": "Connection to backend server",
+        "subtitle": "Checking the connection with your Cattr backend server",
         "success": "Success",
         "error": "Connection refused",
-        "process": "Wait process",
+        "process": "Processing",
         "status": "Backend status",
-        "server_url": "I'll try to find my server at: {serverUrl}",
+        "server_url": "Trying to find the server at: {serverUrl}",
         "wrong_url": "Wrong url?",
         "building_when": "URL should be set up on frontend building",
         "read_more": "You can read more in {0}",
         "documentation": "documentation"
       },
       "database_settings": {
-        "title": "Setting of database",
-        "subtitle": "Set MySQL setting",
+        "title": "Database configuration",
+        "subtitle": "Set MySQL configuration",
         "success": "Success",
         "error": "Wrong params",
         "process": "Wait process",
@@ -69,17 +69,17 @@
         "username":"User name",
         "password":"Password",
         "status": "Database status",
-        "docker_title": "Cattr is running inside official Docker container",
-        "docker_subtitle": "You do not need to set up database connection settings"
+        "docker_title": "Cattr is running inside the official Docker container",
+        "docker_subtitle": "You do not need to adjust database connection settings"
       },
       "company_settings": {
-        "title": "Settings of company",
+        "title": "Company settings",
         "subtitle": "Set company settings",
         "language": "Language",
         "timezone": "Timezone"
       },
       "account": {
-        "title": "Settings of account",
+        "title": "Admin account settings",
         "subtitle": "Create admin account",
         "email": "E-mail",
         "password": "Password"
@@ -87,13 +87,13 @@
       "permission": {
         "title": "Permission",
         "subtitle": "Give permission",
-        "registration_process": "Wait for process registration",
+        "registration_process": "Wait until the registration process is completed",
         "registration": "Registration"
       },
       "recaptcha": {
-        "title": "Settings of reCAPTCHA",
-        "subtitle": "Connect reCAPTCHA to protect user accounts from password attacks.",
-        "get_recaptcha": "Get keys of reCAPTCHA"
+        "title": "reCAPTCHA settings",
+        "subtitle": "Connect reCAPTCHA to protect user accounts from password attacks",
+        "get_recaptcha": "Get reCAPTCHA keys"
       }
     }
   },
@@ -102,9 +102,9 @@
     "forgot_password": "Forgot password?",
     "message": {
       "user_not_found": "We can't find the user with provided credentials",
-      "solve_captcha": "You must solve a CAPTCHA",
+      "solve_captcha": "You must resolve a CAPTCHA",
       "auth_error": "Authorization error",
-      "data_reset": "Data are flushing, please wait a minute and try again"
+      "data_reset": "Data is flushing right now, please wait a minute and try again"
     },
     "desktop": {
       "header": "Desktop application login",
@@ -115,11 +115,11 @@
       "cancel": "Cancel",
       "open": "Open application",
       "finish": "Finish",
-      "error": "It seems, Desktop application is not installed on your PC",
-      "download": "You can download it by going {0}",
-      "download_button": "there"
+      "error": "The desktop application is not installed on your PC",
+      "download": "You can download it {0}",
+      "download_button": "here"
     },
-    "switch_to_common": "Login via password",
+    "switch_to_common": "Log in with password",
     "close": "Close page",
     "desktop_error": "Error happened during authorization",
     "desktop_working": "Authorizing"
@@ -161,7 +161,7 @@
     "subtitle": "Please fill out the fields to confirm your registration",
     "register_btn": "Create account",
     "success_title": "Account was created successfully",
-    "success_subtitle": "Go to the login page to log into your account"
+    "success_subtitle": "Go to the login page to log in to your account"
   },
   "settings": {
     "account": "Account",
@@ -242,7 +242,7 @@
     "total_time": "Total time",
     "total_spent": "Total Spent Time",
     "time": "Time",
-    "auto_thin": "Automatic storage thinning",
+    "auto_thin": "Automatic storage cleanup",
     "members": "Members",
     "url": "URL",
     "statuses": {
@@ -286,14 +286,14 @@
   },
   "message": {
     "no_data": "No data to display",
-    "page_not_found": "Looks like the page you're looking for doesn't exist :(",
-    "page_forbidden": "Access forbidden",
+    "page_not_found": "The page you're looking for doesn't exist",
+    "page_forbidden": "Access denied",
     "field_is_required": "This field is required",
     "something_went_wrong": "Something went wrong",
     "success": "Success",
     "error": "Error",
-    "vulnerable_version": "You are using a vulnerable version of the app, please update to the latest available version",
-    "update_version": "A new version is available"
+    "vulnerable_version": "You are using an outdated app version, please update to the latest one",
+    "update_version": "New version is available"
   },
   "time": {
     "h": "h",
@@ -302,16 +302,16 @@
   },
   "tooltip": {
     "task_important": "Related screenshots should not be deleted automatically",
-    "user_change_password": "Makes the password change after the first login mandatory",
+    "user_change_password": "Makes the password change on the first login mandatory",
     "user_manual_time": "Allow users to manually add time",
     "user_send_invite": "Email user the account's credentials. If \"Password\" field is not filled in, an email with an auto-generated password will be sent in any case ",
     "user_computer_time_popup": "User's inactivity time in minutes before 'inactivity detected' modal pops up",
-    "user_interval_screenshot": "Screenshot creation time in minutes",
-    "color_intervals": "Lets you select colors for workday time intervals from 0 to 100%",
-    "work_time": "Minimum working hours/day",
+    "user_interval_screenshot": "Screenshot creation time interval in minutes",
+    "color_intervals": "Lets you select colors for clocked-in time intervals from 0 to 100%",
+    "work_time": "Minimum amount of working hours/day",
     "auto_thin": "Old screenshots will be deleted automatically",
     "activity_progress": {
-      "not_tracked": "Activity was not tracked",
+      "not_tracked": "No activity tracked",
       "overall": "Overall activity: | Overall activity: 1% | Overall activity: {percent}%",
       "mouse": "Mouse: 0% | Mouse: 1% | Mouse: {percent}%",
       "keyboard": "Keyboard: 0% | Keyboard: 1% | Keyboard: {percent}%",
@@ -329,24 +329,24 @@
       "status": "Status",
       "vulnerable": "Vulnerable",
       "ok": "Up to date",
-      "outdated": "Outdated"
+      "outdated": "Out of date"
     },
     "module_versions": "Module versions",
     "module_storage": "Storage",
     "no_modules": "No modules installed",
     "no_storage": "No info about storage",
     "storage": {
-      "last_thinning": "Last clean was",
+      "last_thinning": "Last cleanup was",
       "space": {
-        "left": "Space left",
-        "total": "Total space available",
+        "left": "Space available",
+        "total": "Total space",
         "used": "Space used"
       },
-      "screenshots_available": "For deletion available",
+      "screenshots_available": "Can be removed",
       "screenshots": "0 screenshots | {n} screenshot | {n} screenshots",
-      "thin_unavailable": "Thinning unavailable",
-      "thin_available": "Thinning available",
-      "thin": "Start thinning"
+      "thin_unavailable": "Cleanup is unavailable at this moment",
+      "thin_available": "Cleanup is available",
+      "thin": "Cleanup space"
     }
   },
   "notification": {
@@ -366,7 +366,7 @@
       "delete": {
         "confirmation": {
           "title": "Delete record?",
-          "message": "Are you sure you want delete record?"
+          "message": "Are you sure you want delete this record?"
         },
         "success": {
           "title": "Success",
@@ -386,21 +386,21 @@
       "save": {
         "success": {
           "title": "Success",
-          "message": "Screenshots was saved successfully"
+          "message": "Screenshots were saved successfully"
         },
         "error": {
           "title": "Error",
-          "message": "Failed to save these screenshots"
+          "message": "Failed to save the screenshots"
         }
       },
       "delete": {
         "success": {
           "title": "Success",
-          "message": "Screenshots was successfully deleted"
+          "message": "Screenshots were successfully deleted"
         },
         "error": {
           "title": "Error",
-          "message": "Failed to remove these screenshots"
+          "message": "Failed to remove the screenshots"
         }
       }
     }
