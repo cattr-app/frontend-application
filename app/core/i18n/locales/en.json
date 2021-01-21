@@ -338,7 +338,7 @@
     "storage": {
       "last_thinning": "Last cleanup was",
       "space": {
-        "left": "Space available",
+        "left": "Free space",
         "total": "Total space",
         "used": "Space used"
       },
