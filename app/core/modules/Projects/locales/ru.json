@@ -9,10 +9,24 @@
     "project_members": "Участники",
     "members": "Участники",
     "enable_status": "Включить статус в проекте",
-    "override_color": "Переопределить цвет"
+    "override_color": "Переопределить цвет",
+    "tasks": "Задачи",
+    "project_tasks": "Задачи проекта",
+    "add_task": "Добавить задачу",
+    "task_change": "{user} изменил {field} {date}",
+    "task_change_users": "{user} назначил исполнителем {value} {date}",
+    "show_history": "Показать",
+    "hide_history": "Скрыть",
+    "add_comment": "Добавить"
   },
   "field": {
     "default_priority": "Приоритет по-умолчанию",
-    "statuses": "Статусы"
+    "statuses": "Статусы",
+    "due_date": "Дата завершения",
+    "history": "История",
+    "project_id": "Проект",
+    "priority_id": "Приоритет",
+    "status_id": "Статус",
+    "comments": "Комментарии"
   }
 }

@@ -9,6 +9,7 @@
 
 <script>
     import * as Sentry from '@sentry/browser';
+    import moment from 'moment';
     import { getLangCookie, setLangCookie } from './i18n';
 
     export const config = { beforeLayout: null };
@@ -62,8 +63,10 @@
                 if (user.user_language) {
                     this.$i18n.locale = user.user_language;
                     setLangCookie(user.user_language);
+                    moment.locale(user.user_language);
                 } else if (cookieLang) {
                     this.$i18n.locale = cookieLang;
+                    moment.locale(cookieLang);
                 }
             },
         },
