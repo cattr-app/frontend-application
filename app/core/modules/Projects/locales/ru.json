@@ -28,5 +28,8 @@
     "priority_id": "Приоритет",
     "status_id": "Статус",
     "comments": "Комментарии"
+  },
+  "control": {
+    "task-list": "Список задач"
   }
 }

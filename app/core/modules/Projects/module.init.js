@@ -312,7 +312,7 @@ export function init(context) {
     const assignRouteName = context.getModuleRouteName() + '.members';
     context.addRoute([
         {
-            path: `/${context.routerPrefix}/:id/tasks`,
+            path: `/${context.routerPrefix}/:id/tasks/kanban`,
             name: tasksRouteName,
             component: () => import('./views/Tasks.vue'),
             meta: {

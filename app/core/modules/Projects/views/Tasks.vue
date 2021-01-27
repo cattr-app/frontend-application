@@ -1,5 +1,5 @@
 <template>
-    <div class="at-container">
+    <div>
         <div class="crud crud__content">
             <div class="page-controls">
                 <h1 class="page-title crud__title">{{ project.name }}</h1>
@@ -10,9 +10,16 @@
                             v-if="$can('create', 'task')"
                             type="primary"
                             size="large"
+                            icon="icon-edit"
                             @click="$router.push({ name: 'Tasks.crud.tasks.new' })"
                         >
                             {{ $t('projects.add_task') }}
+                        </at-button>
+                    </div>
+
+                    <div class="control-item">
+                        <at-button size="large" @click="$router.push(`/projects/${$route.params['id']}/tasks/list`)">
+                            {{ $t('control.task-list') }}
                         </at-button>
                     </div>
 
@@ -22,7 +29,7 @@
                 </div>
             </div>
 
-            <div ref="kanban" class="project-tasks">
+            <div ref="kanban" class="project-tasks at-container">
                 <kanban-board :stages="stages" :blocks="blocks" @update-block="updateBlock">
                     <div
                         v-for="stage in stages"
@@ -423,6 +430,10 @@
         },
         mounted() {
             window.addEventListener('scroll', this.onScroll);
+
+            if (this.$route.query.task) {
+                this.loadTask(+this.$route.query.task);
+            }
         },
         beforeDestroy() {
             window.removeEventListener('scroll', this.onScroll);
@@ -573,6 +584,10 @@
             background: #ecf2fc;
             border-radius: 4px;
         }
+    }
+
+    .project-tasks {
+        padding: 16px;
     }
 
     .project-tasks /deep/ {

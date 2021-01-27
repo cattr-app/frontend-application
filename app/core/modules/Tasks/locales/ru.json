@@ -25,5 +25,8 @@
   },
   "field": {
     "source": "Источник"
+  },
+  "control": {
+    "kanban-board": "Kanban"
   }
 }

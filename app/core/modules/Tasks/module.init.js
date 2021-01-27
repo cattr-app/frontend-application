@@ -35,6 +35,8 @@ export function init(context, router) {
         });
     });
 
+    context.routerPrefix = 'projects/:project_id/tasks/list';
+
     const crud = context.createCrud('tasks.crud-title', 'tasks', TasksService, {
         with: 'priority, project, users, status',
     });
@@ -528,17 +530,16 @@ export function init(context, router) {
             filterName: 'filter.fields.task_name',
             referenceKey: 'task_name',
         },
-        {
-            filterName: 'filter.fields.project_name',
-            referenceKey: 'project.name',
-        },
     ]);
 
     grid.addFilterField([
         {
             key: 'project_id',
             label: 'tasks.projects',
-            fieldOptions: { type: 'project-select' },
+            fieldOptions: {
+                type: 'project-select',
+                hidden: true,
+            },
         },
         {
             key: 'users.id',
@@ -599,14 +600,23 @@ export function init(context, router) {
                 return $can('create', 'task');
             },
         },
-    ]);
-
-    context.addNavbarEntry({
-        label: 'navigation.tasks',
-        to: {
-            name: 'Tasks.crud.tasks',
+        {
+            label: 'control.kanban-board',
+            type: 'default',
+            onClick: ({ $router, $route }) => {
+                $router.push(`/projects/${$route.params.project_id}/tasks/kanban`);
+            },
+            renderCondition: () => true,
         },
-    });
+        {
+            label: 'control.back',
+            type: 'default',
+            onClick: ({ $router }) => {
+                $router.go(-1);
+            },
+            renderCondition: () => true,
+        },
+    ]);
 
     context.addLocalizationData({
         en: require('./locales/en'),

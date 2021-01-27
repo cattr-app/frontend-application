@@ -28,5 +28,8 @@
     "priority_id": "Priority",
     "status_id": "Status",
     "comments": "Comments"
+  },
+  "control": {
+    "task-list": "Task List"
   }
 }
