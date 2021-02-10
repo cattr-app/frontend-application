@@ -131,6 +131,20 @@
             height() {
                 return timelineHeight + titleHeight + subtitleHeight;
             },
+            tasks() {
+                if (!this.user) {
+                    return {};
+                }
+
+                const userIntervals = this.intervals[this.user.id];
+                if (!userIntervals) {
+                    return {};
+                }
+
+                return userIntervals.intervals
+                    .map(interval => interval.task)
+                    .reduce((obj, task) => ({ ...obj, [task.id]: task }), {});
+            },
             projects() {
                 return Object.keys(this.tasks)
                     .map(taskID => this.tasks[taskID])
