@@ -774,7 +774,7 @@
 
                 &__cell {
                     max-width: 250px;
-                    overflow: hidden;
+                    overflow-x: hidden;
 
                     padding-top: $spacing-05;
                     padding-bottom: $spacing-05;

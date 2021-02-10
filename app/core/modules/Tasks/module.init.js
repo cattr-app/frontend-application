@@ -480,8 +480,8 @@ export function init(context, router) {
                     return makeCellBg(h, null, item);
                 }
 
-                const cell = h('div', { class: 'flex' }, [
-                    item.users.map(user =>
+                const cell = h('div', { class: ['flex', 'flex-gap', 'flex-wrap'] }, [
+                    users.map(user =>
                         h(
                             'AtTooltip',
                             {

@@ -1,5 +1,6 @@
 {
   "settings": {
+    "company_language": "Company language",
     "color_interval": {
       "label": "Progress of the working day",
       "notification": {

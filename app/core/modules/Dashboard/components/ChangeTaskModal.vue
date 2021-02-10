@@ -46,9 +46,17 @@
                             :label="option.label"
                         >
                             <div class="input__select-wrap">
-                                <at-tooltip :content="option.user.full_name" placement="right-top">
-                                    <user-avatar :key="option.value" :user="option.user" />
-                                </at-tooltip>
+                                <div class="flex flex-wrap flex-gap">
+                                    <at-tooltip
+                                        v-for="(user, userKey) in option.users"
+                                        :key="userKey"
+                                        :content="user.full_name"
+                                        placement="right"
+                                        class="user-tooltips"
+                                    >
+                                        <user-avatar :user="user" />
+                                    </at-tooltip>
+                                </div>
                                 <span>{{ option.label }}</span>
                             </div>
                         </at-option>
@@ -135,12 +143,12 @@
         watch: {
             async projectId(projectId) {
                 try {
-                    const taskList = (await this.tasksService.getWithFilters({ project_id: projectId, with: 'user' }))
+                    const taskList = (await this.tasksService.getWithFilters({ project_id: projectId, with: 'users' }))
                         .data;
                     this.tasksOptionList = taskList.map(option => ({
                         value: option.id,
                         label: option['task_name'],
-                        user: option.user,
+                        users: option.users,
                     }));
                 } catch ({ response }) {
                     if (process.env.NODE_ENV === 'development') {
@@ -178,6 +186,10 @@
 
             span {
                 padding-left: 10px;
+            }
+
+            .flex {
+                max-width: 40%;
             }
         }
     }

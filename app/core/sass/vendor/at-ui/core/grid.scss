@@ -124,6 +124,18 @@ $baseWidth: 4.166667%;
   order: 1;
 }
 
+.flex-gap {
+  gap: 10px;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.flex-wrap-reverse {
+  flex-wrap: wrap-reverse;
+}
+
 /* normal */
 .container {
   width: 100%;
