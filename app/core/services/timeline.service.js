@@ -146,8 +146,7 @@ export default class TimelineService extends StoreService {
             .getWithFilters({
                 with: 'timeInterval',
                 'timeInterval.user_id': ['=', userIDs],
-                'timeInterval.start_at': ['>=', startAt],
-                'timeInterval.end_at': ['<=', endAt],
+                'timeInterval.start_at': ['between', [startAt, endAt]],
             })
             .then(response => {
                 const { data } = response;
