@@ -6,7 +6,7 @@
                     <div class="row flex-middle flex-between">
                         <div class="col-4">
                             {{ $t('field.selected') }}:
-                            <strong>{{ getFormattedTotalTime() }}</strong>
+                            <strong>{{ formattedTotalTime }}</strong>
                         </div>
                         <div class="col-12">
                             <div class="flex flex-end">
@@ -80,13 +80,7 @@
             ChangeTaskModal,
         },
         props: {
-            selectedIntervalIds: {
-                type: Array,
-            },
-            screenshots: {
-                type: Array,
-            },
-            intervals: {
+            intervalIds: {
                 type: Array,
             },
         },
@@ -95,46 +89,32 @@
             showAddNewTaskModal() {
                 return this.modal === 'addNewTask';
             },
-
             showChangeTaskModal() {
                 return this.modal === 'changeTask';
+            },
+            totalTimeOfSelectedIntervals() {
+                return this.intervals
+                    .map(interval => {
+                        const start = moment.utc(interval.start_at);
+                        const end = moment.utc(interval.end_at);
+                        return end.diff(start);
+                    })
+                    .reduce((total, curr) => total + curr, 0);
+            },
+            formattedTotalTime() {
+                return moment.utc(this.totalTimeOfSelectedIntervals).format('HH:mm:ss');
             },
         },
         data() {
             return {
                 tasksService: new TasksService(),
                 timeIntervalsService: new TimeIntervalsService(),
-
                 modal: '',
                 disabledButtons: false,
-                intervalIds: [],
+                intervals: [],
             };
         },
         methods: {
-            totalTimeOfSelectedIntervals() {
-                if (typeof this.screenshots !== 'undefined') {
-                    return this.screenshots
-                        .filter(screenshot => this.intervalIds.includes(screenshot.time_interval_id))
-                        .map(screenshot => {
-                            const start = moment.utc(screenshot.time_interval.start_at);
-                            const end = moment.utc(screenshot.time_interval.end_at);
-                            return end.diff(start);
-                        })
-                        .reduce((total, curr) => total + curr, 0);
-                } else {
-                    return this.intervals
-                        .filter(interval => this.intervalIds.includes(interval.id))
-                        .map(interval => {
-                            const start = moment.utc(interval.start_at);
-                            const end = moment.utc(interval.end_at);
-                            return end.diff(start);
-                        })
-                        .reduce((total, curr) => total + curr, 0);
-                }
-            },
-            getFormattedTotalTime() {
-                return moment.utc(this.totalTimeOfSelectedIntervals()).format('HH:mm:ss');
-            },
             async saveTimeIntervals(data) {
                 try {
                     this.disabledButtons = true;
@@ -175,10 +155,11 @@
                         message: this.$t('notification.screenshot.delete.success.message'),
                     });
 
-                    this.$emit('remove', this.intervalIds);
-                    this.intervalIds = [];
+                    this.$emit('remove', this.intervals);
                     this.disabledButtons = false;
                 } catch (e) {
+                    console.log(e);
+
                     this.$Notify({
                         type: 'error',
                         title: this.$t('notification.screenshot.delete.error.title'),
@@ -252,8 +233,9 @@
             },
         },
         watch: {
-            selectedIntervalIds(values) {
-                this.intervalIds = values;
+            async intervalIds(values) {
+                const response = await this.timeIntervalsService.getAll({ id: ['in', values] });
+                this.intervals = response.data;
             },
         },
     };
