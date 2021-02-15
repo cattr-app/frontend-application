@@ -56,7 +56,7 @@
 
                 const filters = { task_name: ['like', `%${query}%`], with: 'project' };
                 if (this.userID) {
-                    filters['user_id'] = this.userID;
+                    filters['users.id'] = this.userID;
                 }
 
                 this.options = await this.service.getWithFilters(filters).then(({ data }) => {
