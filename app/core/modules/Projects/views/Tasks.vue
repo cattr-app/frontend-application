@@ -91,7 +91,7 @@
 
             <div class="row">
                 <div class="col-8 label">{{ $t('field.priority') }}:</div>
-                <div class="col">{{ task.priority.name }}</div>
+                <div class="col">{{ task.priority ? task.priority.name : '' }}</div>
             </div>
 
             <div class="row">
@@ -489,14 +489,15 @@
     }
 
     .task-view {
-        position: absolute;
+        position: fixed;
         top: 0;
         right: 0;
         background: #ffffff;
         border: 1px solid #c5d9e8;
         border-radius: 4px;
         width: 600px;
-        min-height: 100%;
+        max-height: 100vh;
+        overflow: hidden auto;
         padding: 16px;
 
         &-header {
