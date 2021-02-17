@@ -48,6 +48,7 @@
                                             :render="field.render"
                                             :value="values[field.key]"
                                             :field="field"
+                                            :values="values"
                                         ></renderable-field>
                                         <template v-else>{{ values[field.key] }}</template>
                                     </Skeleton>

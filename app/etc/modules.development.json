@@ -6,5 +6,9 @@
   "AmazingCat_RedmineIntegration": {
     "type": "local",
     "ref": "AmazingCat_RedmineIntegration"
+  },
+  "AmazingCat_JiraIntegration": {
+    "type": "local",
+    "ref": "AmazingCat_JiraIntegration"
   }
 }

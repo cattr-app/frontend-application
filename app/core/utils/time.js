@@ -18,6 +18,10 @@ export function formatDurationString(time) {
     return `${hours}${i18n.t('time.h')} ${minutes}${i18n.t('time.m')}`;
 }
 
+export function fromNow(date) {
+    return moment(date).fromNow();
+}
+
 export function getDateToday() {
     return moment().format('YYYY-MM-DD');
 }

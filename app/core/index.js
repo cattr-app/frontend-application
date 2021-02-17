@@ -17,6 +17,7 @@ import './plugins/vee-validate';
 import './plugins/sentry';
 import './policies';
 import Gate from './plugins/gate';
+import vueKanban from 'vue-kanban';
 
 //Global components
 import installGlobalComponents from './global-extension';
@@ -31,6 +32,7 @@ Vue.use(VueLazyload, {
     lazyComponent: true,
 });
 Vue.use(Gate);
+Vue.use(vueKanban);
 
 installGlobalComponents(Vue);
 

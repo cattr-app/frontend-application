@@ -27,11 +27,18 @@
                 type: String,
                 default: 'normal',
             },
+            value: {
+                type: Array,
+                default: null,
+            },
         },
         data() {
+            const selectedProjectIds =
+                this.value !== null ? this.value : JSON.parse(localStorage.getItem(localStorageKey));
+
             return {
                 projectService: new ProjectService(),
-                selectedProjectIds: JSON.parse(localStorage.getItem(localStorageKey)),
+                selectedProjectIds,
             };
         },
         methods: {

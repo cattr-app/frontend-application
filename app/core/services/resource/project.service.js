@@ -22,7 +22,9 @@ export default class ProjectService extends ResourceService {
      * @returns {Promise<AxiosResponse<T>>}
      */
     getItem(id) {
-        return axios.get(this.getItemRequestUri(id) + '&' + serialize({ with: ['users', 'defaultPriority'] }));
+        return axios.get(
+            this.getItemRequestUri(id) + '&' + serialize({ with: ['users', 'defaultPriority', 'statuses'] }),
+        );
     }
 
     /**

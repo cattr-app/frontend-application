@@ -25,12 +25,17 @@
 
                     <div v-show="filterPopupVisible" class="crud__popup-filters">
                         <template v-for="filter of visibleFilterFields">
-                            <div :key="filter.key + '_title'" class="crud__popup-filter-title">
+                            <div
+                                v-show="!filter.fieldOptions || !filter.fieldOptions.hidden"
+                                :key="filter.key + '_title'"
+                                class="crud__popup-filter-title"
+                            >
                                 {{ $t(filter.label) }}
                             </div>
 
                             <at-select
                                 v-if="filter.fieldOptions && filter.fieldOptions.type === 'select'"
+                                v-show="!filter.fieldOptions || !filter.fieldOptions.hidden"
                                 :key="filter.key"
                                 v-model="filterFieldsModel[filter.key]"
                                 type="text"
@@ -50,6 +55,7 @@
 
                             <UserSelect
                                 v-else-if="filter.fieldOptions && filter.fieldOptions.type === 'user-select'"
+                                v-show="!filter.fieldOptions || !filter.fieldOptions.hidden"
                                 :key="filter.key"
                                 v-model="filterFieldsModel[filter.key]"
                                 size="small"
@@ -59,6 +65,7 @@
 
                             <ProjectSelect
                                 v-else-if="filter.fieldOptions && filter.fieldOptions.type === 'project-select'"
+                                v-show="!filter.fieldOptions || !filter.fieldOptions.hidden"
                                 :key="filter.key"
                                 v-model="filterFieldsModel[filter.key]"
                                 size="small"
@@ -66,8 +73,19 @@
                                 @change="onProjectsChange(filter.key, $event)"
                             />
 
+                            <StatusSelect
+                                v-else-if="filter.fieldOptions && filter.fieldOptions.type === 'status-select'"
+                                v-show="!filter.fieldOptions || !filter.fieldOptions.hidden"
+                                :key="filter.key"
+                                v-model="filterFieldsModel[filter.key]"
+                                size="small"
+                                class="crud__popup-filter"
+                                @change="onStatusesChange(filter.key, $event)"
+                            />
+
                             <at-input
                                 v-else
+                                v-show="!filter.fieldOptions || !filter.fieldOptions.hidden"
                                 :key="filter.key"
                                 v-model="filterFieldsModel[filter.key]"
                                 type="text"
@@ -99,6 +117,7 @@
                         <at-button
                             v-else
                             :key="key"
+                            class="crud__control-items__item"
                             size="large"
                             :type="control.type"
                             :icon="control.icon"
@@ -130,6 +149,7 @@
 <script>
     import Preloader from '@/components/Preloader';
     import ProjectSelect from '@/components/ProjectSelect';
+    import StatusSelect from '@/components/StatusSelect';
     import UserSelect from '@/components/UserSelect';
 
     const defaultItemsPerPage = 10;
@@ -139,10 +159,11 @@
         components: {
             Preloader,
             ProjectSelect,
+            StatusSelect,
             UserSelect,
         },
         data() {
-            const { query } = this.$route;
+            const { query, params } = this.$route;
             const { gridData, sortable } = this.$route.meta;
 
             let orderBy = null;
@@ -163,7 +184,14 @@
             const fieldsToLoad = (gridData.filterFields || []).filter(f => f.saveToQuery).map(f => f.key);
             Object.keys(query).forEach(field => {
                 if (fieldsToLoad.indexOf(field) !== -1) {
-                    filterFieldsModel[field] = query[field];
+                    filterFieldsModel[field] = ['=', query[field]];
+                }
+            });
+
+            const fieldsToLoadFromParams = (gridData.filterFields || []).map(f => f.key);
+            Object.keys(params).forEach(field => {
+                if (fieldsToLoadFromParams.indexOf(field) !== -1) {
+                    filterFieldsModel[field] = ['=', params[field]];
                 }
             });
 
@@ -290,6 +318,15 @@
                 this.filterFieldsData();
             },
             onProjectsChange(key, data) {
+                if (data.length > 0) {
+                    this.filterFieldsModel[key] = ['=', data];
+                } else {
+                    this.filterFieldsModel[key] = '';
+                }
+
+                this.filterFieldsData();
+            },
+            onStatusesChange(key, data) {
                 if (data.length > 0) {
                     this.filterFieldsModel[key] = ['=', data];
                 } else {

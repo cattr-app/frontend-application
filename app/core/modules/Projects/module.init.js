@@ -5,7 +5,8 @@ import i18n from '@/i18n';
 import { formatDurationString } from '@/utils/time';
 import { ModuleLoaderInterceptor } from '@/moduleLoader';
 import PrioritySelect from '@/components/PrioritySelect';
-import TeamAvatars from './components/TeamAvatars.vue';
+import TeamAvatars from '@/components/TeamAvatars';
+import Statuses from './components/Statuses';
 
 export const ModuleConfig = {
     routerPrefix: 'projects',
@@ -54,7 +55,7 @@ export function init(context) {
     crud.edit.addToMetaProperties('permissions', 'projects/edit', crud.edit.getRouterConfig());
 
     const grid = context.createGrid('projects.grid-title', 'projects', ProjectService, {
-        with: ['users', 'defaultPriority'],
+        with: ['users', 'defaultPriority', 'statuses'],
         withCount: ['tasks'],
     });
     grid.addToMetaProperties('navigation', navigation, grid.getRouterConfig());
@@ -244,6 +245,24 @@ export function init(context) {
             },
             required: false,
         },
+        {
+            label: 'field.statuses',
+            key: 'statuses',
+            render: (h, data) => {
+                const value = Array.isArray(data.currentValue) ? data.currentValue : [];
+
+                return h(Statuses, {
+                    props: {
+                        value,
+                    },
+                    on: {
+                        change(value) {
+                            data.inputHandler(value);
+                        },
+                    },
+                });
+            },
+        },
     ];
 
     crud.view.addField(fieldsToShow);
@@ -289,8 +308,17 @@ export function init(context) {
         },
     ]);
 
+    const tasksRouteName = context.getModuleRouteName() + '.tasks';
     const assignRouteName = context.getModuleRouteName() + '.members';
     context.addRoute([
+        {
+            path: `/${context.routerPrefix}/:id/tasks/kanban`,
+            name: tasksRouteName,
+            component: () => import('./views/Tasks.vue'),
+            meta: {
+                auth: true,
+            },
+        },
         {
             path: `/${context.routerPrefix}/:id/members`,
             name: assignRouteName,
@@ -310,6 +338,17 @@ export function init(context) {
             },
             renderCondition({ $store }) {
                 // User always can view assigned projects
+                return true;
+            },
+        },
+        {
+            title: 'projects.tasks',
+            icon: 'icon-list',
+            onClick: (router, { item }) => {
+                router.push({ name: tasksRouteName, params: { id: item.id } });
+            },
+            renderCondition({ $can }, item) {
+                // User always can view project's tasks
                 return true;
             },
         },

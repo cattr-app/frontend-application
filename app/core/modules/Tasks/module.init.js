@@ -1,5 +1,6 @@
 import TasksService from '@/services/resource/task.service';
 import ProjectsService from '@/services/resource/project.service';
+import StatusService from '@/services/resource/status.service';
 import { ModuleLoaderInterceptor } from '@/moduleLoader';
 import UserAvatar from '@/components/UserAvatar';
 import UserSelect from '@/components/UserSelect';
@@ -8,6 +9,8 @@ import i18n from '@/i18n';
 import { getTextColor } from '@/utils/color';
 import { formatDate, formatDurationString } from '@/utils/time';
 import { VueEditor } from 'vue2-editor';
+import TaskComments from './components/TaskComments';
+import TaskHistory from './components/TaskHistory';
 
 export const ModuleConfig = {
     routerPrefix: 'tasks',
@@ -34,8 +37,10 @@ export function init(context, router) {
         });
     });
 
+    context.routerPrefix = 'projects/:project_id/tasks/list';
+
     const crud = context.createCrud('tasks.crud-title', 'tasks', TasksService, {
-        with: 'priority, project, users',
+        with: 'priority, project, users, status, changes, changes.user, comments, comments.user',
     });
 
     const crudViewRoute = crud.view.getViewRouteName();
@@ -53,17 +58,29 @@ export function init(context, router) {
     crud.edit.addToMetaProperties('permissions', 'tasks/edit', crud.edit.getRouterConfig());
 
     const grid = context.createGrid('tasks.grid-title', 'tasks', TasksService, {
-        with: 'priority, project, users',
+        with: 'priority, project, users, status',
         is_active: true,
     });
     grid.addToMetaProperties('navigation', navigation, grid.getRouterConfig());
 
     const fieldsToShow = [
         {
-            key: 'active',
+            key: 'status',
+            label: 'field.status',
+            render: (h, { currentValue }) => {
+                return h('span', typeof currentValue !== 'undefined' && currentValue !== null ? currentValue.name : '');
+            },
+        },
+        {
+            key: 'status',
             label: 'field.active',
             render: (h, { currentValue }) => {
-                return h('span', currentValue ? i18n.t('control.yes') : i18n.t('control.no'));
+                return h(
+                    'span',
+                    typeof currentValue !== 'undefined' && currentValue !== null && currentValue.active
+                        ? i18n.t('control.yes')
+                        : i18n.t('control.no'),
+                );
             },
         },
         {
@@ -247,6 +264,20 @@ export function init(context, router) {
                 });
             },
         },
+        {
+            key: 'history',
+            label: 'field.history',
+            render: (h, props) => {
+                return h(TaskHistory, { props: { task: props.values } });
+            },
+        },
+        {
+            key: 'comments',
+            label: 'field.comments',
+            render: (h, props) => {
+                return h(TaskComments, { props: { task: props.values } });
+            },
+        },
     ];
 
     const fieldsToFill = [
@@ -373,14 +404,14 @@ export function init(context, router) {
                     },
                 });
             },
-            required: false,
+            required: true,
         },
         {
-            label: 'field.active',
-            key: 'active',
-            type: 'checkbox',
-            initialValue: true,
-            default: 1,
+            label: 'field.status',
+            key: 'status_id',
+            type: 'resource-select',
+            service: new StatusService(),
+            required: true,
         },
     ];
 
@@ -418,7 +449,7 @@ export function init(context, router) {
             key: 'task_name',
             render: (h, { item }) => {
                 const classes = ['tasks-grid__task'];
-                if (!item.active) {
+                if (!item.status || !item.status.active) {
                     classes.push('tasks-grid__task--inactive');
                 }
 
@@ -481,6 +512,7 @@ export function init(context, router) {
                                 h(UserAvatar, {
                                     props: {
                                         user,
+                                        showTooltip: true,
                                     },
                                 }),
                             ],
@@ -514,17 +546,16 @@ export function init(context, router) {
             filterName: 'filter.fields.task_name',
             referenceKey: 'task_name',
         },
-        {
-            filterName: 'filter.fields.project_name',
-            referenceKey: 'project.name',
-        },
     ]);
 
     grid.addFilterField([
         {
             key: 'project_id',
             label: 'tasks.projects',
-            fieldOptions: { type: 'project-select' },
+            fieldOptions: {
+                type: 'project-select',
+                hidden: true,
+            },
         },
         {
             key: 'users.id',
@@ -532,27 +563,9 @@ export function init(context, router) {
             fieldOptions: { type: 'user-select' },
         },
         {
-            key: 'active',
+            key: 'status_id',
             label: 'tasks.status',
-            placeholder: 'tasks.statuses.any',
-            saveToQuery: true,
-            fieldOptions: {
-                type: 'select',
-                options: [
-                    {
-                        value: '',
-                        label: 'tasks.statuses.any',
-                    },
-                    {
-                        value: '1',
-                        label: 'tasks.statuses.open',
-                    },
-                    {
-                        value: '0',
-                        label: 'tasks.statuses.closed',
-                    },
-                ],
-            },
+            fieldOptions: { type: 'status-select' },
         },
     ]);
 
@@ -603,14 +616,23 @@ export function init(context, router) {
                 return $can('create', 'task');
             },
         },
-    ]);
-
-    context.addNavbarEntry({
-        label: 'navigation.tasks',
-        to: {
-            name: 'Tasks.crud.tasks',
+        {
+            label: 'control.kanban-board',
+            type: 'default',
+            onClick: ({ $router, $route }) => {
+                $router.push(`/projects/${$route.params.project_id}/tasks/kanban`);
+            },
+            renderCondition: () => true,
         },
-    });
+        {
+            label: 'control.back',
+            type: 'default',
+            onClick: ({ $router }) => {
+                $router.go(-1);
+            },
+            renderCondition: () => true,
+        },
+    ]);
 
     context.addLocalizationData({
         en: require('./locales/en'),
