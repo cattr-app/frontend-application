@@ -110,19 +110,22 @@
                 </div>
 
                 <div class="row">
-                    <at-button class="control-item" size="large" icon="icon-eye" @click="viewTask(task)">
-                        {{ $t('control.view') }}
-                    </at-button>
+                    <at-button
+                        class="control-item"
+                        size="large"
+                        icon="icon-eye"
+                        :title="$t('control.view')"
+                        @click="viewTask(task)"
+                    />
 
                     <at-button
                         v-if="$can('update', 'task', task)"
                         class="control-item"
                         size="large"
                         icon="icon-edit"
+                        :title="$t('control.edit')"
                         @click="editTask(task)"
-                    >
-                        {{ $t('control.edit') }}
-                    </at-button>
+                    />
 
                     <at-button
                         v-if="$can('delete', 'task', task)"
@@ -130,10 +133,9 @@
                         size="large"
                         type="error"
                         icon="icon-trash-2"
+                        :title="$t('control.delete')"
                         @click="deleteTask(task)"
-                    >
-                        {{ $t('control.delete') }}
-                    </at-button>
+                    />
                 </div>
             </div>
         </transition>
