@@ -11,7 +11,7 @@ export default class New extends AbstractCrud {
         this.routerConfig = {
             path: `${context.routerPrefix}${context.defaultPrefix.length ? '/' + context.defaultPrefix : ''}/new`,
             name: this.getNewRouteName(),
-            component: () => import(/* webpackChunkName: "editview" */ '../../../views/Crud/EditView.vue'),
+            component: () => import(/* webpackChunkName: "editview" */ '@/views/Crud/EditView.vue'),
             meta: {
                 auth: true,
                 service: context.serviceClass,

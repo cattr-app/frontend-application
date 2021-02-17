@@ -19,7 +19,7 @@ const routes = [
             guest: true,
             layout: 'auth-layout',
         },
-        component: () => import(/* webpackChunkName: "login" */ '../views/Auth/Login.vue'),
+        component: () => import(/* webpackChunkName: "login" */ '@/views/Auth/Login.vue'),
         beforeEnter: (to, from, next) => {
             if (Store.getters['user/loggedIn']) {
                 next('/');
@@ -43,7 +43,7 @@ const routes = [
                 next();
             }
         },
-        component: () => import(/* webpackChunkName: "desktop-login" */ '../views/Auth/Desktop.vue'),
+        component: () => import(/* webpackChunkName: "desktop-login" */ '@/views/Auth/Desktop.vue'),
     },
     {
         path: '/auth/password/reset',
@@ -51,7 +51,7 @@ const routes = [
         meta: {
             auth: false,
         },
-        component: () => import(/* webpackChunkName: "ResetPassword" */ '../views/Auth/ResetPassword.vue'),
+        component: () => import(/* webpackChunkName: "ResetPassword" */ '@/views/Auth/ResetPassword.vue'),
     },
     {
         path: '/auth/register',
@@ -59,7 +59,7 @@ const routes = [
         meta: {
             auth: false,
         },
-        component: () => import(/* webpackChunkName: "Register" */ '../views/Auth/Register.vue'),
+        component: () => import(/* webpackChunkName: "Register" */ '@/views/Auth/Register.vue'),
         beforeEnter: (to, from, next) => {
             if (Store.getters['user/loggedIn']) {
                 Store.dispatch('user/forceUserExit');
@@ -74,7 +74,7 @@ const routes = [
         meta: {
             auth: false,
         },
-        component: () => import(/* webpackChunkName: "PageNotFound" */ '../views/PageNotFound.vue'),
+        component: () => import(/* webpackChunkName: "PageNotFound" */ '@/views/PageNotFound.vue'),
     },
     {
         path: '/forbidden',
@@ -82,17 +82,17 @@ const routes = [
         meta: {
             auth: false,
         },
-        component: () => import(/* webpackChunkName: "PageForbidden" */ '../views/PageForbidden.vue'),
+        component: () => import(/* webpackChunkName: "PageForbidden" */ '@/views/PageForbidden.vue'),
     },
     {
         path: '/about',
         name: 'about',
-        component: () => import(/* webpackChunkName: "About" */ '../views/About.vue'),
+        component: () => import(/* webpackChunkName: "About" */ '@/views/About.vue'),
     },
     {
         path: '/desktop-login',
         name: 'desktop-login',
-        component: () => import(/* webpackChunkName: "DesktopLogin" */ '../views/DesktopLogin.vue'),
+        component: () => import(/* webpackChunkName: "DesktopLogin" */ '@/views/DesktopLogin.vue'),
     },
     {
         path: '/setup',
@@ -100,7 +100,7 @@ const routes = [
         meta: {
             auth: false,
         },
-        component: () => import(/* webpackChunkName: "Setup" */ '../views/Setup.vue'),
+        component: () => import(/* webpackChunkName: "Setup" */ '@/views/Setup.vue'),
     },
 ];
 

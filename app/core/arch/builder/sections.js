@@ -1,4 +1,4 @@
-import Store from '../../store';
+import Store from '@/store';
 
 /**
  * Section class - create new section with provided params

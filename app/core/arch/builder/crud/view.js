@@ -11,7 +11,7 @@ export default class View extends AbstractCrud {
         this.routerConfig = {
             path: `${context.routerPrefix}${context.defaultPrefix.length ? '/' + context.defaultPrefix : ''}/view/:id`,
             name: this.getViewRouteName(context),
-            component: () => import(/* webpackChunkName: "itemview" */ '../../../views/Crud/ItemView.vue'),
+            component: () => import(/* webpackChunkName: "itemview" */ '@/views/Crud/ItemView.vue'),
             meta: {
                 auth: true,
                 service: context.serviceClass,
