@@ -5,7 +5,7 @@ import i18n from '@/i18n';
 import { formatDurationString } from '@/utils/time';
 import { ModuleLoaderInterceptor } from '@/moduleLoader';
 import PrioritySelect from '@/components/PrioritySelect';
-import TeamAvatars from './components/TeamAvatars';
+import TeamAvatars from '@/components/TeamAvatars';
 import Statuses from './components/Statuses';
 
 export const ModuleConfig = {

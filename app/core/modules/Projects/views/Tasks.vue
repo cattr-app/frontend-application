@@ -105,111 +105,42 @@
             </div>
 
             <div class="row">
-                <div class="col-8 label">{{ $t('field.history') }}:</div>
-                <div class="col toggle-history">
-                    <a v-if="showHistory" href="#" @click="showHistory = false">
-                        {{ $t('projects.hide_history') }}
-                    </a>
+                <at-button class="control-item" size="large" icon="icon-eye" @click="viewTask(task)">
+                    {{ $t('control.view') }}
+                </at-button>
 
-                    <a v-else href="#" @click="showHistory = true">
-                        {{ $t('projects.show_history') }}
-                    </a>
-                </div>
+                <at-button
+                    v-if="$can('update', 'task', task)"
+                    class="control-item"
+                    size="large"
+                    icon="icon-edit"
+                    @click="editTask(task)"
+                >
+                    {{ $t('control.edit') }}
+                </at-button>
 
-                <template v-if="showHistory">
-                    <div v-for="change in task.changes" :key="change.id" class="change">
-                        <team-avatars class="change-avatar" :users="[change.user]" />
-
-                        <template v-if="change.field === 'users'">
-                            {{
-                                $t('projects.task_change_users', {
-                                    user: change.user.full_name,
-                                    date: fromNow(change.created_at),
-                                    value:
-                                        change.new_value && change.new_value.length
-                                            ? JSON.parse(change.new_value)
-                                                  .map(user => user.full_name)
-                                                  .join(', ')
-                                            : '',
-                                })
-                            }}
-                        </template>
-
-                        <template v-else-if="change.field !== 'relative_position'">
-                            {{
-                                $t('projects.task_change', {
-                                    user: change.user.full_name,
-                                    field: $t(`field.${change.field}`).toLocaleLowerCase(),
-                                    date: fromNow(change.created_at),
-                                })
-                            }}
-                        </template>
-                    </div>
-                </template>
-            </div>
-
-            <div class="row">
-                <div class="col-8 label">{{ $t('field.comments') }}:</div>
-                <div class="col"></div>
-
-                <div ref="commentForm" class="comment-form">
-                    <at-textarea v-model="commentMessage" class="comment-message" @change="commentMessageChange" />
-
-                    <div
-                        v-if="showUsers"
-                        class="comment-form-users"
-                        :style="{ top: `${usersTop - scrollTop - commentMessageScrollTop}px`, left: `${usersLeft}px` }"
-                    >
-                        <div
-                            v-for="user in visibleUsers"
-                            :key="user.id"
-                            class="comment-form-user"
-                            @click="insertUserName(user.full_name)"
-                        >
-                            <team-avatars class="user-avatar" :users="[user]" />
-                            {{ user.full_name }}
-                        </div>
-                    </div>
-
-                    <at-button class="comment-submit" @click.prevent="createComment(task.id)">
-                        {{ $t('projects.add_comment') }}
-                    </at-button>
-                </div>
-
-                <div v-for="comment in task.comments" :key="comment.id" class="comment">
-                    <div class="comment-header">
-                        <span class="comment-author">
-                            <team-avatars class="comment-avatar" :users="[comment.user]" />
-                            {{ comment.user.full_name }}
-                        </span>
-
-                        <span class="comment-date">{{ formatDate(comment.created_at) }}</span>
-                    </div>
-
-                    <div class="comment-content">
-                        <template v-for="(content, index) in getCommentContent(comment)">
-                            <span v-if="content.type === 'text'" :key="index">{{ content.text }}</span>
-                            <span v-else-if="content.type === 'username'" :key="index" class="username">{{
-                                content.text
-                            }}</span>
-                        </template>
-                    </div>
-                </div>
+                <at-button
+                    v-if="$can('delete', 'task', task)"
+                    class="control-item"
+                    size="large"
+                    type="error"
+                    icon="icon-trash-2"
+                    @click="deleteTask(task)"
+                >
+                    {{ $t('control.delete') }}
+                </at-button>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-    import { offset } from 'caret-pos';
+    import TeamAvatars from '@/components/TeamAvatars';
     import ProjectService from '@/services/resource/project.service';
     import StatusService from '@/services/resource/status.service';
     import TasksService from '@/services/resource/task.service';
-    import TaskCommentService from '@/services/resource/task-comment.service';
-    import UsersService from '@/services/resource/user.service';
     import { getTextColor } from '@/utils/color';
-    import { formatDate, formatDurationString, fromNow } from '@/utils/time';
-    import TeamAvatars from '../components/TeamAvatars';
+    import { formatDate, formatDurationString } from '@/utils/time';
 
     export default {
         components: {
@@ -221,23 +152,10 @@
                 projectService: new ProjectService(),
                 statusService: new StatusService(),
                 taskService: new TasksService(),
-                taskCommentService: new TaskCommentService(),
-                userService: new UsersService(),
                 project: {},
                 statuses: [],
                 tasks: [],
                 task: null,
-                showHistory: true,
-                commentMessage: '',
-                users: [],
-                userFilter: '',
-                userNameStart: 0,
-                userNameEnd: 0,
-                showUsers: false,
-                usersTop: 0,
-                usersLeft: 0,
-                scrollTop: 0,
-                commentMessageScrollTop: 0,
             };
         },
         computed: {
@@ -250,22 +168,11 @@
                     status: this.getStatusName(task.status_id),
                 }));
             },
-            visibleUsers() {
-                return this.users.filter(user => {
-                    return (
-                        user.full_name
-                            .replace(/\s/g, '')
-                            .toLocaleLowerCase()
-                            .indexOf(this.userFilter) === 0
-                    );
-                });
-            },
         },
         methods: {
             getTextColor,
             formatDate,
             formatDurationString,
-            fromNow,
             getBlock(id) {
                 return this.blocks.find(block => +block.id === +id);
             },
@@ -338,78 +245,64 @@
             async loadTask(id) {
                 this.task = (
                     await this.taskService.getItem(id, {
-                        with: 'users,priority,project,changes,changes.user,comments,comments.user',
+                        with: 'users, priority, project',
                     })
                 ).data;
             },
-            async createComment(id) {
-                const comment = await this.taskCommentService.save({
-                    task_id: id,
-                    content: this.commentMessage,
+            viewTask(task) {
+                this.$router.push({ name: 'Tasks.crud.tasks.view', params: { id: task.id } });
+            },
+            editTask(task) {
+                this.$router.push({ name: 'Tasks.crud.tasks.edit', params: { id: task.id } });
+            },
+            async deleteTask(task) {
+                const isConfirm = await this.$CustomModal({
+                    title: this.$t('notification.record.delete.confirmation.title'),
+                    content: this.$t('notification.record.delete.confirmation.message'),
+                    okText: this.$t('control.delete'),
+                    cancelText: this.$t('control.cancel'),
+                    showClose: false,
+                    styles: {
+                        'border-radius': '10px',
+                        'text-align': 'center',
+                        footer: {
+                            'text-align': 'center',
+                        },
+                        header: {
+                            padding: '16px 35px 4px 35px',
+                            color: 'red',
+                        },
+                        body: {
+                            padding: '16px 35px 4px 35px',
+                        },
+                    },
+                    width: 320,
+                    type: 'trash',
+                    typeButton: 'error',
                 });
 
-                await this.loadTask(id);
-
-                this.commentMessage = '';
-            },
-            commentMessageChange(value) {
-                const textArea = this.$refs.commentForm.querySelector('textarea');
-                const regexp = /@([0-9a-zа-я._-]*)/gi;
-                let match,
-                    found = false;
-                while ((match = regexp.exec(value)) !== null) {
-                    const start = match.index;
-                    const end = start + match[0].length;
-                    if (textArea.selectionStart >= start && textArea.selectionEnd <= end) {
-                        this.userNameStart = start;
-                        this.userNameEnd = end;
-                        this.userFilter = match[1].replace(/\s/g, '').toLocaleLowerCase();
-                        this.showUsers = true;
-
-                        this.scrollTop = document.scrollingElement.scrollTop;
-                        this.commentMessageScrollTop = textArea.scrollTop;
-
-                        const coords = offset(textArea);
-                        this.usersTop = coords.top + 20;
-                        this.usersLeft = coords.left;
-
-                        found = true;
-                        break;
-                    }
+                if (isConfirm !== 'confirm') {
+                    return;
                 }
 
-                if (!found) {
-                    this.showUsers = false;
-                    this.userFilter = '';
-                }
-            },
-            onScroll() {
-                this.scrollTop = document.scrollingElement.scrollTop;
-            },
-            insertUserName(value) {
-                const messageBefore = this.commentMessage.substring(0, this.userNameStart);
-                const messageAfter = this.commentMessage.substring(this.userNameEnd);
-                const userName = `@${value.replace(/[^0-9a-zа-я._-]/gi, '')}`;
-                this.commentMessage = [messageBefore, userName, messageAfter].join('');
-
-                this.$nextTick(() => {
-                    const textArea = this.$refs.commentForm.querySelector('textarea');
-                    textArea.focus();
-
-                    textArea.selectionStart = this.userNameStart + userName.length;
-                    textArea.selectionEnd = this.userNameStart + userName.length;
-
-                    this.showUsers = false;
-                    this.userFilter = '';
+                await this.taskService.deleteItem(task.id);
+                this.$Notify({
+                    type: 'success',
+                    title: this.$t('notification.record.delete.success.title'),
+                    message: this.$t('notification.record.delete.success.message'),
                 });
-            },
-            getCommentContent(comment) {
-                return comment.content.split(/(@[0-9a-zа-я._-]+)/gi).map(str => {
-                    return {
-                        type: /^@[0-9a-zа-я._-]+/i.test(str) ? 'username' : 'text',
-                        text: str,
-                    };
-                });
+
+                this.task = null;
+
+                const projectId = this.$route.params['id'];
+
+                this.tasks = (
+                    await this.taskService.getWithFilters({
+                        project_id: projectId,
+                        orderBy: 'relative_position',
+                        with: 'users,priority',
+                    })
+                ).data;
             },
         },
         async created() {
@@ -425,18 +318,11 @@
                     with: 'users,priority',
                 })
             ).data;
-
-            this.users = (await this.userService.getAll()).data;
         },
         mounted() {
-            window.addEventListener('scroll', this.onScroll);
-
             if (this.$route.query.task) {
                 this.loadTask(+this.$route.query.task);
             }
-        },
-        beforeDestroy() {
-            window.removeEventListener('scroll', this.onScroll);
         },
     };
 </script>
@@ -474,18 +360,6 @@
             justify-content: flex-end;
             height: 34px;
         }
-    }
-
-    .toggle-history {
-        text-align: right;
-    }
-
-    .change {
-        margin-top: 16px;
-    }
-
-    .change-avatar {
-        display: inline-block;
     }
 
     .task-view {
@@ -533,57 +407,6 @@
 
         .label {
             font-weight: bold;
-        }
-    }
-
-    .comment-form {
-        width: 100%;
-        margin-top: 16px;
-
-        &-users {
-            position: fixed;
-            background: #fff;
-            border-radius: 4px;
-            box-shadow: 0px 0px 10px rgba(63, 51, 86, 0.1);
-            padding: 4px 0 4px;
-            z-index: 10;
-        }
-
-        &-user {
-            padding: 4px 8px 4px;
-            cursor: pointer;
-
-            &:hover {
-                background: #ecf2fc;
-            }
-        }
-    }
-
-    .user-avatar {
-        display: inline-block;
-    }
-
-    .comment-submit {
-        margin-top: 8px;
-    }
-
-    .comment {
-        display: block;
-        margin-top: 16px;
-        width: 100%;
-
-        &-header {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        &-avatar {
-            display: inline-block;
-        }
-
-        .username {
-            background: #ecf2fc;
-            border-radius: 4px;
         }
     }
 

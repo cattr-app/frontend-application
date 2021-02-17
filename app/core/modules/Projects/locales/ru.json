@@ -14,6 +14,7 @@
     "project_tasks": "Задачи проекта",
     "add_task": "Добавить задачу",
     "task_change": "{user} изменил {field} {date}",
+    "task_change_to": "{user} изменил {field} на {value} {date}",
     "task_change_users": "{user} назначил исполнителем {value} {date}",
     "show_history": "Показать",
     "hide_history": "Скрыть",
