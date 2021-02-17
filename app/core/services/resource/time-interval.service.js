@@ -20,9 +20,10 @@ export default class TimeIntervalService extends ResourceService {
 
     /**
      * @returns {Promise<AxiosResponse<T>>}
+     * @param filters
      */
-    getAll() {
-        return axios.get('time-intervals/list');
+    getAll(filters = {}) {
+        return axios.post('time-intervals/list', filters);
     }
 
     /**

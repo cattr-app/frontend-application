@@ -198,12 +198,11 @@
                         'timeInterval.user_id': ['in', this.userIDs],
                         'timeInterval.task.project_id': ['in', this.projectsList],
                         'timeInterval.start_at': [
-                            '>=',
-                            this.getStartOfDayInTimezone(this.datepickerDateStart, this.companyData.timezone),
-                        ],
-                        'timeInterval.end_at': [
-                            '<=',
-                            this.getEndOfDayInTimezone(this.datepickerDateEnd, this.companyData.timezone),
+                            'between',
+                            [
+                                this.getStartOfDayInTimezone(this.datepickerDateStart, this.companyData.timezone),
+                                this.getEndOfDayInTimezone(this.datepickerDateEnd, this.companyData.timezone),
+                            ],
                         ],
 
                         paginate: true,

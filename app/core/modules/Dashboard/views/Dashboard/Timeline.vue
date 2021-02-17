@@ -70,9 +70,7 @@
                     <preloader v-if="isDataLoading" class="timeline__loader" :is-transparent="true"></preloader>
 
                     <time-interval-edit
-                        :screenshots="selectedScreenshots"
-                        :intervals="selectedIntervals"
-                        :selected-interval-ids="selectedIntervalIds"
+                        :interval-ids="selectedIntervalIds"
                         @remove="onBulkRemove"
                         @edit="loadData"
                         @close="clearIntervals"
@@ -257,35 +255,37 @@
                 const fileName = `${this.exportFilename}.${format}`;
                 downloadBlob(blob, fileName);
             },
-            onBulkRemove() {
-                this.recalculateStatistic(this.selectedScreenshots);
+            onBulkRemove(intervals) {
+                const intervalIds = intervals.map(interval => interval.id);
+                const totalIntervals = cloneDeep(this.intervals);
+                intervals.forEach(interval => {
+                    const userIntervals = cloneDeep(this.intervals[interval.user_id]);
+                    const deletedDuration = moment(interval.end_at).diff(interval.start_at, 'seconds');
+                    userIntervals.duration -= deletedDuration;
+                    userIntervals.intervals = userIntervals.intervals
+                        .map(interval => ({
+                            ...interval,
+                            ids: interval.ids.filter(id => intervalIds.indexOf(id) === -1),
+                        }))
+                        .filter(interval => interval.ids.length);
+
+                    totalIntervals[interval.user_id] = userIntervals;
+                });
+                this.$store.dispatch('timeline/setIntervals', totalIntervals);
+
+                this.$store.dispatch(
+                    'timeline/setScreenshots',
+                    this.screenshots.filter(screenshot => intervalIds.indexOf(screenshot.time_interval_id) === -1),
+                );
+
                 this.clearIntervals();
             },
             onTimezoneChange(timezone) {
                 this.setTimezone(timezone);
             },
             recalculateStatistic(screenshots) {
-                screenshots.map(screenshot => {
-                    const interval = screenshot.time_interval;
-                    const totalIntervals = cloneDeep(this.intervals);
-                    const userInterval = cloneDeep(this.intervals[interval.user_id]);
-                    const deletedDuration = moment(interval.end_at).diff(interval.start_at, 'seconds');
-
-                    userInterval.duration -= deletedDuration;
-                    userInterval.intervals = userInterval.intervals.filter(int => {
-                        if (int.ids.includes(interval.id)) {
-                            int.duration -= deletedDuration;
-                        }
-                        return int.duration > 0;
-                    });
-
-                    totalIntervals[interval.user_id] = userInterval;
-                    this.$store.dispatch('timeline/setIntervals', totalIntervals);
-                    this.$store.dispatch(
-                        'timeline/setScreenshots',
-                        this.screenshots.filter(scr => scr.id !== screenshot.id),
-                    );
-                });
+                const intervals = screenshots.map(screenshot => screenshot.time_interval);
+                this.onBulkRemove(intervals);
             },
             setSelectedIntervals(intervalIds) {
                 this.selectedScreenshots = this.screenshots.filter(screenshot =>
