@@ -60,77 +60,83 @@
             </div>
         </div>
 
-        <div v-if="task" class="task-view">
-            <div class="task-view-header">
-                <h4 class="task-view-title">{{ task.task_name }}</h4>
+        <transition name="slide">
+            <div v-if="task" class="task-view">
+                <div>
+                    <div class="task-view-header">
+                        <h4 class="task-view-title">{{ task.task_name }}</h4>
 
-                <p class="task-view-description">{{ task.description }}</p>
+                        <p class="task-view-description">{{ task.description }}</p>
 
-                <div class="task-view-close" @click="task = null">
-                    <span class="icon icon-x"></span>
+                        <div class="task-view-close" @click="task = null">
+                            <span class="icon icon-x"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-10 label">{{ $t('field.users') }}:</div>
+
+                        <div class="col">
+                            <team-avatars :users="task.users"></team-avatars>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-10 label">{{ $t('field.due_date') }}:</div>
+                        <div class="col">{{ task.due_date ? formatDate(task.due_date) : '' }}</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-10 label">{{ $t('field.total_spent') }}:</div>
+                        <div class="col">
+                            {{ task.total_spent_time ? formatDurationString(task.total_spent_time) : '' }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-10 label">{{ $t('field.priority') }}:</div>
+                        <div class="col">{{ task.priority ? task.priority.name : '' }}</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-10 label">{{ $t('field.source') }}:</div>
+                        <div class="col">{{ task.project.source }}</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-10 label">{{ $t('field.created_at') }}:</div>
+                        <div class="col">{{ formatDate(task.created_at) }}</div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <at-button class="control-item" size="large" icon="icon-eye" @click="viewTask(task)">
+                        {{ $t('control.view') }}
+                    </at-button>
+
+                    <at-button
+                        v-if="$can('update', 'task', task)"
+                        class="control-item"
+                        size="large"
+                        icon="icon-edit"
+                        @click="editTask(task)"
+                    >
+                        {{ $t('control.edit') }}
+                    </at-button>
+
+                    <at-button
+                        v-if="$can('delete', 'task', task)"
+                        class="control-item"
+                        size="large"
+                        type="error"
+                        icon="icon-trash-2"
+                        @click="deleteTask(task)"
+                    >
+                        {{ $t('control.delete') }}
+                    </at-button>
                 </div>
             </div>
-
-            <div class="row">
-                <div class="col-8 label">{{ $t('field.users') }}:</div>
-
-                <div class="col">
-                    <team-avatars :users="task.users"></team-avatars>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-8 label">{{ $t('field.due_date') }}:</div>
-                <div class="col">{{ task.due_date ? formatDate(task.due_date) : '' }}</div>
-            </div>
-
-            <div class="row">
-                <div class="col-8 label">{{ $t('field.total_spent') }}:</div>
-                <div class="col">{{ formatDurationString(task.total_spent_time) }}</div>
-            </div>
-
-            <div class="row">
-                <div class="col-8 label">{{ $t('field.priority') }}:</div>
-                <div class="col">{{ task.priority ? task.priority.name : '' }}</div>
-            </div>
-
-            <div class="row">
-                <div class="col-8 label">{{ $t('field.source') }}:</div>
-                <div class="col">{{ task.project.source }}</div>
-            </div>
-
-            <div class="row">
-                <div class="col-8 label">{{ $t('field.created_at') }}:</div>
-                <div class="col">{{ formatDate(task.created_at) }}</div>
-            </div>
-
-            <div class="row">
-                <at-button class="control-item" size="large" icon="icon-eye" @click="viewTask(task)">
-                    {{ $t('control.view') }}
-                </at-button>
-
-                <at-button
-                    v-if="$can('update', 'task', task)"
-                    class="control-item"
-                    size="large"
-                    icon="icon-edit"
-                    @click="editTask(task)"
-                >
-                    {{ $t('control.edit') }}
-                </at-button>
-
-                <at-button
-                    v-if="$can('delete', 'task', task)"
-                    class="control-item"
-                    size="large"
-                    type="error"
-                    icon="icon-trash-2"
-                    @click="deleteTask(task)"
-                >
-                    {{ $t('control.delete') }}
-                </at-button>
-            </div>
-        </div>
+        </transition>
     </div>
 </template>
 
@@ -243,6 +249,10 @@
                 }
             },
             async loadTask(id) {
+                // Get basic task info from the task list
+                this.task = this.getTask(id);
+
+                // Load task details
                 this.task = (
                     await this.taskService.getItem(id, {
                         with: 'users, priority, project',
@@ -349,6 +359,7 @@
     .task {
         background: #ffffff;
         padding: 16px;
+        cursor: default;
 
         &-description {
             height: 24px;
@@ -366,11 +377,14 @@
         position: fixed;
         top: 0;
         right: 0;
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: space-between;
         background: #ffffff;
         border: 1px solid #c5d9e8;
         border-radius: 4px;
-        width: 600px;
-        max-height: 100vh;
+        width: 500px;
+        height: 100vh;
         overflow: hidden auto;
         padding: 16px;
 
@@ -397,11 +411,11 @@
 
         .row {
             margin: 0 32px;
+            padding-bottom: 16px;
         }
 
         .row:not(:last-child) {
             border-bottom: 1px solid #eeeef5;
-            padding-bottom: 16px;
             margin-bottom: 16px;
         }
 
@@ -454,6 +468,7 @@
 
         .drag-inner-list {
             min-height: 50px;
+            height: 100%;
             color: white;
         }
 
@@ -497,5 +512,14 @@
         .gu-transit {
             opacity: 0.2;
         }
+    }
+
+    .slide-enter-active,
+    .slide-leave-active {
+        transition: transform 250ms ease;
+    }
+    .slide-enter,
+    .slide-leave-to {
+        transform: translate(100%, 0);
     }
 </style>
