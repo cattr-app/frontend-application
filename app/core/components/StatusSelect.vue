@@ -51,7 +51,9 @@
                 if (!localStorage.getItem(localStorageKey)) {
                     this.selectedStatusIds = allStatusIds;
                     localStorage.setItem(localStorageKey, JSON.stringify(this.selectedStatusIds));
-                    return this.$emit('change', this.selectedStatusIds);
+                    this.$emit('change', this.selectedStatusIds);
+                    this.$nextTick(() => this.$emit('loaded'));
+                    return;
                 }
 
                 // Remove options that no longer exists
@@ -63,6 +65,7 @@
                 }
 
                 this.$emit('change', this.selectedStatusIds);
+                this.$nextTick(() => this.$emit('loaded'));
             },
             selectedStatuses(values) {
                 this.selectedStatusIds = values;

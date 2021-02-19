@@ -49,7 +49,9 @@
                 if (!localStorage.getItem(localStorageKey)) {
                     this.selectedProjectIds = allProjectIds;
                     localStorage.setItem(localStorageKey, JSON.stringify(this.selectedProjectIds));
-                    return this.$emit('change', this.selectedProjectIds);
+                    this.$emit('change', this.selectedProjectIds);
+                    this.$nextTick(() => this.$emit('loaded'));
+                    return;
                 }
 
                 // Remove options that no longer exists
@@ -63,6 +65,7 @@
                 }
 
                 this.$emit('change', this.selectedProjectIds);
+                this.$nextTick(() => this.$emit('loaded'));
             },
             selectedProjects(values) {
                 this.selectedProjectIds = values;

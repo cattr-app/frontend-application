@@ -200,6 +200,7 @@
                 this.$emit('change', this.userIDs);
             }
             this.isLoading = false;
+            this.$nextTick(() => this.$emit('loaded'));
         },
         beforeDestroy() {
             window.removeEventListener('click', this.hidePopup);
