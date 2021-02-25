@@ -262,10 +262,14 @@
                 ).data;
             },
             viewTask(task) {
-                this.$router.push({ name: 'Tasks.crud.tasks.view', params: { id: task.id } });
+                this.$router.push({
+                    path: `/projects/${task.project_id}/tasks/list/view/${task.id}`,
+                });
             },
             editTask(task) {
-                this.$router.push({ name: 'Tasks.crud.tasks.edit', params: { id: task.id } });
+                this.$router.push({
+                    path: `/projects/${task.project_id}/tasks/list/edit/${task.id}`,
+                });
             },
             async deleteTask(task) {
                 const isConfirm = await this.$CustomModal({
