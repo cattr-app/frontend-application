@@ -52,7 +52,7 @@
     import UserSelect from '@/components/UserSelect';
     import ProjectReportService from '@/services/reports/project-report.service';
     import Project from './ProjectReport/Project';
-    import { getDateToday, getStartDate, getEndDate, getStartDay, getEndDay, formatDurationString } from '@/utils/time';
+    import { getDateToday, getStartDate, getEndDate, formatDurationString } from '@/utils/time';
     import ProjectSelect from '@/components/ProjectSelect';
     import Preloader from '@/components/Preloader';
     import moment from 'moment';
@@ -138,8 +138,8 @@
                 try {
                     const { data } = await this.reportService.getProjects({
                         uids: this.userIds,
-                        start_at: getStartDay(this.datepickerDateStart),
-                        end_at: getEndDay(this.datepickerDateEnd),
+                        start_at: getStartDate(this.datepickerDateStart),
+                        end_at: getEndDate(this.datepickerDateEnd),
                         pids: this.projectsList,
                     });
 
