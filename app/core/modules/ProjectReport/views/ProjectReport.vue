@@ -52,7 +52,7 @@
     import UserSelect from '@/components/UserSelect';
     import ProjectReportService from '@/services/reports/project-report.service';
     import Project from './ProjectReport/Project';
-    import { getDateToday, getStartDate, getEndDate, formatDurationString } from '@/utils/time';
+    import { getDateToday, getStartDate, getEndDate, getStartDay, getEndDay, formatDurationString } from '@/utils/time';
     import ProjectSelect from '@/components/ProjectSelect';
     import Preloader from '@/components/Preloader';
     import moment from 'moment';
@@ -135,18 +135,11 @@
             },
             async fetchData() {
                 this.isDataLoading = true;
-                const timezone = this.companyData.timezone;
                 try {
                     const { data } = await this.reportService.getProjects({
                         uids: this.userIds,
-                        start_at: moment
-                            .tz(this.datepickerDateStart, timezone)
-                            .startOf('day')
-                            .toISOString(),
-                        end_at: moment
-                            .tz(this.datepickerDateEnd, timezone)
-                            .endOf('day')
-                            .toISOString(),
+                        start_at: getStartDay(this.datepickerDateStart),
+                        end_at: getEndDay(this.datepickerDateEnd),
                         pids: this.projectsList,
                     });
 
