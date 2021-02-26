@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getStartDay, getEndDay } from '../../utils/time';
+import { getStartDate, getEndDate } from '../../utils/time';
 
 export default class ProjectReportService {
     /**
@@ -28,8 +28,8 @@ export default class ProjectReportService {
      */
     getReport(startAt, endAt, userIDs, projectIds, config = {}) {
         const params = {
-            start_at: getStartDay(startAt),
-            end_at: getEndDay(endAt),
+            start_at: getStartDate(startAt),
+            end_at: getEndDate(endAt),
             uids: userIDs,
             pids: projectIds,
         };
