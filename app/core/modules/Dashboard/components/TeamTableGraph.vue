@@ -2,8 +2,21 @@
     <div ref="canvasWrapper" class="canvas">
         <canvas ref="canvas"></canvas>
 
-        <div ref="scrollbarBottom" class="scrollbar-top" @scroll="onScroll">
+        <div ref="scrollbarTop" class="scrollbar-top" @scroll="onScroll">
             <div :style="{ width: `${contentWidth}px` }" />
+        </div>
+
+        <div class="scroll-area-wrapper">
+            <div
+                ref="scrollArea"
+                class="scroll-area"
+                @scroll="onScroll"
+                @pointerdown="onDown"
+                @pointermove="onMove"
+                @pointerup="onUp"
+            >
+                <div class="scroll-area-inner" :style="{ width: `${contentWidth}px` }"></div>
+            </div>
         </div>
     </div>
 </template>
@@ -119,11 +132,6 @@
                 skipOffscreen: true,
             });
 
-            this.canvas.on('mouse:down', this.onDown);
-            this.canvas.on('mouse:move', this.onMove);
-            this.canvas.on('mouse:up', this.onUp);
-            this.canvas.on('mouse:wheel', this.onWheel);
-
             this.onResize();
             window.addEventListener('resize', this.onResize);
         },
@@ -144,12 +152,12 @@
 
                 return color;
             },
-            onDown({ e }) {
+            onDown(e) {
                 this.canvas.selection = false;
                 this.isDragging = true;
                 this.lastPosX = e.clientX;
             },
-            onMove({ e }) {
+            onMove(e) {
                 if (this.isDragging) {
                     const deltaX = e.clientX - this.lastPosX;
                     const x = Math.min(0, Math.max(this.canvas.viewportTransform[4] + deltaX, -this.maxScrollX));
@@ -158,20 +166,8 @@
                     this.lastPosX = e.clientX;
                 }
             },
-            onUp({ e }) {
+            onUp(e) {
                 this.isDragging = false;
-            },
-            onWheel({ e }) {
-                if (e.shiftKey) {
-                    const delta = -minColumnWidth * Math.sign(e.deltaY);
-                    const x = Math.min(0, Math.max(this.canvas.viewportTransform[4] + delta, -this.maxScrollX));
-                    if (x !== this.canvas.viewportTransform[4]) {
-                        this.setScroll(x);
-
-                        e.preventDefault();
-                        e.stopPropagation();
-                    }
-                }
             },
             onScroll(e) {
                 this.setScroll(-e.target.scrollLeft);
@@ -181,7 +177,8 @@
                     return;
                 }
 
-                this.$refs.scrollbarBottom.scrollLeft = -x;
+                this.$refs.scrollbarTop.scrollLeft = -x;
+                this.$refs.scrollArea.scrollLeft = -x;
 
                 const transform = [...this.canvas.viewportTransform];
                 transform[4] = x;
@@ -455,11 +452,16 @@
             }, 100),
         },
         watch: {
+            start() {
+                this.resetScroll();
+            },
+            end() {
+                this.resetScroll();
+            },
             users() {
                 this.onResize();
             },
             timePerDay() {
-                this.resetScroll();
                 this.draw();
             },
         },
@@ -516,5 +518,37 @@
             background: #2e2ef9;
             border-radius: 3px;
         }
+    }
+
+    .scroll-area-wrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: block;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        cursor: move;
+    }
+
+    .scroll-area {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: -6px;
+        bottom: -6px;
+        display: block;
+        overflow: scroll;
+        scrollbar-width: thin;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+
+    .scroll-area-inner {
+        display: block;
+        width: 100%;
+        height: 100%;
     }
 </style>
