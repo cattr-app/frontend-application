@@ -60,6 +60,7 @@
                                 v-model="filterFieldsModel[filter.key]"
                                 size="small"
                                 class="crud__popup-filter"
+                                @loaded="onFilterLoaded(filter.key)"
                                 @change="onUserSelectChange(filter.key, $event)"
                             ></UserSelect>
 
@@ -70,6 +71,7 @@
                                 v-model="filterFieldsModel[filter.key]"
                                 size="small"
                                 class="crud__popup-filter"
+                                @loaded="onFilterLoaded(filter.key)"
                                 @change="onProjectsChange(filter.key, $event)"
                             />
 
@@ -80,6 +82,7 @@
                                 v-model="filterFieldsModel[filter.key]"
                                 size="small"
                                 class="crud__popup-filter"
+                                @loaded="onFilterLoaded(filter.key)"
                                 @change="onStatusesChange(filter.key, $event)"
                             />
 
@@ -195,10 +198,20 @@
                 }
             });
 
+            const filters = gridData.filters || [];
+            const filterFields = gridData.filterFields || [];
+            const loadedFilters = filterFields.reduce((obj, filter) => {
+                const loaded =
+                    ['user-select', 'project-select', 'status-select'].indexOf(filter.fieldOptions.type) === -1;
+
+                return { ...obj, [filter.key]: loaded };
+            }, {});
+
             return {
                 title: gridData.title || '',
-                filters: gridData.filters || [],
-                filterFields: gridData.filterFields || [],
+                filters,
+                filterFields,
+                loadedFilters,
                 tableData: [],
 
                 filterModel: this.$route.query.search,
@@ -298,11 +311,13 @@
             filterFieldsData() {
                 clearTimeout(this.filterFieldsTimeout);
 
-                this.filterFieldsTimeout = setTimeout(() => {
-                    this.updateQueryParams();
-                    this.queryParams.page = 1;
-                    this.fetchData();
-                }, 500);
+                this.updateQueryParams();
+                this.queryParams.page = 1;
+                if (!this.filtersLoaded) {
+                    return;
+                }
+
+                this.filterFieldsTimeout = setTimeout(() => this.fetchData(), 500);
             },
             onFilterFieldChange(key, data) {
                 this.filterFieldsData();
@@ -489,6 +504,12 @@
 
                 this.$router.push(data);
             },
+            onFilterLoaded(key) {
+                this.loadedFilters = { ...this.loadedFilters, [key]: true };
+                if (this.filtersLoaded) {
+                    this.fetchData();
+                }
+            },
         },
         updated() {
             const { sortable, orderBy } = this;
@@ -621,11 +642,21 @@
             sortable() {
                 return !!this.$route.meta.sortable;
             },
+            filtersLoaded() {
+                const keys = Object.keys(this.loadedFilters);
+                if (!keys.length) {
+                    return true;
+                }
+
+                return keys.every(key => this.loadedFilters[key]);
+            },
         },
         async mounted() {
             this.loadFilterFields();
             this.updateQueryParams();
-            await this.fetchData();
+            if (this.filtersLoaded) {
+                await this.fetchData();
+            }
 
             window.addEventListener('click', this.handleClick);
             window.addEventListener('resize', this.handleResize);
