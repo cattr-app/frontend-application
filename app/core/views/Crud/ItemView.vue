@@ -82,6 +82,12 @@
             Skeleton,
         },
 
+        provide() {
+            return {
+                reload: this.load,
+            };
+        },
+
         computed: {
             title() {
                 const { fields, values, service, filters, pageData } = this;
@@ -113,18 +119,9 @@
         },
 
         async mounted() {
-            const id = this.$route.params[this.service.getIdParam()];
-
             this.isDataLoading = true;
 
-            try {
-                const data = (await this.service.getItem(id, this.filters)).data;
-                this.values = data;
-            } catch ({ response }) {
-                if (response.data.error_type === 'query.item_not_found') {
-                    this.$router.replace({ name: 'forbidden' });
-                }
-            }
+            await this.load();
 
             this.isDataLoading = false;
         },
@@ -140,6 +137,19 @@
         },
 
         methods: {
+            async load() {
+                const id = this.$route.params[this.service.getIdParam()];
+
+                try {
+                    const data = (await this.service.getItem(id, this.filters)).data;
+                    this.values = data;
+                } catch ({ response }) {
+                    if (response.data.error_type === 'query.item_not_found') {
+                        this.$router.replace({ name: 'forbidden' });
+                    }
+                }
+            },
+
             handleClick(button) {
                 button.onClick(this, this.values[this.service.getIdParam()]);
             },

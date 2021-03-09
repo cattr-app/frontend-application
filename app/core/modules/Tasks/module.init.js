@@ -1,3 +1,4 @@
+import cloneDeep from 'lodash/cloneDeep';
 import TasksService from '@/services/resource/task.service';
 import ProjectsService from '@/services/resource/project.service';
 import StatusService from '@/services/resource/status.service';
@@ -37,9 +38,10 @@ export function init(context, router) {
         });
     });
 
-    context.routerPrefix = 'projects/:project_id/tasks/list';
+    const tasksContext = cloneDeep(context);
+    tasksContext.routerPrefix = 'projects/:project_id/tasks/list';
 
-    const crud = context.createCrud('tasks.crud-title', 'tasks', TasksService, {
+    const crud = tasksContext.createCrud('tasks.crud-title', 'tasks', TasksService, {
         with: 'priority, project, users, status, changes, changes.user, comments, comments.user',
     });
 
@@ -57,7 +59,7 @@ export function init(context, router) {
 
     crud.edit.addToMetaProperties('permissions', 'tasks/edit', crud.edit.getRouterConfig());
 
-    const grid = context.createGrid('tasks.grid-title', 'tasks', TasksService, {
+    const grid = tasksContext.createGrid('tasks.grid-title', 'tasks', TasksService, {
         with: 'priority, project, users, status',
         is_active: true,
     });
@@ -275,7 +277,9 @@ export function init(context, router) {
             key: 'comments',
             label: 'field.comments',
             render: (h, props) => {
-                return h(TaskComments, { props: { task: props.values } });
+                return h(TaskComments, {
+                    props: { task: props.values },
+                });
             },
         },
     ];

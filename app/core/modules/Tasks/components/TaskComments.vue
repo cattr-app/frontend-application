@@ -63,6 +63,7 @@
                 required: true,
             },
         },
+        inject: ['reload'],
         data() {
             return {
                 taskCommentService: new TaskCommentService(),
@@ -99,9 +100,11 @@
                     content: this.commentMessage,
                 });
 
-                window.location.reload();
-
                 this.commentMessage = '';
+
+                if (this.reload) {
+                    this.reload();
+                }
             },
             commentMessageChange(value) {
                 const textArea = this.$refs.commentForm.querySelector('textarea');
