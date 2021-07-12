@@ -269,7 +269,9 @@
     "work_time": "Working Hours",
     "notice": "Notice",
     "report": "Report",
-    "minutes": "{value} minutes"
+    "minutes": "{value} minutes",
+    "duration": "Duration",
+    "duration_value": "{0} to {1}"
   },
   "filter": {
     "enter-single": "Enter {0}",

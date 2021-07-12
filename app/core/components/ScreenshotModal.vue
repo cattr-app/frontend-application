@@ -58,7 +58,7 @@
                     <div v-if="screenshot.time_interval.activity_fill === null" class="screenshot__activity">
                         {{ $t('tooltip.activity_progress.not_tracked') }}
                     </div>
-                    <div v-else class="screenshot__activity">
+                    <div v-else class="screenshot__activity modal-field">
                         <div class="modal-field">
                             <span class="modal-label">{{ $tc('tooltip.activity_progress.overall', 0) }}</span>
                             <span class="modal-value">
@@ -81,6 +81,12 @@
                                 {{ screenshot.time_interval.keyboard_fill + '%' }}
                             </span>
                         </div>
+                    </div>
+                    <div v-if="interval" class="modal-duration modal-field">
+                        <span class="modal-label">{{ $t('field.duration') }}:</span>
+                        <span class="modal-value">{{
+                            $t('field.duration_value', [formatDate(interval.start_at), formatDate(interval.end_at)])
+                        }}</span>
                     </div>
                 </div>
             </div>
@@ -281,6 +287,10 @@
         &-value,
         &-value a {
             color: #2e2ef9;
+        }
+
+        &-duration {
+            padding-right: 3em;
         }
     }
 </style>
