@@ -269,7 +269,8 @@
     "work_time": "Working Hours",
     "notice": "Notice",
     "report": "Report",
-    "minutes": "{value} minutes"
+    "minutes": "{value} minutes",
+    "web_and_app_monitoring": "Enable app monitoring"
   },
   "filter": {
     "enter-single": "Enter {0}",

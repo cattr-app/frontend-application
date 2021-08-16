@@ -268,7 +268,8 @@
     "work_time": "Продолжительность рабочего дня",
     "notice": "Предупреждение",
     "report": "Отчет",
-    "minutes": "{value} минут(-ы)"
+    "minutes": "{value} минут(-ы)",
+    "web_and_app_monitoring": "Мониторинг приложений"
   },
   "filter": {
     "enter-single": "Введите {0}",
