@@ -39,7 +39,7 @@ export function init(context, router) {
     });
 
     const tasksContext = cloneDeep(context);
-    tasksContext.routerPrefix = 'projects/:project_id/tasks/list';
+    //tasksContext.routerPrefix = 'projects/:project_id/tasks/list';
 
     const crud = tasksContext.createCrud('tasks.crud-title', 'tasks', TasksService, {
         with: 'priority, project, users, status, changes, changes.user, comments, comments.user',
@@ -626,7 +626,7 @@ export function init(context, router) {
             onClick: ({ $router, $route }) => {
                 $router.push(`/projects/${$route.params.project_id}/tasks/kanban`);
             },
-            renderCondition: () => true,
+            renderCondition: () => false,
         },
         {
             label: 'control.back',
@@ -641,6 +641,13 @@ export function init(context, router) {
     context.addLocalizationData({
         en: require('./locales/en'),
         ru: require('./locales/ru'),
+    });
+
+    context.addNavbarEntry({
+        label: 'navigation.tasks',
+        to: {
+            name: 'Tasks.crud.tasks',
+        },
     });
 
     context.addRoute(crud.getRouterConfig());

@@ -311,14 +311,14 @@ export function init(context) {
     const tasksRouteName = context.getModuleRouteName() + '.tasks';
     const assignRouteName = context.getModuleRouteName() + '.members';
     context.addRoute([
-        {
-            path: `/${context.routerPrefix}/:id/tasks/kanban`,
-            name: tasksRouteName,
-            component: () => import('./views/Tasks.vue'),
-            meta: {
-                auth: true,
-            },
-        },
+        // {
+        //     path: `/${context.routerPrefix}/:id/tasks/kanban`,
+        //     name: tasksRouteName,
+        //     component: () => import('./views/Tasks.vue'),
+        //     meta: {
+        //         auth: true,
+        //     },
+        // },
         {
             path: `/${context.routerPrefix}/:id/members`,
             name: assignRouteName,
@@ -349,7 +349,7 @@ export function init(context) {
             },
             renderCondition({ $can }, item) {
                 // User always can view project's tasks
-                return true;
+                return false;
             },
         },
         {
