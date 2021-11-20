@@ -1,6 +1,6 @@
 {
   "name": "@amazingcat/cattr-frontend",
-  "version": "3.5.0-alpha",
+  "version": "3.5.0-beta",
   "description": "Frontend application for Cattr",
   "homepage": "https://cattr.app",
   "license": "SSPL-1.0",
