@@ -77,6 +77,14 @@ const routes = [
         component: () => import(/* webpackChunkName: "PageNotFound" */ '@/views/PageNotFound.vue'),
     },
     {
+        path: '/error',
+        name: 'api.error',
+        meta: {
+            auth: false,
+        },
+        component: () => import(/* webpackChunkName: "ApiError */ '@/views/ApiError.vue'),
+    },
+    {
         path: '/forbidden',
         name: 'forbidden',
         meta: {

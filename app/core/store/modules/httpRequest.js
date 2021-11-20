@@ -33,6 +33,11 @@ const actions = {
         const { installed } = await new ApiService().status();
         return installed || false;
     },
+
+    async getCattrStatus() {
+        const { cattr } = await new ApiService().status();
+        return cattr || false;
+    },
 };
 
 export default {

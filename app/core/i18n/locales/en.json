@@ -290,6 +290,7 @@
   "message": {
     "no_data": "No data to display",
     "page_not_found": "Looks like the page you're looking for doesn't exist :(",
+    "api_error": "Looks like we have temporal problems, contact your administrator about that :(",
     "page_forbidden": "Access forbidden",
     "field_is_required": "This field is required",
     "something_went_wrong": "Something went wrong",
