@@ -2,7 +2,7 @@
     <div class="screenshot" @click="$emit('click', $event)">
         <AppImage
             :is-blob="true"
-            :src="getThumbnailPath(screenshot)"
+            :src="getThumbnailPath(interval)"
             class="screenshot__image"
             :lazy="lazyImage"
             @click="onShow"
@@ -10,38 +10,34 @@
 
         <at-tooltip>
             <template slot="content">
-                <div v-if="screenshot.time_interval.activity_fill === null" class="screenshot__activity">
+                <div v-if="interval.activity_fill === null" class="screenshot__activity">
                     {{ $t('tooltip.activity_progress.not_tracked') }}
                 </div>
                 <div v-else class="screenshot__activity">
-                    <span v-if="screenshot.time_interval.activity_fill !== null" class="screenshot__overall-activity">
+                    <span v-if="interval.activity_fill !== null" class="screenshot__overall-activity">
                         {{
-                            $tc('tooltip.activity_progress.overall', screenshot.time_interval.activity_fill, {
-                                percent: screenshot.time_interval.activity_fill,
+                            $tc('tooltip.activity_progress.overall', interval.activity_fill, {
+                                percent: interval.activity_fill,
                             })
                         }}
                     </span>
                     <div class="screenshot__device-activity">
-                        <span v-if="screenshot.time_interval.mouse_fill !== null">
+                        <span v-if="interval.mouse_fill !== null">
                             {{
-                                $tc('tooltip.activity_progress.mouse', screenshot.time_interval.mouse_fill, {
-                                    percent: screenshot.time_interval.mouse_fill,
+                                $tc('tooltip.activity_progress.mouse', interval.mouse_fill, {
+                                    percent: interval.mouse_fill,
                                 })
                             }}
                         </span>
-                        <span v-if="screenshot.time_interval.keyboard_fill !== null">{{
-                            $tc('tooltip.activity_progress.keyboard', screenshot.time_interval.keyboard_fill, {
-                                percent: screenshot.time_interval.keyboard_fill,
+                        <span v-if="interval.keyboard_fill !== null">{{
+                            $tc('tooltip.activity_progress.keyboard', interval.keyboard_fill, {
+                                percent: interval.keyboard_fill,
                             })
                         }}</span>
                     </div>
                 </div>
             </template>
-            <at-progress
-                class="screenshot__activity-bar"
-                :stroke-width="5"
-                :percent="screenshot.time_interval.activity_fill || 0"
-            />
+            <at-progress class="screenshot__activity-bar" :stroke-width="5" :percent="interval.activity_fill || 0" />
         </at-tooltip>
 
         <div v-if="showText" class="screenshot__text">
@@ -54,7 +50,7 @@
         <ScreenshotModal
             v-if="!disableModal"
             :project="project"
-            :screenshot="screenshot"
+            :interval="interval"
             :show="showModal"
             :showNavigation="showNavigation"
             :task="task"
@@ -73,8 +69,8 @@
     import ScreenshotModal from './ScreenshotModal';
     import { mapGetters } from 'vuex';
 
-    export function thumbnailPathProvider(screenshot) {
-        return screenshot.path;
+    export function thumbnailPathProvider(interval) {
+        return 'screenshot/thumb/' + interval.id;
     }
 
     export const config = { thumbnailPathProvider };
@@ -86,7 +82,7 @@
             ScreenshotModal,
         },
         props: {
-            screenshot: {
+            interval: {
                 type: Object,
             },
             project: {
@@ -132,11 +128,11 @@
             screenshotTime() {
                 const timezone = this.timezone || this.companyData['timezone'];
 
-                if (!timezone || !this.screenshot.time_interval.start_at) {
+                if (!timezone || !this.interval.start_at) {
                     return;
                 }
 
-                return moment(this.screenshot.time_interval.start_at)
+                return moment(this.interval.start_at)
                     .tz(timezone)
                     .format('HH:mm');
             },
@@ -156,14 +152,10 @@
             },
             onRemove() {
                 this.onHide();
-                this.$emit('remove', this.screenshot);
+                this.$emit('remove', this.interval);
             },
-            getThumbnailPath(screenshot) {
-                if (screenshot.path === 'uploads/static/none.png') {
-                    return 'none';
-                }
-
-                return config.thumbnailPathProvider(screenshot);
+            getThumbnailPath(interval) {
+                return config.thumbnailPathProvider(interval);
             },
         },
     };

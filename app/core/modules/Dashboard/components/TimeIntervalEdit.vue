@@ -1,7 +1,7 @@
 <template>
     <div>
         <transition name="slide-up">
-            <div v-if="intervalIds.length" class="time-interval-edit-panel">
+            <div v-if="intervals.length" class="time-interval-edit-panel">
                 <div class="container-fluid">
                     <div class="row flex-middle flex-between">
                         <div class="col-4">
@@ -11,33 +11,36 @@
                         <div class="col-12">
                             <div class="flex flex-end">
                                 <at-button
-                                    class="time-interval-edit-panel__btn"
                                     :disabled="disabledButtons"
+                                    class="time-interval-edit-panel__btn"
                                     @click="openAddNewTaskModal"
-                                    >{{ $t('control.add_new_task') }}
+                                >
+                                    {{ $t('control.add_new_task') }}
                                 </at-button>
 
                                 <at-button
-                                    class="time-interval-edit-panel__btn"
                                     :disabled="disabledButtons"
+                                    class="time-interval-edit-panel__btn"
                                     @click="openChangeTaskModal"
-                                    >{{ $t('control.edit_intervals') }}
+                                >
+                                    {{ $t('control.edit_intervals') }}
                                 </at-button>
 
                                 <at-button
+                                    :disabled="disabledButtons"
                                     class="time-interval-edit-panel__btn"
                                     type="error"
-                                    :disabled="disabledButtons"
                                     @click="deleteTimeIntervals"
-                                    ><i class="icon icon-trash"></i>
+                                >
+                                    <i class="icon icon-trash" />
                                     {{ $t('control.delete') }}
                                 </at-button>
 
-                                <div class="divider"></div>
+                                <div class="divider" />
 
-                                <at-button class="time-interval-edit-panel__btn" @click="$emit('close')">{{
-                                    $t('control.cancel')
-                                }}</at-button>
+                                <at-button class="time-interval-edit-panel__btn" @click="$emit('close')">
+                                    {{ $t('control.cancel') }}
+                                </at-button>
                             </div>
                         </div>
                     </div>
@@ -47,8 +50,8 @@
 
         <template v-if="showAddNewTaskModal">
             <AddNewTaskModal
-                :showModal="showAddNewTaskModal"
                 :disableButtons="disabledButtons"
+                :showModal="showAddNewTaskModal"
                 @cancel="onAddNewTaskModalCancel"
                 @confirm="onAddNewTaskModalConfirm"
             />
@@ -56,8 +59,8 @@
 
         <template v-if="showChangeTaskModal">
             <ChangeTaskModal
-                :showModal="showChangeTaskModal"
                 :disableButtons="disabledButtons"
+                :showModal="showChangeTaskModal"
                 @cancel="onChangeTaskModalCancel"
                 @confirm="onChangeTaskModalConfirm"
             />
@@ -80,7 +83,7 @@
             ChangeTaskModal,
         },
         props: {
-            intervalIds: {
+            intervals: {
                 type: Array,
             },
         },
@@ -111,7 +114,6 @@
                 timeIntervalsService: new TimeIntervalsService(),
                 modal: '',
                 disabledButtons: false,
-                intervals: [],
             };
         },
         methods: {
@@ -146,7 +148,7 @@
                     this.disabledButtons = true;
 
                     await this.timeIntervalsService.bulkDelete({
-                        intervals: this.intervalIds,
+                        intervals: this.intervals.map(el => el.id),
                     });
 
                     this.$Notify({
@@ -230,12 +232,6 @@
             },
             onChangeTaskModalCancel() {
                 this.modal = '';
-            },
-        },
-        watch: {
-            async intervalIds(values) {
-                const response = await this.timeIntervalsService.getAll({ id: ['in', values] });
-                this.intervals = response.data;
             },
         },
     };

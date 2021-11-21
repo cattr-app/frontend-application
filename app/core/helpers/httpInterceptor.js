@@ -32,7 +32,7 @@ const responseInterceptor = response => {
 const responseErrorInterceptor = error => {
     setLoading(false);
 
-    if (!has(error, 'response.status')) {
+    if (!has(error, 'response.status') || (error.request.responseType === 'blob' && error.request.status === 404)) {
         return Promise.reject(error);
     }
 

@@ -62,19 +62,19 @@
                     />
 
                     <TimelineScreenshots
-                        v-if="type === 'day' && screenshots && screenshots.length"
+                        v-if="type === 'day' && intervals && Object.keys(intervals).length"
                         ref="timelineScreenshots"
                         @on-remove="recalculateStatistic"
                         @onSelectedIntervals="setSelectedIntervals"
                     />
-                    <preloader v-if="isDataLoading" class="timeline__loader" :is-transparent="true"></preloader>
+                    <preloader v-if="isDataLoading" class="timeline__loader" :is-transparent="true" />
 
                     <time-interval-edit
-                        :interval-ids="selectedIntervalIds"
+                        :intervals="selectedIntervals"
                         @remove="onBulkRemove"
                         @edit="loadData"
                         @close="clearIntervals"
-                    ></time-interval-edit>
+                    />
                 </div>
             </div>
         </div>
@@ -129,7 +129,6 @@
                 reportService: new DashboardReportService(),
                 showExportModal: false,
                 selectedIntervalIds: [],
-                selectedScreenshots: [],
                 selectedIntervals: [],
                 sessionStorageKey: sessionStorageKey,
                 isDataLoading: false,
@@ -143,18 +142,9 @@
         beforeDestroy() {
             clearInterval(this.updateHandle);
             this.service.unloadIntervals();
-            this.service.unloadScreenshots();
         },
         computed: {
-            ...mapGetters('timeline', [
-                'service',
-                'screenshots',
-                'events',
-                'intervals',
-                'timePerDay',
-                'timePerProject',
-                'timezone',
-            ]),
+            ...mapGetters('timeline', ['service', 'events', 'intervals', 'timePerDay', 'timePerProject', 'timezone']),
             ...mapGetters('user', ['user']),
             userEvents() {
                 if (!this.user || !this.user.id || !this.events[this.user.id]) {
@@ -204,10 +194,6 @@
 
                 await this.service.load(userIDs, projectIDs, startAt, endAt);
 
-                if (this.type === 'day') {
-                    await this.service.loadScreenshots(userIDs, startAt, endAt);
-                }
-
                 this.isDataLoading = false;
             }, 1000),
             onCalendarChange({ type, start, end }) {
@@ -216,7 +202,6 @@
                 this.end = end;
 
                 this.service.unloadIntervals();
-                this.service.unloadScreenshots();
 
                 this.loadData();
             },
@@ -225,10 +210,7 @@
                 localStorage['timeline.active-task'] = event.task_id;
 
                 this.selectedIntervalIds = event.ids;
-                this.selectedScreenshots = this.screenshots.filter(screenshot =>
-                    this.selectedIntervalIds.includes(screenshot.time_interval.id),
-                );
-                this.selectedIntervals = Object.values(this.intervals).reduce((acc, curr) => {
+                this.selectedIntervals = Object.values(this.intervals[this.user.id].intervals).reduce((acc, curr) => {
                     return [...acc, ...curr.intervals.filter(interval => event.ids.includes(interval.id))];
                 }, []);
             },
@@ -273,24 +255,15 @@
                 });
                 this.$store.dispatch('timeline/setIntervals', totalIntervals);
 
-                this.$store.dispatch(
-                    'timeline/setScreenshots',
-                    this.screenshots.filter(screenshot => intervalIds.indexOf(screenshot.time_interval_id) === -1),
-                );
-
                 this.clearIntervals();
             },
             onTimezoneChange(timezone) {
                 this.setTimezone(timezone);
             },
-            recalculateStatistic(screenshots) {
-                const intervals = screenshots.map(screenshot => screenshot.time_interval);
+            recalculateStatistic(intervals) {
                 this.onBulkRemove(intervals);
             },
             setSelectedIntervals(intervalIds) {
-                this.selectedScreenshots = this.screenshots.filter(screenshot =>
-                    intervalIds.includes(screenshot.time_interval_id),
-                );
                 this.selectedIntervals = Object.values(this.intervals).reduce((acc, curr) => {
                     return [...acc, ...curr.intervals.filter(interval => intervalIds.includes(interval.id))];
                 }, []);
@@ -300,7 +273,6 @@
                 if (this.$refs.timelineScreenshots) {
                     this.$refs.timelineScreenshots.clearSelectedIntervals();
                 }
-                this.selectedScreenshots = [];
                 this.selectedIntervals = [];
                 this.selectedIntervalIds = [];
             },

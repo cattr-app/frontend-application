@@ -82,7 +82,7 @@ const routes = [
         meta: {
             auth: false,
         },
-        component: () => import(/* webpackChunkName: "ApiError */ '@/views/ApiError.vue'),
+        component: () => import(/* webpackChunkName: "ApiError" */ '@/views/ApiError.vue'),
     },
     {
         path: '/forbidden',

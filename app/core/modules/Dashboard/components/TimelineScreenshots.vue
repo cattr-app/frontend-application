@@ -4,28 +4,28 @@
         <at-checkbox-group v-model="selectedIntervalIds">
             <div class="row">
                 <div
-                    v-for="(screenshot, index) in screenshots"
-                    :key="screenshot.id"
+                    v-for="(interval, index) in intervals[this.user.id].intervals"
+                    :key="interval.id"
                     class="col-4 col-xl-3 screenshots__item"
                 >
                     <div class="screenshot" :index="index" @click.shift.prevent.stop="onShiftClick(index)">
                         <Screenshot
                             :disableModal="true"
-                            :project="getProject(screenshot)"
-                            :screenshot="screenshot"
-                            :task="getTask(screenshot)"
+                            :project="interval.task.project"
+                            :interval="interval"
+                            :task="interval.task"
                             :user="user"
                             :timezone="timezone"
-                            @click="showPopup(screenshot, $event)"
+                            @click="showPopup(interval, $event)"
                         />
                         <div @click="onCheckboxClick(index)">
-                            <at-checkbox class="screenshot__checkbox" :label="screenshot.time_interval_id" />
+                            <at-checkbox class="screenshot__checkbox" :label="interval.id" />
                         </div>
                     </div>
                 </div>
                 <ScreenshotModal
                     :project="modal.project"
-                    :screenshot="modal.screenshot"
+                    :interval="modal.interval"
                     :show="modal.show"
                     :showNavigation="true"
                     :task="modal.task"
@@ -44,7 +44,7 @@
     import { mapGetters } from 'vuex';
     import Screenshot from '@/components/Screenshot';
     import ScreenshotModal from '@/components/ScreenshotModal';
-    import ScreenshotService from '@/services/resource/screenshot.service';
+    import TimeIntervalService from '@/services/resource/time-interval.service';
 
     export default {
         name: 'TimelineScreenshots',
@@ -54,10 +54,10 @@
         },
         data() {
             return {
-                screenshotsService: new ScreenshotService(),
+                intervalsService: new TimeIntervalService(),
                 selectedIntervalIds: [],
                 modal: {
-                    screenshot: null,
+                    interval: null,
                     project: null,
                     task: null,
                     show: false,
@@ -66,7 +66,7 @@
             };
         },
         computed: {
-            ...mapGetters('timeline', ['tasks', 'screenshots', 'timezone']),
+            ...mapGetters('timeline', ['tasks', 'intervals', 'timezone']),
             ...mapGetters('user', ['user']),
             projects() {
                 return Object.keys(this.tasks)
@@ -86,12 +86,12 @@
                     this.firstSelectedCheckboxIndex = index;
                 }
 
-                this.selectedIntervalIds = this.screenshots
+                this.selectedIntervalIds = this.intervals
                     .slice(
                         Math.min(index, this.firstSelectedCheckboxIndex),
                         Math.max(index, this.firstSelectedCheckboxIndex) + 1,
                     )
-                    .map(el => el.time_interval_id);
+                    .map(el => el.id);
             },
             onCheckboxClick(index) {
                 if (this.firstSelectedCheckboxIndex === null) this.firstSelectedCheckboxIndex = index;
@@ -105,18 +105,18 @@
                     this.showNext();
                 }
             },
-            showPopup(screenshot, e) {
+            showPopup(interval, e) {
                 if (e.shiftKey) {
                     return;
                 }
 
-                if (typeof screenshot !== 'object' || screenshot.id === null) {
+                if (typeof interval !== 'object' || interval.id === null) {
                     return;
                 }
 
-                this.modal.project = this.getProject(screenshot);
-                this.modal.task = this.getTask(screenshot);
-                this.modal.screenshot = screenshot;
+                this.modal.project = interval.task.project;
+                this.modal.task = interval.task;
+                this.modal.interval = interval;
 
                 this.modal.show = true;
             },
@@ -124,62 +124,29 @@
                 this.modal.show = false;
             },
             showPrevious() {
-                const currentIndex = this.screenshots.findIndex(el => el.id === this.modal.screenshot.id);
+                const currentIndex = this.intervals.findIndex(el => el.id === this.modal.interval.id);
 
                 if (currentIndex !== 0) {
                     this.updateDataModal(currentIndex - 1);
                 }
             },
             showNext() {
-                const currentIndex = this.screenshots.findIndex(el => el.id === this.modal.screenshot.id);
+                const currentIndex = this.intervals.findIndex(el => el.id === this.modal.interval.id);
 
-                if (currentIndex + 1 !== this.screenshots.length) {
+                if (currentIndex + 1 !== this.intervals.length) {
                     this.updateDataModal(currentIndex + 1);
                 }
             },
             updateDataModal(currentIndex) {
-                this.modal.screenshot = this.screenshots[currentIndex];
-                this.modal.project = this.getProject(this.modal.screenshot);
-                this.modal.task = this.getTask(this.modal.screenshot);
+                this.modal.interval = this.intervals[currentIndex];
+                this.modal.project = this.modal.interval.task.project;
+                this.modal.task = this.modal.interval.task;
             },
-            getProjectByID(id) {
-                if (!this.projects || !this.projects[id]) {
-                    return null;
-                }
-
-                return this.projects[id];
-            },
-            getProject(screenshot) {
-                if (!screenshot.time_interval) {
-                    return null;
-                }
-
-                const task = this.getTask(screenshot);
-                if (!task) {
-                    return null;
-                }
-
-                return this.getProjectByID(task.project_id);
-            },
-            getTaskByID(id) {
-                if (!this.tasks || !this.tasks[id]) {
-                    return null;
-                }
-
-                return this.tasks[id];
-            },
-            getTask(screenshot) {
-                if (!screenshot.time_interval) {
-                    return null;
-                }
-
-                return this.getTaskByID(screenshot.time_interval.task_id);
-            },
-            async onRemove(screenshotID) {
+            async onRemove(intervalID) {
                 try {
-                    await this.screenshotsService.deleteItem(screenshotID);
+                    await this.intervalsService.deleteItem(intervalID);
 
-                    this.$emit('on-remove', [this.modal.screenshot]);
+                    this.$emit('on-remove', [this.modal.interval]);
 
                     this.$Notify({
                         type: 'success',

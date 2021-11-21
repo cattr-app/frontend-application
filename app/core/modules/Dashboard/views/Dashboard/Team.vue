@@ -3,8 +3,8 @@
         <div class="controls-row flex-between">
             <div class="flex">
                 <Calendar
-                    class="controls-row__item"
                     :sessionStorageKey="sessionStorageKey"
+                    class="controls-row__item"
                     @change="onCalendarChange"
                 />
 
@@ -12,14 +12,14 @@
 
                 <ProjectSelect class="controls-row__item" @change="onProjectsChange" />
 
-                <TimezonePicker class="controls-row__item" :value="timezone" @onTimezoneChange="onTimezoneChange" />
+                <TimezonePicker :value="timezone" class="controls-row__item" @onTimezoneChange="onTimezoneChange" />
             </div>
 
             <div class="flex">
                 <router-link
                     v-if="$can('viewManualTime', 'dashboard')"
-                    to="/time-intervals/new"
                     class="controls-row__item"
+                    to="/time-intervals/new"
                 >
                     <at-button class="controls-row__btn" icon="icon-edit">{{ $t('control.add_time') }}</at-button>
                 </router-link>
@@ -39,13 +39,13 @@
                 <div class="row">
                     <div class="col-8 col-lg-6">
                         <TeamSidebar
-                            class="sidebar"
-                            :users="graphUsers"
-                            :worked="worked"
-                            :currentTasks="currentTasks"
                             :currentProjects="currentProjects"
+                            :currentTasks="currentTasks"
                             :sort="sort"
                             :sortDir="sortDir"
+                            :users="graphUsers"
+                            :worked="worked"
+                            class="sidebar"
                             @sort="onSort"
                         />
                     </div>
@@ -53,30 +53,30 @@
                     <div class="col-16 col-lg-18">
                         <TeamDayGraph
                             v-if="type === 'day'"
-                            class="graph"
-                            :users="graphUsers"
                             :events="events"
                             :timezone="timezone"
+                            :users="graphUsers"
+                            class="graph"
                             @selectedIntervals="onSelectedIntervals"
                         />
                         <TeamTableGraph
                             v-else
-                            class="graph"
-                            :start="start"
                             :end="end"
-                            :users="graphUsers"
+                            :start="start"
                             :timePerDay="timePerDay"
+                            :users="graphUsers"
+                            class="graph"
                         />
                     </div>
 
                     <time-interval-edit
                         :interval-ids="selectedIntervalIds"
-                        @remove="onBulkRemove"
-                        @edit="load"
                         @close="clearIntervals"
+                        @edit="load"
+                        @remove="onBulkRemove"
                     ></time-interval-edit>
                 </div>
-                <preloader v-if="isDataLoading" class="team__loader" :is-transparent="true"></preloader>
+                <preloader v-if="isDataLoading" :is-transparent="true" class="team__loader"></preloader>
             </div>
         </div>
     </div>

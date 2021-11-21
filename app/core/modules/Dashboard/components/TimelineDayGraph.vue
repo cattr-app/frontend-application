@@ -1,6 +1,6 @@
 <template>
     <div ref="canvasWrapper" class="canvas">
-        <canvas ref="canvas"></canvas>
+        <canvas ref="canvas" />
 
         <div
             v-show="hoverPopup.show && !clickPopup.show"
@@ -19,22 +19,22 @@
                 {{ formatDuration(hoverPopup.event.duration) }}
             </div>
 
-            <a class="corner" :style="{ left: `${hoverPopup.borderX}px` }"></a>
+            <a :style="{ left: `${hoverPopup.borderX}px` }" class="corner"></a>
         </div>
 
         <div
             v-show="clickPopup.show"
+            :data-offset="`${clickPopup.borderX}px`"
             :style="{
                 left: `${clickPopup.x - 30}px`,
                 bottom: `${height - clickPopup.y + 10}px`,
             }"
             class="popup"
-            :data-offset="`${clickPopup.borderX}px`"
         >
             <Screenshot
                 v-if="clickPopup.event && getScreenshotByInterval(clickPopup.intervalID)"
-                :lazyImage="false"
                 :disableModal="true"
+                :lazyImage="false"
                 :project="getProject(clickPopup.event.project_id)"
                 :screenshot="getScreenshotByInterval(clickPopup.intervalID)"
                 :showText="false"
@@ -53,7 +53,7 @@
                 </router-link>
             </div>
 
-            <a class="corner" :style="{ left: `${clickPopup.borderX}px` }"></a>
+            <a :style="{ left: `${clickPopup.borderX}px` }" class="corner"></a>
         </div>
 
         <ScreenshotModal
@@ -94,7 +94,7 @@
 
     const titleHeight = 20;
     const subtitleHeight = 20;
-    const timelineHeight = 75;
+    const timelineHeight = 80;
     const columns = 24;
 
     const popupWidth = 270;
@@ -282,8 +282,8 @@
                         height: timelineHeight - 1,
                         rx: 20,
                         ry: 20,
-                        fill: '#FAFAFA',
-                        stroke: '#DFE5ED',
+                        fill: '#fafafa',
+                        stroke: '#dfe5ed',
                         strokeWidth: 1,
                         ...fabricObjectOptions,
                     }).on('mousedown', () => this.$emit('outsideClick')),
@@ -327,7 +327,7 @@
                             fontFamily: 'Nunito, sans-serif',
                             fontSize: 10,
                             fontWeight: '600',
-                            fill: '#B1B1BE',
+                            fill: '#b1b1be',
                             ...fabricObjectOptions,
                         }),
                     );
@@ -338,7 +338,7 @@
                             new fabric.Line([0, 0, 0, timelineHeight], {
                                 left,
                                 top: titleHeight + subtitleHeight,
-                                stroke: '#DFE5ED',
+                                stroke: '#dfe5ed',
                                 strokeWidth: 1,
                                 ...fabricObjectOptions,
                             }),
@@ -362,7 +362,7 @@
                         height: 30,
                         rx: 3,
                         ry: 3,
-                        fill: event.is_manual ? '#c4b52d' : '#2DC48D',
+                        fill: event.is_manual ? '#c4b52d' : '#2dc48d',
                         stroke: 'transparent',
                         strokeWidth: 0,
                         ...fabricObjectOptions,
@@ -500,7 +500,7 @@
         }
 
         .popup {
-            background: #ffffff;
+            background: #fff;
             border: 0;
 
             border-radius: 20px;
@@ -522,7 +522,7 @@
                 border-left: 15px solid transparent;
 
                 border-right: 15px solid transparent;
-                border-top: 10px solid #ffffff;
+                border-top: 10px solid #fff;
 
                 bottom: -10px;
                 content: ' ';
