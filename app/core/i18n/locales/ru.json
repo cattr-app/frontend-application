@@ -278,7 +278,9 @@
     "work_time": "Продолжительность рабочего дня",
     "notice": "Предупреждение",
     "report": "Отчет",
-    "minutes": "{value} минут(-ы)"
+    "minutes": "{value} минут(-ы)",
+    "duration": "Продолжительность",
+    "duration_value": "{0} по {1}"
   },
   "filter": {
     "enter-single": "Введите {0}",
