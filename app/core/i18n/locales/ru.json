@@ -24,6 +24,7 @@
     "step_description": {
       "welcome": "Приветствие",
       "database_settings": "Настройка базы данных",
+      "mail_settings": "Настройка почты",
       "company_settings": "Настройка компании",
       "account": "Настройки аккаунта",
       "permission": "Доступы",
@@ -71,6 +72,15 @@
         "status": "Статус базы данных",
         "docker_title": "Cattr запущен в официальном докер контейнере",
         "docker_subtitle": "Вам не требуется задавать параметры подключения к базе данных"
+      },
+      "mail_settings": {
+        "title": "Настройка почты",
+        "subtitle": "Задайте настройки почты",
+        "email": "Почта",
+        "password": "Пароль",
+        "host": "Адрес сервера",
+        "port": "Порт",
+        "encryption": "Шифрование"
       },
       "company_settings": {
         "title": "Настройка компании",

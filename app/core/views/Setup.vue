@@ -149,6 +149,12 @@ stdout_logfile=/app/backend/storage/logs/worker.log</pre
                     },
                     {
                         status: 'wait',
+                        name: 'mail_settings',
+                        component: () => import(/* webpackChunkName: "setup/mail_settings" */ './Setup/MailSettings'),
+                        storage: {},
+                    },
+                    {
+                        status: 'wait',
                         name: 'database_settings',
                         component: () =>
                             import(/* webpackChunkName: "setup/database_settings" */ './Setup/DatabaseSettings'),
