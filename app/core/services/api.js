@@ -28,10 +28,8 @@ export default class ApiService extends StoreService {
         return axios
             .get('/auth/me', { ignoreCancel: true })
             .then(({ data }) => {
-                const { user } = data;
-
                 this.context.dispatch('setLoggedInStatus', true);
-                this.context.dispatch('setUser', user);
+                this.context.dispatch('setUser', data.data);
 
                 return Promise.resolve();
             })
@@ -69,8 +67,8 @@ export default class ApiService extends StoreService {
         return axios
             .post('/auth/login', credentials, { ignoreCancel: true })
             .then(({ data }) => {
-                this.setUserToken(data.access_token);
-                this.setUserData(data.user);
+                this.setUserToken(data.data.access_token);
+                this.setUserData(data.data.user);
                 this.setLoggedInStatus();
 
                 return Promise.resolve(data);
