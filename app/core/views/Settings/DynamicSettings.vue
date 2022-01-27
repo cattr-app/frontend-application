@@ -8,7 +8,7 @@
                 v-for="(component, index) of this.section.topComponents"
                 :key="index"
                 :parent="this"
-            ></component>
+            />
             <validation-observer ref="form">
                 <div class="data-entries">
                     <template v-for="(fields, groupKey) of this.groups">
@@ -321,8 +321,7 @@
                 this.isLoading = true;
 
                 try {
-                    const { data } = await this.section.service.save(this.values);
-                    await this.$store.dispatch('settings/updateSection', { pathName: this.$route.name, data });
+                    await this.section.service.save(this.values);
 
                     this.$Notify({
                         type: 'success',
