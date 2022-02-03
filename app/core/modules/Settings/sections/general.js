@@ -17,7 +17,7 @@ export default {
 
     route: {
         // After processing this route will be named as 'settings.exampleSection'
-        name: 'Settings.company.general',
+        name: 'company.settings.general',
 
         // After processing this route can be accessed via URL 'settings/example'
         path: '/company/general',

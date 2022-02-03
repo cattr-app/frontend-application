@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1 class="page-title settings__title">{{ $t(section.label) }}</h1>
+        <h1 v-if="this.section" class="page-title settings__title">{{ $t(this.section.label) }}</h1>
 
         <template v-if="this.section && values">
             <component
@@ -49,7 +49,7 @@
                                                     :class="{
                                                         'at-select--error at-input--error has-error': errors.length > 0,
                                                     }"
-                                                ></renderable-field>
+                                                />
                                                 <small>{{ errors[0] }}</small>
                                             </validation-provider>
 

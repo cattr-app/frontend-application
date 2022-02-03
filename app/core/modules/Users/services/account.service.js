@@ -41,11 +41,11 @@ export default class AccountService extends SettingsService {
         return axios.get(this.getItemRequestUri(), { ignoreCancel: true }).then(({ data }) => {
             return {
                 data: {
-                    id: data.user.id,
-                    password: data.user.password,
-                    email: data.user.email,
-                    full_name: data.user.full_name,
-                    user_language: data.user.user_language,
+                    id: data.data.id,
+                    password: data.data.password,
+                    email: data.data.email,
+                    full_name: data.data.full_name,
+                    user_language: data.data.user_language,
                 },
             };
         });

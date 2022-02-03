@@ -11,7 +11,7 @@ export function init(context, router) {
         label: 'navigation.settings',
         icon: 'icon-settings',
         to: {
-            name: 'Users.settings.account',
+            name: 'settings.user.account',
         },
     });
     context.addLocalizationData({
