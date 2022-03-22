@@ -48,7 +48,9 @@ const responseErrorInterceptor = error => {
         default:
             Vue.prototype.$Notify.error({
                 title: 'Error',
-                message: has(error, 'response.data.message') ? error.response.data.message : 'Internal server error',
+                message: has(error, 'response.data.error.message')
+                    ? error.response.data.error.message
+                    : 'Internal server error',
                 duration: 5000,
             });
     }
