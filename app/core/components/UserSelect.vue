@@ -176,7 +176,7 @@
             this.isLoading = true;
             try {
                 const { data } = await this.usersService.getAll();
-                this.users = data;
+                this.users = data.data;
             } catch ({ response }) {
                 if (process.env.NODE_ENV === 'development') {
                     console.warn(response ? response : 'request to users is canceled');

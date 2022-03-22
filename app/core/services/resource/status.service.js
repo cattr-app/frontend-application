@@ -52,15 +52,13 @@ export default class StatusService extends ResourceService {
     }
 
     getOptionList() {
-        return this.getAll().then(({ data }) => {
-            return data.map(option => {
-                return {
-                    value: option.id,
-                    label: option[this.getOptionLabelKey()],
-                    active: option.active,
-                };
-            });
-        });
+        return this.getAll().then(({ data }) =>
+            data.data.map(option => ({
+                value: option.id,
+                label: option[this.getOptionLabelKey()],
+                active: option.active,
+            })),
+        );
     }
 
     /**
