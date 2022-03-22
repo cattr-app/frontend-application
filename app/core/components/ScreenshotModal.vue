@@ -98,7 +98,7 @@
     import { mapGetters } from 'vuex';
 
     export function screenshotPathProvider(interval) {
-        return 'screenshot/' + interval.id;
+        return `time-intervals/${interval.id}/screenshot`;
     }
 
     export const config = { screenshotPathProvider };

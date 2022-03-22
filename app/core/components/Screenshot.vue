@@ -37,7 +37,7 @@
                     </div>
                 </div>
             </template>
-            <at-progress class="screenshot__activity-bar" :stroke-width="5" :percent="interval.activity_fill || 0" />
+            <at-progress class="screenshot__activity-bar" :stroke-width="5" :percent="+interval.activity_fill || 0" />
         </at-tooltip>
 
         <div v-if="showText" class="screenshot__text">
@@ -70,7 +70,7 @@
     import { mapGetters } from 'vuex';
 
     export function thumbnailPathProvider(interval) {
-        return 'screenshot/thumb/' + interval.id;
+        return `time-intervals/${interval.id}/thumb`;
     }
 
     export const config = { thumbnailPathProvider };

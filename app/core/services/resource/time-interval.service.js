@@ -69,4 +69,12 @@ export default class TimeIntervalService extends ResourceService {
 
         return axios.post(url, data, config);
     }
+
+    /**
+     * @param id
+     * @returns {Promise<AxiosResponse<T>>}
+     */
+    deleteItem(id) {
+        return axios.post('time-intervals/remove', { id });
+    }
 }
