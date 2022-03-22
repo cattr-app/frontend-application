@@ -199,6 +199,12 @@ export function fieldsToFillProvider() {
             ],
             default: 'employee',
         },
+        {
+            label: 'field.web_and_app_monitoring',
+            key: 'web_and_app_monitoring',
+            type: 'checkbox',
+            default: 1,
+        },
     ];
 }
 

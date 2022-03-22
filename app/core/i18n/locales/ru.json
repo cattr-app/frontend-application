@@ -280,7 +280,8 @@
     "report": "Отчет",
     "minutes": "{value} минут(-ы)",
     "duration": "Продолжительность",
-    "duration_value": "{0} по {1}"
+    "duration_value": "{0} по {1}",
+    "web_and_app_monitoring": "Мониторинг приложений"
   },
   "filter": {
     "enter-single": "Введите {0}",

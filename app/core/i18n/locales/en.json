@@ -281,7 +281,8 @@
     "report": "Report",
     "minutes": "{value} minutes",
     "duration": "Duration",
-    "duration_value": "{0} to {1}"
+    "duration_value": "{0} to {1}",
+    "web_and_app_monitoring": "Enable app monitoring"
   },
   "filter": {
     "enter-single": "Enter {0}",
