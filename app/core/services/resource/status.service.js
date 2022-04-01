@@ -1,6 +1,6 @@
-import ResourceService from './resource.service';
+import ResourceService from '../resource.service';
 import axios from 'axios';
-import { serialize } from '../../utils/url';
+import { serialize } from '@/utils/url';
 
 export default class StatusService extends ResourceService {
     /**

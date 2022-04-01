@@ -5,11 +5,11 @@
         </at-modal>
 
         <div class="color-input__color">
-            <div class="at-input__original" :style="{ background: value }" @click.prevent="modal = true"></div>
+            <div class="at-input__original" :style="{ background: value }" @click.prevent="modal = true" />
         </div>
 
         <at-button class="color-input__remove" @click.prevent="$emit('change', null)">
-            <span class="icon icon-x"></span>
+            <span class="icon icon-x" />
         </at-button>
     </div>
 </template>

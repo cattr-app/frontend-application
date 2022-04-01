@@ -10,7 +10,11 @@
             :src="getScreenshotPath(interval)"
             :openable="true"
         />
-        <at-progress class="screenshot__activity-bar" :stroke-width="7" :percent="interval.activity_fill || 0" />
+        <at-progress
+            class="screenshot__activity-bar"
+            :stroke-width="7"
+            :percent="+(+interval.activity_fill / 2 || 0)"
+        />
 
         <div v-if="showNavigation" class="modal-left">
             <at-button type="primary" icon="icon-arrow-left" @click="$emit('showPrevious')"></at-button>
@@ -85,7 +89,7 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div v-if="canRemove" class="row">
                 <at-button class="modal-remove" type="text" icon="icon-trash-2" @click="onRemove" />
             </div>
         </template>
@@ -128,6 +132,10 @@
             showNavigation: {
                 type: Boolean,
                 default: false,
+            },
+            canRemove: {
+                type: Boolean,
+                default: true,
             },
         },
         computed: {

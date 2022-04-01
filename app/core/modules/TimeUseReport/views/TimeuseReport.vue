@@ -31,7 +31,7 @@
 <script>
     import List from './TimeUseReport/List';
     import UsersService from '@/services/resource/user.service';
-    import TimeUseReportService from '@/services/reports/time-use-report.service';
+    import TimeUseReportService from '_internal/TimeUseReport/service/time-use-report.service';
     import { formatDurationString } from '@/utils/time';
     import moment from 'moment';
     import Preloader from '@/components/Preloader';

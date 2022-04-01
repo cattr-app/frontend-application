@@ -37,7 +37,7 @@
 
 <script>
     import { mapGetters } from 'vuex';
-    import UserAvatar from './UserAvatar';
+    import UserAvatar from '@/components/UserAvatar';
     import { getModuleList } from '@/moduleLoader';
     import NavigationMenuItem from '@/components/NavigationMenuItem';
 

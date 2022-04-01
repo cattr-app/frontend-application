@@ -37,7 +37,11 @@
                     </div>
                 </div>
             </template>
-            <at-progress class="screenshot__activity-bar" :stroke-width="5" :percent="+interval.activity_fill || 0" />
+            <at-progress
+                class="screenshot__activity-bar"
+                :stroke-width="5"
+                :percent="+(+interval.activity_fill / 2 || 0)"
+            />
         </at-tooltip>
 
         <div v-if="showText" class="screenshot__text">

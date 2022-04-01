@@ -21,8 +21,8 @@
 </template>
 
 <script>
-    import MultiSelect from './MultiSelect';
-    import StatusService from '../services/resource/status.service';
+    import MultiSelect from '@/components/MultiSelect';
+    import StatusService from '@/services/resource/status.service';
 
     const localStorageKey = 'amazingcat.local.storage.status_select';
 

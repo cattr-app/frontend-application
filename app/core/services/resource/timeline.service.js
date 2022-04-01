@@ -1,6 +1,6 @@
 import axios from 'axios';
 import moment from 'moment';
-import StoreService from './store.service';
+import StoreService from '../store.service';
 
 export default class TimelineService extends StoreService {
     constructor(context, timeIntervalService, projectService, taskService, screenshotService, userService) {
@@ -18,9 +18,9 @@ export default class TimelineService extends StoreService {
             .getAll({})
             .then(response => {
                 const { data } = response;
-                this.context.dispatch('setUsers', data);
+                this.context.dispatch('setUsers', data.data);
 
-                return data;
+                return data.data;
             })
             .catch(e => {
                 if (!axios.isCancel(e)) {

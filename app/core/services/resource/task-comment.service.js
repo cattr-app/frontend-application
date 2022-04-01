@@ -1,6 +1,6 @@
-import ResourceService from '@/services/resource/resource.service';
+import ResourceService from '@/services/resource.service';
 import axios from 'axios';
-import { serialize } from '../../utils/url';
+import { serialize } from '@/utils/url';
 
 export default class TaskCommentService extends ResourceService {
     /**

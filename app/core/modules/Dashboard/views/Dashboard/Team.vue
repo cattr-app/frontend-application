@@ -70,11 +70,12 @@
                     </div>
 
                     <time-interval-edit
-                        :interval-ids="selectedIntervalIds"
+                        v-if="intervals.length"
+                        :intervals="intervals.filter(i => selectedIntervalIds.indexOf(i.id) !== -1)"
                         @close="clearIntervals"
                         @edit="load"
                         @remove="onBulkRemove"
-                    ></time-interval-edit>
+                    />
                 </div>
                 <preloader v-if="isDataLoading" :is-transparent="true" class="team__loader"></preloader>
             </div>
@@ -135,28 +136,25 @@
                 reportService: new DashboardReportService(),
                 showExportModal: false,
                 selectedIntervalIds: [],
-                selectedScreenshots: [],
                 selectedIntervals: [],
                 sessionStorageKey: sessionStorageKey,
                 isDataLoading: false,
             };
         },
-        created() {
+        async created() {
             localStorage['dashboard.tab'] = 'team';
             this.service.loadUsers();
-            this.load();
+            await this.load();
             this.updateHandle = setInterval(() => this.load(false), updateInterval);
         },
         beforeDestroy() {
             clearInterval(this.updateHandle);
             this.service.unloadIntervals();
-            this.service.unloadScreenshots();
         },
         computed: {
             ...mapGetters('timeline', [
                 'service',
                 'intervals',
-                'screenshots',
                 'events',
                 'timePerDay',
                 'users',
@@ -260,16 +258,12 @@
                     return;
                 }
 
-                this.service.loadLatestIntervals(this.userIDs, this.projectIDs);
+                await this.service.loadLatestIntervals(this.userIDs, this.projectIDs);
 
                 const startAt = this.getStartOfDayInTimezone(this.start, this.timezone);
                 const endAt = this.getEndOfDayInTimezone(this.end, this.timezone);
 
                 await this.service.load(this.userIDs, this.projectIDs, startAt, endAt);
-
-                if (this.type === 'day') {
-                    await this.service.loadScreenshots(this.userIDs, startAt, endAt);
-                }
 
                 this.isDataLoading = false;
             }, 1000),
@@ -279,7 +273,6 @@
                 this.end = end;
 
                 this.service.unloadIntervals();
-                this.service.unloadScreenshots();
 
                 this.load();
             },
@@ -339,9 +332,7 @@
             },
             onSelectedIntervals(event) {
                 this.selectedIntervalIds = event.ids;
-                this.selectedScreenshots = this.screenshots.filter(screenshot =>
-                    this.selectedIntervalIds.includes(screenshot.time_interval_id),
-                );
+
                 this.selectedIntervals = Object.values(this.intervals).reduce((acc, curr) => {
                     return [...acc, ...curr.intervals.filter(interval => event.ids.includes(interval.id))];
                 }, []);
@@ -364,19 +355,9 @@
                 });
                 this.$store.dispatch('timeline/setIntervals', totalIntervals);
 
-                this.$store.dispatch(
-                    'timeline/setScreenshots',
-                    this.screenshots.filter(screenshot => intervalIds.indexOf(screenshot.time_interval_id) === -1),
-                );
-
                 this.clearIntervals();
             },
-            recalculateStatistic(screenshots) {
-                const intervals = screenshots.map(screenshot => screenshot.time_interval);
-                this.onBulkRemove(intervals);
-            },
             clearIntervals() {
-                this.selectedScreenshots = [];
                 this.selectedIntervals = [];
                 this.selectedIntervalIds = [];
             },

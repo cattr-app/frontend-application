@@ -1,4 +1,4 @@
-import ApiService from '../../services/api';
+import ApiService from '@/services/api';
 
 const state = {
     api: null,

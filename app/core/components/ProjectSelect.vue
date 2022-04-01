@@ -12,8 +12,8 @@
 </template>
 
 <script>
-    import MultiSelect from './MultiSelect';
-    import ProjectService from '../services/resource/project.service';
+    import MultiSelect from '@/components/MultiSelect';
+    import ProjectService from '@/services/resource/project.service';
 
     const localStorageKey = 'amazingcat.local.storage.project_select';
 

@@ -1,5 +1,5 @@
 import axios from '@/config/app';
-import ResourceService from '@/services/resource/resource.service';
+import ResourceService from '@/services/resource.service';
 
 export default class PriorityService extends ResourceService {
     getAll(config = {}) {

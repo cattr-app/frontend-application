@@ -71,7 +71,7 @@
 </template>
 
 <script>
-    import RenderableField from '../../components/RenderableField';
+    import RenderableField from '@/components/RenderableField';
     import { Skeleton } from 'vue-loading-skeleton';
 
     export default {

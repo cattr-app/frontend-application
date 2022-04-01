@@ -2,7 +2,7 @@
     <div class="dropdown">
         <at-dropdown :placement="position" :trigger="trigger" @on-dropdown-command="onExport">
             <at-button type="text">
-                <span class="icon icon-download"></span>
+                <span class="icon icon-download" />
             </at-button>
 
             <at-dropdown-menu slot="menu">

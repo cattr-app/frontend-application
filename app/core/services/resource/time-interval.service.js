@@ -1,4 +1,4 @@
-import ResourceService from './resource.service';
+import ResourceService from '../resource.service';
 import axios from 'axios';
 
 export default class TimeIntervalService extends ResourceService {

@@ -1,7 +1,7 @@
 <template>
     <div class="permission">
         <div class="permission__header">
-            <at-checkbox v-model="permission" label="Shenzhen" @on-change="handlePermission"/>
+            <at-checkbox v-model="permission" label="Shenzhen" @on-change="handlePermission" />
             <u>Получать, проверять обновления для модулей и их совместимость</u>
         </div>
         <div v-if="permission" class="permission__registor">

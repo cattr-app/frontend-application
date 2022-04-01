@@ -32,15 +32,15 @@
             class="popup"
         >
             <Screenshot
-                v-if="clickPopup.event && getScreenshotByInterval(clickPopup.intervalID)"
+                v-if="clickPopup.event && getIntervalById(clickPopup.intervalID, clickPopup.event.user_id)"
                 :disableModal="true"
                 :lazyImage="false"
                 :project="getProject(clickPopup.event.project_id)"
-                :screenshot="getScreenshotByInterval(clickPopup.intervalID)"
+                :interval="getIntervalById(clickPopup.intervalID, clickPopup.event.user_id)"
                 :showText="false"
                 :task="getTask(clickPopup.event.task_id)"
                 :user="user"
-                @click="showPopup(getScreenshotByInterval(clickPopup.intervalID))"
+                @click="showPopup(getIntervalById(clickPopup.intervalID, clickPopup.event.user_id))"
             />
 
             <div v-if="clickPopup.event">
@@ -58,7 +58,7 @@
 
         <ScreenshotModal
             :project="modal.project"
-            :screenshot="modal.screenshot"
+            :interval="modal.interval"
             :show="modal.show"
             :showNavigation="true"
             :task="modal.task"
@@ -78,7 +78,7 @@
     import { formatDurationString } from '@/utils/time';
     import Screenshot from '@/components/Screenshot';
     import ScreenshotModal from '@/components/ScreenshotModal';
-    import ScreenshotService from '@/services/resource/screenshot.service';
+    import IntervalService from '@/services/resource/time-interval.service';
     import { mapGetters } from 'vuex';
 
     const fabricObjectOptions = {
@@ -126,7 +126,7 @@
             ScreenshotModal,
         },
         computed: {
-            ...mapGetters('timeline', ['tasks', 'screenshots', 'intervals']),
+            ...mapGetters('timeline', ['tasks', 'intervals']),
             ...mapGetters('user', ['user']),
             height() {
                 return timelineHeight + titleHeight + subtitleHeight;
@@ -168,9 +168,9 @@
                     intervalID: null,
                     borderX: 0,
                 },
-                screenshotsService: new ScreenshotService(),
+                intervalService: new IntervalService(),
                 modal: {
-                    screenshot: null,
+                    interval: null,
                     project: null,
                     task: null,
                     show: false,
@@ -197,14 +197,14 @@
         },
         methods: {
             formatDuration: formatDurationString,
-            showPopup(screenshot) {
-                if (typeof screenshot !== 'object') {
+            showPopup(interval) {
+                if (typeof interval !== 'object') {
                     return;
                 }
 
-                this.modal.task = this.getTask(screenshot.time_interval?.task_id);
+                this.modal.task = this.getTask(interval?.task_id);
                 this.modal.project = this.modal.task?.project;
-                this.modal.screenshot = screenshot;
+                this.modal.interval = interval;
 
                 this.modal.show = true;
             },
@@ -221,17 +221,17 @@
                 }
             },
             showPrevious() {
-                const currentIndex = this.screenshots.findIndex(x => x.id === this.modal.screenshot.id);
+                const currentIndex = this.intervals.findIndex(x => x.id === this.modal.interval.id);
 
                 if (currentIndex !== 0) {
-                    this.modal.screenshot = this.screenshots[currentIndex - 1];
+                    this.modal.interval = this.intervals[currentIndex - 1];
                 }
             },
             showNext() {
-                const currentIndex = this.screenshots.findIndex(x => x.id === this.modal.screenshot.id);
+                const currentIndex = this.intervals.findIndex(x => x.id === this.modal.interval.id);
 
-                if (currentIndex + 1 !== this.screenshots.length) {
-                    this.modal.screenshot = this.screenshots[currentIndex + 1];
+                if (currentIndex + 1 !== this.intervals.length) {
+                    this.modal.interval = this.intervals[currentIndex + 1];
                 }
             },
             getProjectName(projectID) {
@@ -264,8 +264,8 @@
 
                 return this.tasks[taskID];
             },
-            getScreenshotByInterval(intervalID) {
-                return this.screenshots.find(screenshot => screenshot.time_interval_id === intervalID);
+            getIntervalById(intervalID, userId) {
+                return this.intervals[userId].intervals.find(i => i.id === intervalID);
             },
             draw: throttle(function() {
                 this.canvas.clear();
@@ -465,7 +465,7 @@
             }, 100),
             async onRemove() {
                 try {
-                    await this.screenshotsService.deleteItem(this.modal.screenshot.id);
+                    await this.intervalService.deleteItem(this.modal.interval.id);
 
                     this.$Notify({
                         type: 'success',

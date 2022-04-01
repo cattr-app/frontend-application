@@ -2,11 +2,7 @@
     <div class="user-select" :class="{ 'at-select--visible': showPopup }" @click="togglePopup">
         <at-input class="user-select-input" :readonly="true" :value="inputValue" :size="size" />
 
-        <span
-            v-show="userIDs.length"
-            class="user-select__clear icon icon-x at-select__clear"
-            @click="clearSelection"
-        ></span>
+        <span v-show="userIDs.length" class="user-select__clear icon icon-x at-select__clear" @click="clearSelection" />
 
         <span class="icon icon-chevron-down at-select__arrow"></span>
 
@@ -124,8 +120,8 @@
 </template>
 
 <script>
-    import UserAvatar from './UserAvatar';
-    import UsersService from '../services/resource/user.service';
+    import UserAvatar from '@/components/UserAvatar';
+    import UsersService from '@/services/resource/user.service';
     import Preloader from '@/components/Preloader';
 
     const localStorageKey = 'user-select.users';

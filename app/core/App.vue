@@ -10,7 +10,7 @@
 <script>
     import * as Sentry from '@sentry/browser';
     import moment from 'moment';
-    import { getLangCookie, setLangCookie } from './i18n';
+    import { getLangCookie, setLangCookie } from '@/i18n';
 
     export const config = { beforeLayout: null };
 

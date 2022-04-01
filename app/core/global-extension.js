@@ -1,6 +1,6 @@
-import DefaultLayout from './layouts/DefaultLayout';
-import AuthLayout from './layouts/AuthLayout';
-import CustomAtModal from './components/global/CustomModal/dialog';
+import DefaultLayout from '@/layouts/DefaultLayout';
+import AuthLayout from '@/layouts/AuthLayout';
+import CustomAtModal from '@/components/global/CustomModal/dialog';
 
 import axios from 'axios';
 

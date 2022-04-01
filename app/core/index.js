@@ -1,22 +1,22 @@
-import './config/app';
+import '@/config/app';
 
-import { localModuleLoader } from './moduleLoader';
-import './settings';
+import { localModuleLoader } from '@/moduleLoader';
+import '@/settings';
 
 import Vue from 'vue';
-import App from './App.vue';
-import router from './router';
-import store from './store';
+import App from '@/App.vue';
+import router from '@/router';
+import store from '@/store';
 import AtComponents from '@amazingcat/at-ui';
 import Dialog from 'vue-dialog-loading';
 import DatePicker from 'vue2-datepicker';
 import moment from 'vue-moment';
-import i18n from './i18n';
+import i18n from '@/i18n';
 import VueLazyload from 'vue-lazyload';
-import './plugins/vee-validate';
-import './plugins/sentry';
-import './policies';
-import Gate from './plugins/gate';
+import '@/plugins/vee-validate';
+import '@/plugins/sentry';
+import '@/policies';
+import Gate from '@/plugins/gate';
 import vueKanban from 'vue-kanban';
 
 //Global components

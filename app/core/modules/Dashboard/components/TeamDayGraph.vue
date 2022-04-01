@@ -30,12 +30,12 @@
             }"
             class="popup"
         >
-            <div v-if="clickPopup.event && getScreenshotByInterval(clickPopup.intervalID)">
+            <div v-if="clickPopup.event && getIntervalById(clickPopup.intervalID, clickPopup.event.user_id)">
                 <Screenshot
                     :disableModal="true"
                     :lazyImage="false"
                     :project="getProject(clickPopup.event.task.project_id)"
-                    :screenshot="getScreenshotByInterval(clickPopup.intervalID)"
+                    :interval="getIntervalById(clickPopup.intervalID, clickPopup.event.user_id)"
                     :showText="false"
                     :task="getTask(clickPopup.event.task.id)"
                     :user="getUser(clickPopup.event.user_id)"
@@ -58,7 +58,7 @@
 
         <ScreenshotModal
             :project="modal.project"
-            :screenshot="modal.screenshot"
+            :interval="modal.interval"
             :show="modal.show"
             :showNavigation="true"
             :task="modal.task"
@@ -80,7 +80,7 @@
     import Screenshot from '@/components/Screenshot';
     import ScreenshotModal from '@/components/ScreenshotModal';
     import { formatDurationString } from '@/utils/time';
-    import ScreenshotService from '@/services/resource/screenshot.service';
+    import IntervalsService from '@/services/resource/time-interval.service';
 
     const fabricObjectOptions = {
         editable: false,
@@ -140,14 +140,14 @@
                     intervalID: null,
                     borderX: 0,
                 },
-                screenshotsService: new ScreenshotService(),
+                intervalsService: new IntervalsService(),
                 modal: {
                     show: false,
                     intervalID: null,
                     project: null,
                     task: null,
                     user: null,
-                    screenshot: null,
+                    interval: null,
                 },
             };
         },
@@ -187,7 +187,7 @@
                 this.modal.project = this.getProject(this.clickPopup.event.project_id);
                 this.modal.user = this.getUser(this.clickPopup.event.user_id);
                 this.modal.task = this.getTask(this.clickPopup.event.task_id);
-                this.modal.screenshot = this.getScreenshotByInterval(this.clickPopup.intervalID);
+                this.modal.interval = this.getIntervalById(this.clickPopup.intervalID);
 
                 this.modal.show = true;
             },
@@ -223,32 +223,30 @@
             showPrevious() {
                 const intervals = this.getUngroupedUserIntervals(this.modal.user.id);
 
-                const currentIndex = intervals.findIndex(x => x.id === this.modal.intervalID);
+                const currentIndex = intervals.findIndex(x => x.id === this.modal.interval.id);
 
                 if (currentIndex > 0) {
                     const interval = intervals[currentIndex - 1];
                     if (interval) {
-                        this.modal.intervalID = interval.id;
+                        this.modal.interval = interval;
                         this.modal.project = this.getProject(interval.project_id);
                         this.modal.user = this.getUser(interval.user_id);
                         this.modal.task = this.getTask(interval.task_id);
-                        this.modal.screenshot = this.getScreenshotByInterval(this.modal.intervalID);
                     }
                 }
             },
             showNext() {
                 const intervals = this.getUngroupedUserIntervals(this.modal.user.id);
 
-                const currentIndex = intervals.findIndex(x => x.id === this.modal.intervalID);
+                const currentIndex = intervals.findIndex(x => x.id === this.modal.interval.id);
 
                 if (currentIndex < intervals.length - 1) {
                     const interval = intervals[currentIndex + 1];
                     if (interval) {
-                        this.modal.intervalID = interval.id;
+                        this.modal.interval = interval;
                         this.modal.project = this.getProject(interval.project_id);
                         this.modal.user = this.getUser(interval.user_id);
                         this.modal.task = this.getTask(interval.task_id);
-                        this.modal.screenshot = this.getScreenshotByInterval(this.modal.intervalID);
                     }
                 }
             },
@@ -285,8 +283,8 @@
             getUser(userID) {
                 return this.users.find(user => user.id === userID);
             },
-            getScreenshotByInterval(intervalID) {
-                return this.screenshots.find(screenshot => screenshot.time_interval_id === intervalID);
+            getIntervalById(intervalID, userId) {
+                return this.intervals[userId].intervals.find(i => i.id === intervalID);
             },
             draw: throttle(function() {
                 this.canvas.clear();
@@ -498,7 +496,7 @@
             },
             async onRemove() {
                 try {
-                    await this.screenshotsService.deleteItem(this.modal.screenshot.id);
+                    await this.intervalsService.deleteItem(this.modal.interval.id);
 
                     this.$Notify({
                         type: 'success',

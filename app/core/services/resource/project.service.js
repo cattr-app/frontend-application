@@ -1,7 +1,6 @@
-import ResourceService from './resource.service';
+import ResourceService from '../resource.service';
 import axios from 'axios';
-import difference from 'lodash/difference';
-import { serialize } from '../../utils/url';
+import { serialize } from '@/utils/url';
 
 export default class ProjectService extends ResourceService {
     constructor(params = {}) {

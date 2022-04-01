@@ -1,11 +1,11 @@
 import moment from 'moment';
 import 'moment-timezone';
-import TimelineService from '../../services/timeline.service';
-import ProjectService from '../../services/resource/project.service';
-import ScreenshotService from '../../services/resource/screenshot.service';
-import TasksService from '../../services/resource/task.service';
-import TimeIntervalService from '../../services/resource/time-interval.service';
-import UserService from '../../services/resource/user.service';
+import TimelineService from '@/services/resource/timeline.service';
+import ProjectService from '@/services/resource/project.service';
+import ScreenshotService from '@/services/resource/screenshot.service';
+import TasksService from '@/services/resource/task.service';
+import TimeIntervalService from '@/services/resource/time-interval.service';
+import UserService from '@/services/resource/user.service';
 
 const state = {
     service: null,

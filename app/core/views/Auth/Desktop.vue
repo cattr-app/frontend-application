@@ -131,7 +131,7 @@
 </style>
 
 <script>
-    import sloganGenerator from '../../helpers/sloganGenerator';
+    import sloganGenerator from '@/helpers/sloganGenerator';
 
     export default {
         name: 'desktop-login',
