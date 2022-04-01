@@ -53,7 +53,7 @@
             };
         },
         async created() {
-            this.statuses = (await this.statusService.getAll()).data;
+            this.statuses = (await this.statusService.getAll()).data.data;
         },
         methods: {
             getStatusIndex(id) {

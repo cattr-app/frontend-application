@@ -45,7 +45,7 @@
         async created() {
             try {
                 this.options = await this.service.getAll().then(({ data }) => {
-                    return data.map(option => {
+                    return data.data.map(option => {
                         return {
                             value: option.id,
                             label: option['name'],
