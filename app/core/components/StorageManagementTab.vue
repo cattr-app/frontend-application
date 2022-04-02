@@ -90,9 +90,9 @@
                 this.thinRequested = true;
 
                 try {
-                    const { data } = await axios.post('about/storage');
+                    const { status } = await axios.post('about/storage');
 
-                    if (data.success) {
+                    if (status === 204) {
                         this.$Message.success('Thin has been queued!');
 
                         this.storage.thinning.now = true;
@@ -134,7 +134,7 @@
         async mounted() {
             this.isLoading = true;
             try {
-                this.storage = (await axios.get('about/storage')).data;
+                this.storage = (await axios.get('about/storage')).data.data;
             } catch ({ response }) {
                 if (process.env.NODE_ENV === 'development') {
                     console.warn(response ? response : 'request to storage is canceled');

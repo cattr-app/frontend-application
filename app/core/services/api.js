@@ -114,7 +114,7 @@ export default class ApiService extends StoreService {
     async status() {
         try {
             const { data } = await axios.get('/status', { ignoreCancel: true });
-            return data;
+            return data.data;
         } catch (e) {
             return { cattr: false };
         }
