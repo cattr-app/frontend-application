@@ -68,9 +68,11 @@
 </template>
 
 <script>
-    import axios from 'axios';
     import { Skeleton } from 'vue-loading-skeleton';
     import semverGt from 'semver/functions/gt';
+    import AboutService from '@/services/resource/about.service';
+
+    const aboutService = new AboutService();
 
     export default {
         name: 'About',
@@ -82,9 +84,9 @@
         async mounted() {
             this.isLoading = true;
             try {
-                const { data } = await axios.get('about');
-                this.appData = data.data.app;
-                this.modulesData = data.data.modules;
+                const { data } = await aboutService.getGeneralInfo();
+                this.appData = data.app;
+                this.modulesData = data.modules;
 
                 if (this.appData.vulnerable) {
                     this.knownVulnerableMsg = `${this.$i18n.t('message.vulnerable_version')} ${

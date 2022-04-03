@@ -10,8 +10,8 @@
 
             <div class="controls-row__item controls-row__item--left-auto">
                 <small v-if="companyData.timezone">{{
-                    $t('project-report.report_timezone', [companyData.timezone])
-                }}</small>
+                        $t('project-report.report_timezone', [companyData.timezone])
+                    }}</small>
             </div>
 
             <ExportDropdown
@@ -53,9 +53,7 @@
     import { getDateToday, getStartDate, getEndDate, formatDurationString } from '@/utils/time';
     import ProjectSelect from '@/components/ProjectSelect';
     import Preloader from '@/components/Preloader';
-    import moment from 'moment';
     import ExportDropdown from '@/components/ExportDropdown';
-    import { getMimeType, downloadBlob } from '@/utils/file';
     import { mapGetters } from 'vuex';
 
     const reportService = new ProjectReportService();
@@ -88,12 +86,6 @@
         },
         computed: {
             ...mapGetters('user', ['companyData']),
-            exportFilename() {
-                const days = moment(this.datepickerDateEnd).diff(this.datepickerDateStart, 'days');
-                return days > 1
-                    ? `Project Report from ${this.datepickerDateStart} to ${this.datepickerDateEnd}`
-                    : `Project Report ${this.datepickerDateStart}`;
-            },
             totalTime() {
                 return formatDurationString(this.projects.reduce((acc, cur) => acc + cur.time, 0));
             },
@@ -133,24 +125,20 @@
                 this.isDataLoading = false;
             },
             async onExport(format) {
-                const mimetype = getMimeType(format);
-
-                const config = {
-                    headers: { Accept: mimetype },
-                };
-
                 try {
-                    const { data } = await reportService.getReportFile(
+                    await reportService.getReportFile(
                         this.datepickerDateStart,
                         this.datepickerDateEnd,
                         this.userIds,
                         this.projectsList,
-                        config,
+                        format,
                     );
 
-                    const blob = new Blob([data], { type: mimetype });
-                    const fileName = `${this.exportFilename}.${format}`;
-                    downloadBlob(blob, fileName);
+                    this.$Notify({
+                        type: 'success',
+                        title: this.$t('message.success'),
+                        message: this.$t('message.report_has_been_queued'),
+                    });
                 } catch ({ response }) {
                     if (process.env.NODE_ENV === 'development') {
                         console.log(response ? response : 'request to reports is canceled');
