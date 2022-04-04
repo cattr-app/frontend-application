@@ -24,9 +24,9 @@ export default class ProjectReportService {
      * @param endAt
      * @param users
      * @param projects
-     * @param config
+     * @param format
      */
-    getReportFile(startAt, endAt, users, projects, config = {}) {
+    getReportFile(startAt, endAt, users, projects, format) {
         const params = {
             start_at: getStartDay(startAt),
             end_at: getEndDay(endAt),
@@ -35,8 +35,7 @@ export default class ProjectReportService {
         };
 
         return axios.post(`report/project/download`, params, {
-            ...config,
-            responseType: 'blob',
+            headers: { Accept: format },
         });
     }
 }

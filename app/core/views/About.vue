@@ -25,7 +25,7 @@
                     </div>
                     <!-- /.row -->
 
-                    <div class="about__logo"></div>
+                    <div class="about__logo" />
 
                     <h2>Cattr</h2>
                     <p class="about__version">
@@ -68,9 +68,11 @@
 </template>
 
 <script>
-    import axios from 'axios';
     import { Skeleton } from 'vue-loading-skeleton';
     import semverGt from 'semver/functions/gt';
+    import AboutService from '@/services/resource/about.service';
+
+    const aboutService = new AboutService();
 
     export default {
         name: 'About',
@@ -82,17 +84,21 @@
         async mounted() {
             this.isLoading = true;
             try {
-                const { data } = await axios.get('about');
+                const { data } = await aboutService.getGeneralInfo();
                 this.appData = data.app;
                 this.modulesData = data.modules;
 
-                if (data.app.vulnerable) {
-                    this.knownVulnerableMsg = `${this.$i18n.t('message.vulnerable_version')} ${data.app.last_version}`;
-                } else if (data.app.last_version && data.app.last_version !== data.app.version) {
-                    if (semverGt(data.app.last_version, data.app.version)) {
-                        this.updateVersionMsg = `${this.$i18n.t('message.update_version')} ${data.app.last_version}`;
+                if (this.appData.vulnerable) {
+                    this.knownVulnerableMsg = `${this.$i18n.t('message.vulnerable_version')} ${
+                        this.appData.last_version
+                    }`;
+                } else if (this.appData.last_version && this.appData.last_version !== this.appData.version) {
+                    if (semverGt(this.appData.last_version, data.app.version)) {
+                        this.updateVersionMsg = `${this.$i18n.t('message.update_version')} ${
+                            this.appData.last_version
+                        }`;
                     } else {
-                        this.infoMsg = data.app.message;
+                        this.infoMsg = this.appData.message;
                     }
                 }
             } catch ({ response }) {
@@ -119,20 +125,24 @@
                         render: (h, params) =>
                             h('AtAlert', {
                                 props: {
-                                    message: semverGt(params.item.version, params.item.lastVersion)
-                                        ? params.item.flashMessage
-                                        : params.item.version === params.item.lastVersion
-                                        ? this.$i18n.t('about.modules.ok')
-                                        : params.item.vulnerable
-                                        ? this.$i18n.t('about.modules.vulnerable')
-                                        : this.$i18n.t('about.modules.outdated'),
-                                    type: semverGt(params.item.version, params.item.lastVersion)
-                                        ? 'info'
-                                        : params.item.version === params.item.lastVersion
-                                        ? 'success'
-                                        : params.item.vulnerable
-                                        ? 'error'
-                                        : 'warning',
+                                    message: params.item.hasOwnProperty('lastVersion')
+                                        ? semverGt(params.item.version, params.item.lastVersion)
+                                            ? params.item.flashMessage
+                                            : params.item.version === params.item.lastVersion
+                                            ? this.$i18n.t('about.modules.ok')
+                                            : params.item.vulnerable
+                                            ? this.$i18n.t('about.modules.vulnerable')
+                                            : this.$i18n.t('about.modules.outdated')
+                                        : this.$i18n.t('about.modules.ok'),
+                                    type: params.item.hasOwnProperty('lastVersion')
+                                        ? semverGt(params.item.version, params.item.lastVersion)
+                                            ? 'info'
+                                            : params.item.version === params.item.lastVersion
+                                            ? 'success'
+                                            : params.item.vulnerable
+                                            ? 'error'
+                                            : 'warning'
+                                        : 'info',
                                 },
                                 style: {
                                     'text-align': 'center',
