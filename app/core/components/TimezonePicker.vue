@@ -105,6 +105,11 @@
                         return;
                     }
 
+                    //Asia/Kolkata
+                    if(timezoneName === 'Asia/Calcutta') {
+                        timezoneName = 'Asia/Kolkata';
+                    }
+
                     if (typeof timezoneName !== 'string') return;
 
                     this.timezones.push({
