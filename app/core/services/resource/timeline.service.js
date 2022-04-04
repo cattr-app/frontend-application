@@ -1,6 +1,6 @@
 import axios from 'axios';
 import moment from 'moment';
-import StoreService from '@/services/resource.service';
+import StoreService from '@/services/store.service';
 
 export default class TimelineService extends StoreService {
     constructor(context, timeIntervalService, projectService, taskService, screenshotService, userService) {

@@ -310,7 +310,8 @@
     "success": "Success",
     "error": "Error",
     "vulnerable_version": "You are using an outdated app version, please update to the latest one",
-    "update_version": "New version is available"
+    "update_version": "New version is available",
+    "report_has_been_queued": "Report has been queued and will be sent on your email"
   },
   "time": {
     "h": "h",
