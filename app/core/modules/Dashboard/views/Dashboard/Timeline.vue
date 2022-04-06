@@ -38,8 +38,7 @@
                             position="left-top"
                             trigger="hover"
                             @export="onExport"
-                        >
-                        </ExportDropdown>
+                        />
                     </div>
                 </div>
 
@@ -69,7 +68,7 @@
                     />
                     <preloader v-if="isDataLoading" class="timeline__loader" :is-transparent="true" />
 
-                    <time-interval-edit
+                    <TimeIntervalEdit
                         :intervals="selectedIntervals"
                         @remove="onBulkRemove"
                         @edit="loadData"
@@ -93,7 +92,7 @@
     import TimezonePicker from '@/components/TimezonePicker';
     import DashboardReportService from '@/services/reports/dashboard-report.service';
     import { getMimeType, downloadBlob } from '@/utils/file';
-    import { getDateToday, getEndDay, getStartDay } from '@/utils/time';
+    import { getDateToday } from '@/utils/time';
     import { getStartOfDayInTimezone, getEndOfDayInTimezone } from '@/utils/time';
     import ExportDropdown from '@/components/ExportDropdown';
     import cloneDeep from 'lodash/cloneDeep';
@@ -144,14 +143,14 @@
             this.service.unloadIntervals();
         },
         computed: {
-            ...mapGetters('timeline', ['service', 'events', 'intervals', 'timePerDay', 'timePerProject', 'timezone']),
+            ...mapGetters('timeline', ['service', 'intervals', 'timePerDay', 'timePerProject', 'timezone']),
             ...mapGetters('user', ['user']),
             userEvents() {
-                if (!this.user || !this.user.id || !this.events[this.user.id]) {
+                if (!this.user || !this.user.id || !this.intervals[this.user.id]) {
                     return [];
                 }
 
-                return this.events[this.user.id];
+                return this.intervals[this.user.id];
             },
             userTimePerDay() {
                 if (!this.user || !this.user.id || !this.timePerDay[this.user.id]) {
@@ -169,8 +168,6 @@
             },
         },
         methods: {
-            getStartDay,
-            getEndDay,
             getDateToday,
             getStartOfDayInTimezone,
             getEndOfDayInTimezone,
@@ -187,12 +184,11 @@
                 }
 
                 const userIDs = [this.user.id];
-                const projectIDs = [];
 
                 const startAt = this.getStartOfDayInTimezone(this.start, this.timezone);
                 const endAt = this.getEndOfDayInTimezone(this.end, this.timezone);
 
-                await this.service.load(userIDs, projectIDs, startAt, endAt);
+                await this.service.load(userIDs, null, startAt, endAt);
 
                 this.isDataLoading = false;
             }, 1000),
@@ -210,7 +206,7 @@
                 localStorage['timeline.active-task'] = event.task_id;
 
                 this.selectedIntervalIds = event.ids;
-                this.selectedIntervals = Object.values(this.intervals[this.user.id].intervals).reduce((acc, curr) => {
+                this.selectedIntervals = Object.values(this.intervals[this.user.id]).reduce((acc, curr) => {
                     return [...acc, ...curr.intervals.filter(interval => event.ids.includes(interval.id))];
                 }, []);
             },

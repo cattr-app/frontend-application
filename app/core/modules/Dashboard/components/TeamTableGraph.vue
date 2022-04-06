@@ -1,6 +1,6 @@
 <template>
     <div ref="canvasWrapper" class="canvas">
-        <canvas ref="canvas"></canvas>
+        <canvas ref="canvas" />
 
         <div ref="scrollbarTop" class="scrollbar-top" @scroll="onScroll">
             <div :style="{ width: `${contentWidth}px` }" />
@@ -15,7 +15,7 @@
                 @pointermove="onMove"
                 @pointerup="onUp"
             >
-                <div class="scroll-area-inner" :style="{ width: `${contentWidth}px` }"></div>
+                <div class="scroll-area-inner" :style="{ width: `${contentWidth}px` }" />
             </div>
         </div>
     </div>
@@ -26,6 +26,7 @@
     import throttle from 'lodash/throttle';
     import moment from 'moment';
     import { formatDurationString } from '@/utils/time';
+    import { mapGetters } from 'vuex';
 
     const defaultColorConfig = [
         {
@@ -90,16 +91,12 @@
             };
         },
         computed: {
+            ...mapGetters('user', ['companyData']),
             workingHours() {
-                return 'work_time' in this.$store.getters['user/companyData'] &&
-                    this.$store.getters['user/companyData'].work_time
-                    ? this.$store.getters['user/companyData'].work_time
-                    : 7;
+                return 'work_time' in this.companyData && this.companyData.work_time ? this.companyData.work_time : 7;
             },
             colorRules() {
-                return this.$store.getters['user/companyData'].color
-                    ? this.$store.getters['user/companyData'].color
-                    : defaultColorConfig;
+                return this.companyData.color ? this.companyData.color : defaultColorConfig;
             },
             canvasWidth() {
                 if (!this.canvas) {
@@ -126,7 +123,7 @@
         },
         mounted() {
             this.canvas = new fabric.Canvas(this.$refs.canvas, {
-                backgroundColor: '#fff',
+                backgroundColor: '#ffffff',
                 renderOnAddRemove: false,
                 selection: false,
                 skipOffscreen: true,
@@ -209,8 +206,8 @@
                         height: height - 1,
                         rx: 20,
                         ry: 20,
-                        fill: '#FAFAFA',
-                        stroke: '#DFE5ED',
+                        fill: '#fafafa',
+                        stroke: '#dfe5ed',
                         strokeWidth: 1,
                         ...fabricObjectOptions,
                         cursor,
@@ -253,7 +250,7 @@
                             fontFamily: 'Nunito, sans-serif',
                             fontSize: 10,
                             fontWeight: '600',
-                            fill: '#B1B1BE',
+                            fill: '#b1b1be',
                             ...fabricObjectOptions,
                             cursor,
                             hoverCursor: cursor,
@@ -266,7 +263,7 @@
                             new fabric.Line([0, 0, 0, height], {
                                 left,
                                 top: titleHeight + subtitleHeight,
-                                stroke: '#DFE5ED',
+                                stroke: '#dfe5ed',
                                 strokeWidth: 1,
                                 ...fabricObjectOptions,
                                 cursor,
@@ -428,7 +425,7 @@
                             new fabric.Line([0, 0, width, 0], {
                                 left: 0,
                                 top,
-                                stroke: '#DFE5ED',
+                                stroke: '#dfe5ed',
                                 strokeWidth: 1,
                                 ...fabricObjectOptions,
                                 cursor,

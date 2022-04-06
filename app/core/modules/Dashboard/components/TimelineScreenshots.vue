@@ -4,14 +4,14 @@
         <at-checkbox-group v-model="selectedIntervalIds">
             <div class="row">
                 <div
-                    v-for="(interval, index) in intervals[this.user.id].intervals"
+                    v-for="(interval, index) in intervals[this.user.id]"
                     :key="interval.id"
                     class="col-4 col-xl-3 screenshots__item"
                 >
                     <div class="screenshot" :index="index" @click.shift.prevent.stop="onShiftClick(index)">
                         <Screenshot
                             :disableModal="true"
-                            :project="interval.task.project"
+                            :project="{ id: interval.project_id, name: interval.project_name }"
                             :interval="interval"
                             :task="interval.task"
                             :user="user"

@@ -1,15 +1,14 @@
 import axios from 'axios';
-import moment from 'moment';
 import StoreService from '@/services/store.service';
+import moment from 'moment';
 
 export default class TimelineService extends StoreService {
-    constructor(context, timeIntervalService, projectService, taskService, screenshotService, userService) {
+    constructor(context, timeIntervalService, projectService, taskService, userService) {
         super(context);
 
         this.timeIntervalService = timeIntervalService;
         this.projectService = projectService;
         this.taskService = taskService;
-        this.screenshotService = screenshotService;
         this.userService = userService;
     }
 
@@ -102,7 +101,8 @@ export default class TimelineService extends StoreService {
                     return;
                 }
 
-                const data = response.data.userIntervals;
+                const data = response.data.data;
+
                 this.context.dispatch('setIntervals', data);
 
                 if (!data) {
@@ -112,10 +112,10 @@ export default class TimelineService extends StoreService {
                 const uniqueProjectIDs = new Set();
                 const uniqueTaskIDs = new Set();
                 Object.keys(data).forEach(userID => {
-                    const userIntervals = data[userID].intervals;
+                    const userIntervals = data[userID];
                     userIntervals.forEach(interval => {
-                        uniqueProjectIDs.add(interval.task.project_id);
-                        uniqueTaskIDs.add(interval.task.id);
+                        uniqueProjectIDs.add(interval.project_id);
+                        uniqueTaskIDs.add(interval.task_id);
                     });
                 });
 
@@ -128,67 +128,43 @@ export default class TimelineService extends StoreService {
 
                 return Promise.all(promises);
             })
+            .then(() => {
+                return this.loadUsers();
+            })
+            .then(() =>
+                this.context.dispatch(
+                    'setUsers',
+                    this.context.state.users.map(u => {
+                        if (this.context.state.intervals.hasOwnProperty(u.id)) {
+                            const lastInterval = this.context.state.intervals[u.id].slice(-1)[0];
+
+                            if (
+                                Math.abs(
+                                    moment(lastInterval.end_at).diff(
+                                        moment().subtract(u.screenshot_interval || 1, 'minutes'),
+                                        'seconds',
+                                    ),
+                                ) < 10
+                            ) {
+                                return {
+                                    ...u,
+                                    last_interval: lastInterval,
+                                };
+                            }
+                        }
+
+                        return { ...u, last_interval: null };
+                    }),
+                ),
+            )
             .catch(e => {
                 if (!axios.isCancel(e)) {
                     throw e;
                 }
             });
-    }
-
-    /**
-     * @returns {Promise<AxiosResponse<T>>}
-     * @param userIDs
-     * @param startAt
-     * @param endAt
-     */
-    loadScreenshots(userIDs, startAt, endAt) {
-        return this.screenshotService
-            .getWithFilters({
-                with: 'timeInterval',
-                'timeInterval.user_id': ['=', userIDs],
-                'timeInterval.start_at': ['between', [startAt, endAt]],
-            })
-            .then(response => {
-                const { data } = response;
-
-                this.context.dispatch('setScreenshots', data);
-            })
-            .catch(e => {
-                if (!axios.isCancel(e)) {
-                    throw e;
-                }
-            });
-    }
-
-    /**
-     * @returns {Promise<AxiosResponse<T>>}
-     * @param userIDs
-     * @param projectIDs
-     */
-    async loadLatestIntervals(userIDs, projectIDs) {
-        const endAt = moment();
-        const startAt = endAt.clone().subtract(10, 'minutes');
-        try {
-            const response = await this.timeIntervalService.getDashboardIntervals(userIDs, projectIDs, startAt, endAt);
-            if (typeof response !== 'undefined') {
-                const data = response.data.userIntervals;
-                this.context.dispatch('setLatestIntervals', data);
-            }
-
-            return response;
-        } catch (e) {
-            if (!axios.isCancel(e)) {
-                throw e;
-            }
-        }
     }
 
     unloadIntervals() {
         this.context.dispatch('setIntervals', []);
-        this.context.dispatch('setLatestIntervals', []);
-    }
-
-    unloadScreenshots() {
-        this.context.dispatch('setScreenshots', []);
     }
 }

@@ -44,12 +44,12 @@
             />
 
             <div v-if="clickPopup.event">
-                <router-link :to="`/tasks/view/${clickPopup.event.task.id}`">
-                    {{ getTaskName(clickPopup.event.task.id) }}
+                <router-link :to="`/tasks/view/${clickPopup.event.task_id}`">
+                    {{ clickPopup.event.task_name }}
                 </router-link>
 
-                <router-link :to="`/projects/view/${clickPopup.event.task.project_id}`">
-                    ({{ getProjectName(clickPopup.event.task.project_id) }})
+                <router-link :to="`/projects/view/${clickPopup.event.project_id}`">
+                    ({{ clickPopup.event.project_name }})
                 </router-link>
             </div>
 
@@ -127,7 +127,7 @@
         },
         computed: {
             ...mapGetters('timeline', ['tasks', 'intervals']),
-            ...mapGetters('user', ['user']),
+            ...mapGetters('user', ['user', 'companyData']),
             height() {
                 return timelineHeight + titleHeight + subtitleHeight;
             },
@@ -348,15 +348,22 @@
 
                 // Intervals
                 this.events.forEach(event => {
-                    const startOfDay = moment.tz(event.start_at, this.timezone).startOf('day');
-                    const secondsFromMidnight = moment.utc(event.start_at).diff(startOfDay, 'm', true);
-                    const duration = Math.ceil(moment.utc(event.end_at).diff(event.start_at, 'm'));
+                    const leftOffset = moment
+                        .tz(event.start_at, this.companyData.timezone)
+                        .tz(this.timezone)
+                        .diff(
+                            moment
+                                .tz(event.start_at, this.companyData.timezone)
+                                .tz(this.timezone)
+                                .startOf('day'),
+                            'hours',
+                            true,
+                        );
 
-                    const left = Math.floor((secondsFromMidnight * columnWidth) / 60);
-                    const width = Math.max(Math.ceil((Math.ceil(duration / 10) * 10 * columnWidth) / 60), 2);
+                    const width = ((Math.max(event.duration, 60) + 120) * columnWidth) / 60 / 60;
 
                     const rect = new fabric.Rect({
-                        left,
+                        left: Math.floor(leftOffset * columnWidth),
                         top: titleHeight + subtitleHeight + 22,
                         width,
                         height: 30,

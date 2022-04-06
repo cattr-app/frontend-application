@@ -17,7 +17,7 @@
                 </li>
             </template>
         </v-select>
-        <i class="icon icon-chevron-down at-select__arrow"></i>
+        <i class="icon icon-chevron-down at-select__arrow" />
     </div>
 </template>
 
@@ -106,7 +106,7 @@
                     }
 
                     //Asia/Kolkata
-                    if(timezoneName === 'Asia/Calcutta') {
+                    if (timezoneName === 'Asia/Calcutta') {
                         timezoneName = 'Asia/Kolkata';
                     }
 

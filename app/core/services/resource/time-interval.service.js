@@ -59,10 +59,10 @@ export default class TimeIntervalService extends ResourceService {
      * @param config
      */
     getDashboardIntervals(userIds, projectIds, startAt, endAt, config = {}) {
-        const url = 'time-intervals/dashboard';
+        const url = 'report/dashboard';
         const data = {
-            user_ids: userIds,
-            project_ids: projectIds,
+            users: userIds,
+            projects: projectIds,
             start_at: startAt,
             end_at: endAt,
         };

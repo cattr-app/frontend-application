@@ -95,17 +95,10 @@
             showChangeTaskModal() {
                 return this.modal === 'changeTask';
             },
-            totalTimeOfSelectedIntervals() {
-                return this.intervals
-                    .map(interval => {
-                        const start = moment.utc(interval.start_at);
-                        const end = moment.utc(interval.end_at);
-                        return end.diff(start);
-                    })
-                    .reduce((total, curr) => total + curr, 0);
-            },
             formattedTotalTime() {
-                return moment.utc(this.totalTimeOfSelectedIntervals).format('HH:mm:ss');
+                return moment
+                    .utc(this.intervals.reduce((total, curr) => total + curr.duration * 1000, 0))
+                    .format('HH:mm:ss');
             },
         },
         data() {
@@ -188,8 +181,8 @@
                     );
 
                     const task = taskResponse.data.res;
-                    const intervals = this.intervalIds.map(id => ({
-                        id,
+                    const intervals = this.intervals.map(i => ({
+                        id: i.id,
                         task_id: task.id,
                     }));
                     await this.timeIntervalsService.bulkEdit({ intervals });
@@ -224,7 +217,7 @@
                 this.createTask(projectId, taskName, taskDescription);
             },
             onChangeTaskModalConfirm(taskId) {
-                const intervals = this.intervalIds.map(id => ({ id, task_id: taskId }));
+                const intervals = this.intervals.map(i => ({ id: i.id, task_id: taskId }));
                 this.saveTimeIntervals({ intervals });
             },
             onAddNewTaskModalCancel() {

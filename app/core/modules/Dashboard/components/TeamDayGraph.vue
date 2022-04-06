@@ -1,6 +1,6 @@
 <template>
     <div ref="canvasWrapper" class="canvas">
-        <canvas ref="canvas"></canvas>
+        <canvas ref="canvas" />
 
         <div
             v-show="hoverPopup.show && !clickPopup.show"
@@ -11,8 +11,8 @@
             class="popup"
         >
             <div v-if="hoverPopup.event">
-                {{ getTaskName(hoverPopup.event.task.id) }}
-                ({{ getProjectName(hoverPopup.event.task.project_id) }})
+                {{ hoverPopup.event.task_name }}
+                ({{ hoverPopup.event.project_name }})
             </div>
 
             <div v-if="hoverPopup.event">
@@ -30,30 +30,32 @@
             }"
             class="popup"
         >
-            <div v-if="clickPopup.event && getIntervalById(clickPopup.intervalID, clickPopup.event.user_id)">
-                <Screenshot
-                    :disableModal="true"
-                    :lazyImage="false"
-                    :project="getProject(clickPopup.event.task.project_id)"
-                    :interval="getIntervalById(clickPopup.intervalID, clickPopup.event.user_id)"
-                    :showText="false"
-                    :task="getTask(clickPopup.event.task.id)"
-                    :user="getUser(clickPopup.event.user_id)"
-                    @click="showPopup"
-                />
-            </div>
+            <template v-if="clickPopup.event">
+                <div>
+                    <Screenshot
+                        :disableModal="true"
+                        :lazyImage="false"
+                        :project="{ id: clickPopup.event.project_id, name: clickPopup.event.project_name }"
+                        :interval="clickPopup.event"
+                        :showText="false"
+                        :task="{ id: clickPopup.event.task_id, name: clickPopup.event.task_name }"
+                        :user="clickPopup.event"
+                        @click="showPopup"
+                    />
+                </div>
 
-            <div v-if="clickPopup.event">
-                <router-link :to="`/tasks/view/${clickPopup.event.task.id}`">
-                    {{ getTaskName(clickPopup.event.task.id) }}
-                </router-link>
+                <div>
+                    <router-link :to="`/tasks/view/${clickPopup.event.task_id}`">
+                        {{ clickPopup.event.task_id }}
+                    </router-link>
 
-                <router-link :to="`/projects/view/${clickPopup.event.task.project_id}`">
-                    ({{ getProjectName(clickPopup.event.task.project_id) }})
-                </router-link>
-            </div>
+                    <router-link :to="`/projects/view/${clickPopup.event.project_id}`">
+                        ({{ clickPopup.event.project_name }})
+                    </router-link>
+                </div>
+            </template>
 
-            <a :style="{ left: `${clickPopup.borderX}px` }" class="corner"></a>
+            <a :style="{ left: `${clickPopup.borderX}px` }" class="corner" />
         </div>
 
         <ScreenshotModal
@@ -80,7 +82,9 @@
     import Screenshot from '@/components/Screenshot';
     import ScreenshotModal from '@/components/ScreenshotModal';
     import { formatDurationString } from '@/utils/time';
-    import IntervalsService from '@/services/resource/time-interval.service';
+    import IntervalService from '@/services/resource/time-interval.service';
+
+    let intervalService = new IntervalService();
 
     const fabricObjectOptions = {
         editable: false,
@@ -93,7 +97,6 @@
         hoverCursor: 'default',
     };
 
-    const sidebarWidth = 300;
     const titleHeight = 20;
     const subtitleHeight = 20;
     const rowHeight = 65;
@@ -114,14 +117,6 @@
                 type: Array,
                 required: true,
             },
-            events: {
-                type: Object,
-                required: true,
-            },
-            timezone: {
-                type: String,
-                required: true,
-            },
         },
         data() {
             return {
@@ -140,10 +135,8 @@
                     intervalID: null,
                     borderX: 0,
                 },
-                intervalsService: new IntervalsService(),
                 modal: {
                     show: false,
-                    intervalID: null,
                     project: null,
                     task: null,
                     user: null,
@@ -152,14 +145,10 @@
             };
         },
         computed: {
-            ...mapGetters('timeline', ['tasks', 'screenshots', 'intervals']),
+            ...mapGetters('timeline', ['intervals', 'timezone']),
+            ...mapGetters('user', ['companyData']),
             height() {
                 return this.users.length * rowHeight + titleHeight + subtitleHeight;
-            },
-            projects() {
-                return Object.keys(this.tasks)
-                    .map(taskID => this.tasks[taskID])
-                    .reduce((projects, task) => ({ ...projects, [task.project_id]: task.project }), {});
             },
         },
         mounted() {
@@ -183,16 +172,21 @@
         methods: {
             formatDuration: formatDurationString,
             showPopup() {
-                this.modal.intervalID = this.clickPopup.intervalID;
-                this.modal.project = this.getProject(this.clickPopup.event.project_id);
-                this.modal.user = this.getUser(this.clickPopup.event.user_id);
-                this.modal.task = this.getTask(this.clickPopup.event.task_id);
-                this.modal.interval = this.getIntervalById(this.clickPopup.intervalID);
-
-                this.modal.show = true;
+                this.modal = {
+                    show: true,
+                    project: { id: this.clickPopup.event.project_id, name: this.clickPopup.event.project_name },
+                    user: this.clickPopup.event,
+                    task: { id: this.clickPopup.event.task_id, name: this.clickPopup.event.task_name },
+                    interval: this.clickPopup.event,
+                };
             },
             onHide() {
-                this.modal.show = false;
+                this.modal = {
+                    ...this.modal,
+                    show: false,
+                };
+
+                this.$emit('selectedIntervals', null);
             },
             onKeyDown(e) {
                 if (!this.modal.show) {
@@ -207,21 +201,8 @@
                     this.showNext();
                 }
             },
-            getUserIntervals(userID) {
-                return this.intervals[userID].intervals;
-            },
-            getUngroupedUserIntervals(userID) {
-                return this.getUserIntervals(userID).reduce((total, current) => {
-                    const intervals = current.ids.map(id => ({
-                        ...current,
-                        id,
-                    }));
-
-                    return total.concat(intervals);
-                }, []);
-            },
             showPrevious() {
-                const intervals = this.getUngroupedUserIntervals(this.modal.user.id);
+                const intervals = this.intervals[this.modal.user.user_id];
 
                 const currentIndex = intervals.findIndex(x => x.id === this.modal.interval.id);
 
@@ -229,14 +210,14 @@
                     const interval = intervals[currentIndex - 1];
                     if (interval) {
                         this.modal.interval = interval;
-                        this.modal.project = this.getProject(interval.project_id);
-                        this.modal.user = this.getUser(interval.user_id);
-                        this.modal.task = this.getTask(interval.task_id);
+                        this.modal.user = interval;
+                        this.modal.project = { id: interval.project_id, name: interval.project_name };
+                        this.modal.task = { id: interval.task_id, name: interval.task_name };
                     }
                 }
             },
             showNext() {
-                const intervals = this.getUngroupedUserIntervals(this.modal.user.id);
+                const intervals = this.intervals[this.modal.user.user_id];
 
                 const currentIndex = intervals.findIndex(x => x.id === this.modal.interval.id);
 
@@ -244,47 +225,11 @@
                     const interval = intervals[currentIndex + 1];
                     if (interval) {
                         this.modal.interval = interval;
-                        this.modal.project = this.getProject(interval.project_id);
-                        this.modal.user = this.getUser(interval.user_id);
-                        this.modal.task = this.getTask(interval.task_id);
+                        this.modal.user = interval;
+                        this.modal.project = { id: interval.project_id, name: interval.project_name };
+                        this.modal.task = { id: interval.task_id, name: interval.task_name };
                     }
                 }
-            },
-            getProjectName(projectID) {
-                const project = this.getProject(projectID);
-                if (!project) {
-                    return '';
-                }
-
-                return project.name;
-            },
-            getTaskName(taskID) {
-                const task = this.getTask(taskID);
-                if (!task) {
-                    return '';
-                }
-
-                return task.task_name;
-            },
-            getProject(projectID) {
-                if (!this.projects[projectID]) {
-                    return null;
-                }
-
-                return this.projects[projectID];
-            },
-            getTask(taskID) {
-                if (!this.tasks[taskID]) {
-                    return null;
-                }
-
-                return this.tasks[taskID];
-            },
-            getUser(userID) {
-                return this.users.find(user => user.id === userID);
-            },
-            getIntervalById(intervalID, userId) {
-                return this.intervals[userId].intervals.find(i => i.id === intervalID);
             },
             draw: throttle(function() {
                 this.canvas.clear();
@@ -370,19 +315,38 @@
                 this.users.forEach((user, row) => {
                     const top = row * rowHeight + titleHeight + subtitleHeight;
 
-                    // Intervals
-                    const userEvents = this.events[user.id];
-                    if (userEvents) {
-                        userEvents.forEach(event => {
-                            const startOfDay = moment.tz(event.start_at, this.timezone).startOf('day');
-                            const secondsFromMidnight = moment.utc(event.start_at).diff(startOfDay, 'm', true);
-                            const duration = Math.ceil(moment.utc(event.end_at).diff(event.start_at, 'm'));
+                    // Horizontal grid lines
+                    if (row > 0) {
+                        this.canvas.add(
+                            new fabric.Line([0, 0, width, 0], {
+                                left: 0,
+                                top,
+                                stroke: '#DFE5ED',
+                                strokeWidth: 1,
+                                ...fabricObjectOptions,
+                            }),
+                        );
+                    }
 
-                            const left = Math.floor((secondsFromMidnight * columnWidth) / 60);
-                            const width = Math.max(Math.ceil((Math.ceil(duration / 10) * 10 * columnWidth) / 60), 2);
+                    // Intervals
+                    if (this.intervals.hasOwnProperty(user.id)) {
+                        this.intervals[user.id].forEach(event => {
+                            const leftOffset = moment
+                                .tz(event.start_at, this.companyData.timezone)
+                                .tz(this.timezone)
+                                .diff(
+                                    moment
+                                        .tz(event.start_at, this.companyData.timezone)
+                                        .tz(this.timezone)
+                                        .startOf('day'),
+                                    'hours',
+                                    true,
+                                );
+
+                            const width = ((Math.max(event.duration, 60) + 120) * columnWidth) / 60 / 60;
 
                             const rect = new fabric.Rect({
-                                left,
+                                left: Math.floor(leftOffset * columnWidth),
                                 top: top + rowHeight / 4,
                                 width,
                                 height: rowHeight / 2,
@@ -424,31 +388,22 @@
                             });
 
                             rect.on('mousedown', e => {
-                                const { ids } = event;
-                                const { pointer, target } = e;
-                                const n = Math.floor(((pointer.x - target.left) * ids.length) / (target.width + 1));
-                                const x = target.left + (target.width * n) / ids.length;
-                                const y = target.top;
-                                const intervalID = ids[n];
-
                                 this.$emit('selectedIntervals', event);
 
-                                if (x > maxLeftOffset) {
+                                if (e.target.left > maxLeftOffset) {
                                     this.clickPopup = {
                                         show: true,
                                         x: maxLeftOffset,
-                                        y,
+                                        y: e.target.top,
                                         event,
-                                        intervalID,
-                                        borderX: defaultCornerOffset + x - maxLeftOffset,
+                                        borderX: defaultCornerOffset + e.target.left - maxLeftOffset,
                                     };
                                 } else {
                                     this.clickPopup = {
                                         show: true,
-                                        x,
-                                        y,
+                                        x: e.target.left,
+                                        y: e.target.top,
                                         event,
-                                        intervalID,
                                         borderX: defaultCornerOffset,
                                     };
                                 }
@@ -458,19 +413,6 @@
 
                             this.canvas.add(rect);
                         });
-                    }
-
-                    // Horizontal grid lines
-                    if (row > 0) {
-                        this.canvas.add(
-                            new fabric.Line([0, 0, width, 0], {
-                                left: 0,
-                                top,
-                                stroke: '#DFE5ED',
-                                strokeWidth: 1,
-                                ...fabricObjectOptions,
-                            }),
-                        );
                     }
                 });
 
@@ -490,13 +432,16 @@
                     return;
                 }
 
-                if (this.clickPopup.show) {
-                    this.clickPopup.show = false;
-                }
+                this.clickPopup = {
+                    ...this.clickPopup,
+                    show: false,
+                };
+
+                this.onHide();
             },
             async onRemove() {
                 try {
-                    await this.intervalsService.deleteItem(this.modal.interval.id);
+                    await intervalService.deleteItem(this.modal.interval.id);
 
                     this.$Notify({
                         type: 'success',
@@ -517,7 +462,7 @@
             users() {
                 this.onResize();
             },
-            events() {
+            intervals() {
                 this.draw();
             },
             timezone() {

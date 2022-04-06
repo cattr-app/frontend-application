@@ -29,8 +29,7 @@
                     position="left"
                     trigger="hover"
                     @export="onExport"
-                >
-                </ExportDropdown>
+                />
             </div>
         </div>
 
@@ -39,12 +38,9 @@
                 <div class="row">
                     <div class="col-8 col-lg-6">
                         <TeamSidebar
-                            :currentProjects="currentProjects"
-                            :currentTasks="currentTasks"
                             :sort="sort"
                             :sortDir="sortDir"
                             :users="graphUsers"
-                            :worked="worked"
                             class="sidebar"
                             @sort="onSort"
                         />
@@ -53,8 +49,6 @@
                     <div class="col-16 col-lg-18">
                         <TeamDayGraph
                             v-if="type === 'day'"
-                            :events="events"
-                            :timezone="timezone"
                             :users="graphUsers"
                             class="graph"
                             @selectedIntervals="onSelectedIntervals"
@@ -69,15 +63,15 @@
                         />
                     </div>
 
-                    <time-interval-edit
-                        v-if="intervals.length"
-                        :intervals="intervals.filter(i => selectedIntervalIds.indexOf(i.id) !== -1)"
+                    <TimeIntervalEdit
+                        v-if="selectedIntervals.length"
+                        :intervals="selectedIntervals"
                         @close="clearIntervals"
                         @edit="load"
                         @remove="onBulkRemove"
                     />
                 </div>
-                <preloader v-if="isDataLoading" :is-transparent="true" class="team__loader"></preloader>
+                <preloader v-if="isDataLoading" :is-transparent="true" class="team__loader" />
             </div>
         </div>
     </div>
@@ -98,7 +92,7 @@
     import DashboardReportService from '@/services/reports/dashboard-report.service';
     import ProjectService from '@/services/resource/project.service';
     import { downloadBlob, getMimeType } from '@/utils/file';
-    import { getDateToday, getEndDay, getEndOfDayInTimezone, getStartDay, getStartOfDayInTimezone } from '@/utils/time';
+    import { getDateToday, getEndOfDayInTimezone, getStartOfDayInTimezone } from '@/utils/time';
     import ExportDropdown from '@/components/ExportDropdown';
     import TimeIntervalEdit from '../../components/TimeIntervalEdit';
     import cloneDeep from 'lodash/cloneDeep';
@@ -135,7 +129,6 @@
                 projectService: new ProjectService(),
                 reportService: new DashboardReportService(),
                 showExportModal: false,
-                selectedIntervalIds: [],
                 selectedIntervals: [],
                 sessionStorageKey: sessionStorageKey,
                 isDataLoading: false,
@@ -143,7 +136,7 @@
         },
         async created() {
             localStorage['dashboard.tab'] = 'team';
-            this.service.loadUsers();
+
             await this.load();
             this.updateHandle = setInterval(() => this.load(false), updateInterval);
         },
@@ -152,15 +145,7 @@
             this.service.unloadIntervals();
         },
         computed: {
-            ...mapGetters('timeline', [
-                'service',
-                'intervals',
-                'events',
-                'timePerDay',
-                'users',
-                'latestIntervals',
-                'timezone',
-            ]),
+            ...mapGetters('timeline', ['intervals', 'timePerDay', 'users', 'timezone', 'service']),
             graphUsers() {
                 const { worked } = this;
 
@@ -181,58 +166,6 @@
                         return this.sortDir === 'asc' ? order : -order;
                     });
             },
-            worked() {
-                if (!this.intervals) {
-                    return {};
-                }
-
-                return Object.keys(this.intervals).reduce((result, userID) => {
-                    const { duration } = this.intervals[userID];
-
-                    return {
-                        ...result,
-                        [userID]: duration,
-                    };
-                }, {});
-            },
-            currentTasks() {
-                if (!this.latestIntervals) {
-                    return {};
-                }
-
-                return Object.keys(this.latestIntervals).reduce((result, userID) => {
-                    const { intervals } = this.latestIntervals[userID];
-                    if (intervals.length) {
-                        const interval = intervals[intervals.length - 1];
-                        const task = interval.task;
-                        if (task) {
-                            return {
-                                ...result,
-                                [userID]: task,
-                            };
-                        }
-                    }
-
-                    return result;
-                }, {});
-            },
-            currentProjects() {
-                if (!this.latestIntervals) {
-                    return {};
-                }
-
-                return Object.keys(this.latestIntervals).reduce((result, userID) => {
-                    const task = this.currentTasks[userID];
-                    if (task) {
-                        return {
-                            ...result,
-                            [userID]: task.project,
-                        };
-                    }
-
-                    return result;
-                }, {});
-            },
             exportFilename() {
                 const days = moment(this.end).diff(this.start, 'days');
 
@@ -242,8 +175,6 @@
             },
         },
         methods: {
-            getStartDay,
-            getEndDay,
             getDateToday,
             getStartOfDayInTimezone,
             getEndOfDayInTimezone,
@@ -257,8 +188,6 @@
 
                     return;
                 }
-
-                await this.service.loadLatestIntervals(this.userIDs, this.projectIDs);
 
                 const startAt = this.getStartOfDayInTimezone(this.start, this.timezone);
                 const endAt = this.getEndOfDayInTimezone(this.end, this.timezone);
@@ -331,11 +260,7 @@
                 downloadBlob(blob, fileName);
             },
             onSelectedIntervals(event) {
-                this.selectedIntervalIds = event.ids;
-
-                this.selectedIntervals = Object.values(this.intervals).reduce((acc, curr) => {
-                    return [...acc, ...curr.intervals.filter(interval => event.ids.includes(interval.id))];
-                }, []);
+                this.selectedIntervals = event ? [event] : [];
             },
             onBulkRemove(intervals) {
                 const intervalIds = intervals.map(interval => interval.id);
@@ -359,7 +284,6 @@
             },
             clearIntervals() {
                 this.selectedIntervals = [];
-                this.selectedIntervalIds = [];
             },
 
             // for send invites to new users
