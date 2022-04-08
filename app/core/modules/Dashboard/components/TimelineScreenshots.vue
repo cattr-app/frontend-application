@@ -1,7 +1,7 @@
 <template>
     <div class="screenshots">
         <h3 class="screenshots__title">{{ $t('field.screenshots') }}</h3>
-        <at-checkbox-group v-model="selectedIntervalIds">
+        <at-checkbox-group v-model="selectedIntervals">
             <div class="row">
                 <div
                     v-for="(interval, index) in intervals[this.user.id]"
@@ -55,7 +55,7 @@
         data() {
             return {
                 intervalsService: new TimeIntervalService(),
-                selectedIntervalIds: [],
+                selectedIntervals: [],
                 modal: {
                     interval: null,
                     project: null,
@@ -86,15 +86,17 @@
                     this.firstSelectedCheckboxIndex = index;
                 }
 
-                this.selectedIntervalIds = this.intervals
+                this.selectedIntervals = this.intervals[this.user.id]
                     .slice(
                         Math.min(index, this.firstSelectedCheckboxIndex),
                         Math.max(index, this.firstSelectedCheckboxIndex) + 1,
                     )
-                    .map(el => el.id);
+                    .map(i => i.id);
             },
             onCheckboxClick(index) {
-                if (this.firstSelectedCheckboxIndex === null) this.firstSelectedCheckboxIndex = index;
+                if (this.firstSelectedCheckboxIndex === null) {
+                    this.firstSelectedCheckboxIndex = index;
+                }
             },
             onKeyDown(e) {
                 if (e.key === 'ArrowLeft') {
@@ -114,33 +116,46 @@
                     return;
                 }
 
-                this.modal.project = interval.task.project;
-                this.modal.task = interval.task;
-                this.modal.interval = interval;
-
-                this.modal.show = true;
+                this.modal = {
+                    show: true,
+                    project: { id: interval.project_id, name: interval.project_name },
+                    user: interval,
+                    task: { id: interval.task_id, name: interval.task_name },
+                    interval,
+                };
             },
             onHide() {
                 this.modal.show = false;
             },
             showPrevious() {
-                const currentIndex = this.intervals.findIndex(el => el.id === this.modal.interval.id);
+                const intervals = this.intervals[this.modal.user.user_id];
 
-                if (currentIndex !== 0) {
-                    this.updateDataModal(currentIndex - 1);
+                const currentIndex = intervals.findIndex(x => x.id === this.modal.interval.id);
+
+                if (currentIndex > 0) {
+                    const interval = intervals[currentIndex - 1];
+                    if (interval) {
+                        this.modal.interval = interval;
+                        this.modal.user = interval;
+                        this.modal.project = { id: interval.project_id, name: interval.project_name };
+                        this.modal.task = { id: interval.task_id, name: interval.task_name };
+                    }
                 }
             },
             showNext() {
-                const currentIndex = this.intervals.findIndex(el => el.id === this.modal.interval.id);
+                const intervals = this.intervals[this.modal.user.user_id];
 
-                if (currentIndex + 1 !== this.intervals.length) {
-                    this.updateDataModal(currentIndex + 1);
+                const currentIndex = intervals.findIndex(x => x.id === this.modal.interval.id);
+
+                if (currentIndex < intervals.length - 1) {
+                    const interval = intervals[currentIndex + 1];
+                    if (interval) {
+                        this.modal.interval = interval;
+                        this.modal.user = interval;
+                        this.modal.project = { id: interval.project_id, name: interval.project_name };
+                        this.modal.task = { id: interval.task_id, name: interval.task_name };
+                    }
                 }
-            },
-            updateDataModal(currentIndex) {
-                this.modal.interval = this.intervals[currentIndex];
-                this.modal.project = this.modal.interval.task.project;
-                this.modal.task = this.modal.interval.task;
             },
             async onRemove(intervalID) {
                 try {
@@ -164,14 +179,19 @@
                 }
             },
             clearSelectedIntervals() {
-                this.selectedIntervalIds = [];
+                this.selectedIntervals = [];
             },
         },
         watch: {
-            selectedIntervalIds(intervalIds) {
-                if (intervalIds.length === 0) this.firstSelectedCheckboxIndex = null;
+            selectedIntervals(intervalIds) {
+                if (intervalIds.length === 0) {
+                    this.firstSelectedCheckboxIndex = null;
+                }
 
-                this.$emit('onSelectedIntervals', intervalIds);
+                this.$emit(
+                    'onSelectedIntervals',
+                    this.intervals[this.user.id].filter(i => intervalIds.indexOf(i.id) !== -1),
+                );
             },
         },
     };

@@ -5,17 +5,17 @@
                 <div slot="title" class="item-header">
                     <div class="row flex-middle">
                         <div class="col-xs-4 col-md-2 col-lg-1">
-                            <user-avatar :user="user.user" :size="35"></user-avatar>
+                            <UserAvatar :user="user.user" :size="35" />
                         </div>
                         <div class="col-xs-10 col-md-10 col-lg-13">
                             <span class="h5">{{ user.user.full_name }}</span>
                         </div>
                         <div class="col-xs-offset-3 col-xs-7 col-md-3 col-lg-2">
-                            <span class="h4">{{ formatDurationString(user.total_time) }}</span>
+                            <span class="h4">{{ formatDurationString(user.time) }}</span>
                         </div>
                         <div class="col-xs-5 col-md-9 col-lg-8 d-xs-none">
                             <at-progress
-                                :percent="getUserPercentage(user.total_time, user.total_time)"
+                                :percent="getUserPercentage(user.time, user.time)"
                                 class="time-percentage"
                                 status="success"
                                 :stroke-width="15"
@@ -43,15 +43,15 @@
                             :title="task.name"
                             :to="{ name: taskViewRoute, params: { id: task.task_id } }"
                         >
-                            {{ task.name }}
+                            {{ task.task_name }}
                         </router-link>
                     </div>
                     <div class="col-xs-offset-3 col-xs-7 col-md-3 col-lg-2">
-                        <span class="h4">{{ formatDurationString(task.total_time) }}</span>
+                        <span class="h4">{{ formatDurationString(task.time) }}</span>
                     </div>
                     <div class="col-xs-5 col-md-9 col-lg-8 d-xs-none">
                         <at-progress
-                            :percent="getUserPercentage(task.total_time, user.total_time)"
+                            :percent="getUserPercentage(task.time, user.time)"
                             :stroke-width="15"
                             status="success"
                         />

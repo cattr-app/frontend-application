@@ -6,10 +6,7 @@
                 <Calendar :sessionStorageKey="sessionStorageKey" @change="onCalendarChange" />
             </div>
             <div class="select controls-row__item">
-                <UserSelect @change="onUsersChange"></UserSelect>
-            </div>
-            <div class="timezone controls-row__item">
-                <TimezonePicker :value="timezone" @onTimezoneChange="onTimezoneChange" />
+                <UserSelect @change="onUsersChange" />
             </div>
         </div>
         <div class="at-container">
@@ -18,10 +15,10 @@
                 <span class="total-time-value">{{ formatDurationString(totalTime) }}</span>
             </div>
             <div v-if="Object.keys(userReportsList).length && !isDataLoading">
-                <list :reportsList="userReportsList"></list>
+                <list :reportsList="userReportsList" />
             </div>
             <div v-else class="at-container__inner no-data">
-                <preloader v-if="isDataLoading"></preloader>
+                <preloader v-if="isDataLoading" />
                 <span>{{ $t('message.no_data') }}</span>
             </div>
         </div>
@@ -36,16 +33,13 @@
     import moment from 'moment';
     import Preloader from '@/components/Preloader';
     import UserSelect from '@/components/UserSelect';
-    import TimezonePicker from '@/components/TimezonePicker';
     import Calendar from '@/components/Calendar';
-    import { mapActions, mapGetters } from 'vuex';
 
     export default {
         components: {
             List,
             Preloader,
             UserSelect,
-            TimezonePicker,
             Calendar,
         },
         data() {
@@ -63,17 +57,13 @@
             };
         },
         computed: {
-            ...mapGetters('timeline', ['timezone']),
             totalTime() {
-                return this.userReportsList.reduce((total, current) => total + current.total_time, 0);
+                return this.userReportsList.reduce((total, current) => total + current.time, 0);
             },
         },
         methods: {
             formatDurationString,
 
-            ...mapActions({
-                setTimezone: 'timeline/setTimezone',
-            }),
             async sendRequests() {
                 try {
                     this.users = (await this.user.getAll()).data;
@@ -85,7 +75,7 @@
                 }
             },
             async getReport() {
-                if (this.userIDs === 'undefined') {
+                if (this.userIDs === 'undefined' || !this.datepickerDateStart) {
                     return;
                 }
 
@@ -100,12 +90,11 @@
                     .toISOString();
                 try {
                     const { data } = await this.timeUseService.getTimeUserReport({
-                        user_ids: this.userIDs,
+                        users: this.userIDs,
                         start_at,
                         end_at,
-                        timezone: this.timezone,
                     });
-                    this.userReportsList = data;
+                    this.userReportsList = data.data;
                 } catch ({ response }) {
                     if (process.env.NODE_ENV === 'development') {
                         console.warn(response ? response : 'request to time use report is canceled');

@@ -28,9 +28,9 @@
                             to="/time-intervals/new"
                             class="controls-row__item"
                         >
-                            <at-button class="controls-row__btn" icon="icon-edit">{{
-                                $t('control.add_time')
-                            }}</at-button>
+                            <at-button class="controls-row__btn" icon="icon-edit">
+                                {{ $t('control.add_time') }}
+                            </at-button>
                         </router-link>
 
                         <ExportDropdown
@@ -90,8 +90,7 @@
     import TimelineCalendarGraph from '../../components/TimelineCalendarGraph';
     import TimelineScreenshots from '../../components/TimelineScreenshots';
     import TimezonePicker from '@/components/TimezonePicker';
-    import DashboardReportService from '@/services/reports/dashboard-report.service';
-    import { getMimeType, downloadBlob } from '@/utils/file';
+    import DashboardService from '_internal/Dashboard/services/dashboard.service';
     import { getDateToday } from '@/utils/time';
     import { getStartOfDayInTimezone, getEndOfDayInTimezone } from '@/utils/time';
     import ExportDropdown from '@/components/ExportDropdown';
@@ -100,6 +99,8 @@
     import Preloader from '@/components/Preloader';
 
     const updateInterval = 60 * 1000;
+
+    const dashboardService = new DashboardService();
 
     export default {
         name: 'Timeline',
@@ -125,9 +126,7 @@
                 datepickerDateStart: '',
                 datepickerDateEnd: '',
                 activeTask: +localStorage.getItem('timeline.active-task') || 0,
-                reportService: new DashboardReportService(),
                 showExportModal: false,
-                selectedIntervalIds: [],
                 selectedIntervals: [],
                 sessionStorageKey: sessionStorageKey,
                 isDataLoading: false,
@@ -158,13 +157,6 @@
                 }
 
                 return this.timePerDay[this.user.id];
-            },
-            exportFilename() {
-                const days = moment(this.end).diff(this.start, 'days');
-
-                return days > 1
-                    ? `Dashboard Report from ${this.start} to ${this.end}`
-                    : `Dashboard Report ${this.start}`;
             },
         },
         methods: {
@@ -202,36 +194,25 @@
                 this.loadData();
             },
             onIntervalsSelect(event) {
-                this.activeTask = event.task_id;
-                localStorage['timeline.active-task'] = event.task_id;
-
-                this.selectedIntervalIds = event.ids;
-                this.selectedIntervals = Object.values(this.intervals[this.user.id]).reduce((acc, curr) => {
-                    return [...acc, ...curr.intervals.filter(interval => event.ids.includes(interval.id))];
-                }, []);
+                this.selectedIntervals = event ? [event] : [];
             },
             async onExport(format) {
-                const mimetype = getMimeType(format);
-
-                const config = {
-                    headers: { Accept: mimetype },
-                };
-
-                const params = {
-                    start_at: this.start,
-                    end_at: moment
+                await dashboardService.queueReport(
+                    this.start,
+                    moment
                         .utc(this.end)
                         .add(1, 'day')
                         .format('YYYY-MM-DD'),
-                    user_ids: [this.user.id],
-                    project_ids: this.projectIDs,
-                    timezone: this.timezone,
-                };
+                    [this.user.id],
+                    this.projectIDs,
+                    format,
+                );
 
-                const response = await this.reportService.getReport(params, config);
-                const blob = new Blob([response.data], { type: mimetype });
-                const fileName = `${this.exportFilename}.${format}`;
-                downloadBlob(blob, fileName);
+                this.$Notify({
+                    type: 'success',
+                    title: this.$t('message.success'),
+                    message: this.$t('message.report_has_been_queued'),
+                });
             },
             onBulkRemove(intervals) {
                 const intervalIds = intervals.map(interval => interval.id);
@@ -239,8 +220,10 @@
                 intervals.forEach(interval => {
                     const userIntervals = cloneDeep(this.intervals[interval.user_id]);
                     const deletedDuration = moment(interval.end_at).diff(interval.start_at, 'seconds');
+
+                    console.log(userIntervals);
                     userIntervals.duration -= deletedDuration;
-                    userIntervals.intervals = userIntervals.intervals
+                    userIntervals.items = userIntervals.items
                         .map(interval => ({
                             ...interval,
                             ids: interval.ids.filter(id => intervalIds.indexOf(id) === -1),
@@ -260,17 +243,13 @@
                 this.onBulkRemove(intervals);
             },
             setSelectedIntervals(intervalIds) {
-                this.selectedIntervals = Object.values(this.intervals).reduce((acc, curr) => {
-                    return [...acc, ...curr.intervals.filter(interval => intervalIds.includes(interval.id))];
-                }, []);
-                this.selectedIntervalIds = intervalIds;
+                this.selectedIntervals = intervalIds;
             },
             clearIntervals() {
                 if (this.$refs.timelineScreenshots) {
                     this.$refs.timelineScreenshots.clearSelectedIntervals();
                 }
                 this.selectedIntervals = [];
-                this.selectedIntervalIds = [];
             },
         },
         watch: {

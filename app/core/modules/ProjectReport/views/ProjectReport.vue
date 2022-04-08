@@ -9,9 +9,9 @@
             <ProjectSelect class="controls-row__item" @change="onProjectsChange" />
 
             <div class="controls-row__item controls-row__item--left-auto">
-                <small v-if="companyData.timezone">{{
-                        $t('project-report.report_timezone', [companyData.timezone])
-                    }}</small>
+                <small v-if="companyData.timezone">
+                    {{ $t('project-report.report_timezone', [companyData.timezone]) }}
+                </small>
             </div>
 
             <ExportDropdown
@@ -48,7 +48,7 @@
 <script>
     import Calendar from '@/components/Calendar';
     import UserSelect from '@/components/UserSelect';
-    import ProjectReportService from '_internal/ProjectReport/service/project-report.service';
+    import ProjectReportService from '_internal/ProjectReport/services/project-report.service';
     import ProjectLine from './ProjectReport/ProjectLine';
     import { getDateToday, getStartDate, getEndDate, formatDurationString } from '@/utils/time';
     import ProjectSelect from '@/components/ProjectSelect';

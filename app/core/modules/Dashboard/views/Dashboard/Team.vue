@@ -89,9 +89,9 @@
     import TeamDayGraph from '../../components/TeamDayGraph';
     import TeamTableGraph from '../../components/TeamTableGraph';
     import TimezonePicker from '@/components/TimezonePicker';
-    import DashboardReportService from '@/services/reports/dashboard-report.service';
+    import DashboardReportService from '_internal/Dashboard/services/dashboard.service';
     import ProjectService from '@/services/resource/project.service';
-    import { downloadBlob, getMimeType } from '@/utils/file';
+    import { downloadBlob } from '@/utils/file';
     import { getDateToday, getEndOfDayInTimezone, getStartOfDayInTimezone } from '@/utils/time';
     import ExportDropdown from '@/components/ExportDropdown';
     import TimeIntervalEdit from '../../components/TimeIntervalEdit';
@@ -231,33 +231,16 @@
                 localStorage['team.sort-dir'] = this.sortDir;
             },
             async onExport(format) {
-                const mimetype = getMimeType(format);
-
-                const config = {
-                    headers: { Accept: mimetype },
-                };
-
-                let sortBy;
-                if (this.sort === 'user') sortBy = 'name';
-                if (this.sort === 'worked') sortBy = 'time_worked';
-
-                const params = {
-                    start_at: this.start,
-                    end_at: moment
+                await this.reportService.queueReport(
+                    this.start,
+                    moment
                         .utc(this.end)
                         .add(1, 'day')
                         .format('YYYY-MM-DD'),
-                    user_ids: this.userIDs,
-                    project_ids: this.projectIDs,
-                    order_by: sortBy,
-                    order_dir: this.sortDir,
-                    timezone: this.timezone,
-                };
-
-                const response = await this.reportService.getReport(params, config);
-                const blob = new Blob([response.data], { type: mimetype });
-                const fileName = `${this.exportFilename}.${format}`;
-                downloadBlob(blob, fileName);
+                    this.userIDs,
+                    this.projectIDs,
+                    format,
+                );
             },
             onSelectedIntervals(event) {
                 this.selectedIntervals = event ? [event] : [];

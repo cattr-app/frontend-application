@@ -6,6 +6,6 @@ export default class TimeUseReportService {
      * @param filters
      */
     async getTimeUserReport(filters) {
-        return await axios.post('time/report', filters);
+        return await axios.post('report/time', filters);
     }
 }

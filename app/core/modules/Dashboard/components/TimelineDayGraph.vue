@@ -10,14 +10,16 @@
             }"
             class="popup"
         >
-            <div v-if="hoverPopup.event">
-                {{ getTaskName(hoverPopup.event.task.id) }}
-                ({{ getProjectName(hoverPopup.event.task.project_id) }})
-            </div>
+            <template v-if="hoverPopup.event">
+                <div>
+                    {{ hoverPopup.event.task_name }}
+                    ({{ hoverPopup.event.project_name }})
+                </div>
 
-            <div v-if="hoverPopup.event">
-                {{ formatDuration(hoverPopup.event.duration) }}
-            </div>
+                <div>
+                    {{ formatDuration(hoverPopup.event.duration) }}
+                </div>
+            </template>
 
             <a :style="{ left: `${hoverPopup.borderX}px` }" class="corner"></a>
         </div>
@@ -32,15 +34,15 @@
             class="popup"
         >
             <Screenshot
-                v-if="clickPopup.event && getIntervalById(clickPopup.intervalID, clickPopup.event.user_id)"
+                v-if="clickPopup.event"
                 :disableModal="true"
                 :lazyImage="false"
-                :project="getProject(clickPopup.event.project_id)"
-                :interval="getIntervalById(clickPopup.intervalID, clickPopup.event.user_id)"
+                :project="{ id: clickPopup.event.project_id, name: clickPopup.event.project_name }"
+                :interval="clickPopup.event"
                 :showText="false"
-                :task="getTask(clickPopup.event.task_id)"
-                :user="user"
-                @click="showPopup(getIntervalById(clickPopup.intervalID, clickPopup.event.user_id))"
+                :task="{ id: clickPopup.event.task_id, name: clickPopup.event.task_name }"
+                :user="clickPopup.event"
+                @click="showPopup"
             />
 
             <div v-if="clickPopup.event">
@@ -53,7 +55,7 @@
                 </router-link>
             </div>
 
-            <a :style="{ left: `${clickPopup.borderX}px` }" class="corner"></a>
+            <a :style="{ left: `${clickPopup.borderX}px` }" class="corner" />
         </div>
 
         <ScreenshotModal
@@ -62,7 +64,7 @@
             :show="modal.show"
             :showNavigation="true"
             :task="modal.task"
-            :user="user"
+            :user="modal.user"
             @close="onHide"
             @remove="onRemove"
             @showNext="showNext"
@@ -165,7 +167,6 @@
                     x: 0,
                     y: 0,
                     event: null,
-                    intervalID: null,
                     borderX: 0,
                 },
                 intervalService: new IntervalService(),
@@ -197,16 +198,14 @@
         },
         methods: {
             formatDuration: formatDurationString,
-            showPopup(interval) {
-                if (typeof interval !== 'object') {
-                    return;
-                }
-
-                this.modal.task = this.getTask(interval?.task_id);
-                this.modal.project = this.modal.task?.project;
-                this.modal.interval = interval;
-
-                this.modal.show = true;
+            showPopup() {
+                this.modal = {
+                    show: true,
+                    project: { id: this.clickPopup.event.project_id, name: this.clickPopup.event.project_name },
+                    user: this.clickPopup.event,
+                    task: { id: this.clickPopup.event.task_id, name: this.clickPopup.event.task_name },
+                    interval: this.clickPopup.event,
+                };
             },
             onHide() {
                 this.modal.show = false;
@@ -221,51 +220,34 @@
                 }
             },
             showPrevious() {
-                const currentIndex = this.intervals.findIndex(x => x.id === this.modal.interval.id);
+                const intervals = this.intervals[this.modal.user.user_id];
 
-                if (currentIndex !== 0) {
-                    this.modal.interval = this.intervals[currentIndex - 1];
+                const currentIndex = intervals.findIndex(x => x.id === this.modal.interval.id);
+
+                if (currentIndex > 0) {
+                    const interval = intervals[currentIndex - 1];
+                    if (interval) {
+                        this.modal.interval = interval;
+                        this.modal.user = interval;
+                        this.modal.project = { id: interval.project_id, name: interval.project_name };
+                        this.modal.task = { id: interval.task_id, name: interval.task_name };
+                    }
                 }
             },
             showNext() {
-                const currentIndex = this.intervals.findIndex(x => x.id === this.modal.interval.id);
+                const intervals = this.intervals[this.modal.user.user_id];
 
-                if (currentIndex + 1 !== this.intervals.length) {
-                    this.modal.interval = this.intervals[currentIndex + 1];
-                }
-            },
-            getProjectName(projectID) {
-                const project = this.getProject(projectID);
-                if (!project) {
-                    return '';
-                }
+                const currentIndex = intervals.findIndex(x => x.id === this.modal.interval.id);
 
-                return project.name;
-            },
-            getTaskName(taskID) {
-                const task = this.getTask(taskID);
-                if (!task) {
-                    return '';
+                if (currentIndex < intervals.length - 1) {
+                    const interval = intervals[currentIndex + 1];
+                    if (interval) {
+                        this.modal.interval = interval;
+                        this.modal.user = interval;
+                        this.modal.project = { id: interval.project_id, name: interval.project_name };
+                        this.modal.task = { id: interval.task_id, name: interval.task_name };
+                    }
                 }
-
-                return task.task_name;
-            },
-            getProject(projectID) {
-                if (!this.projects[projectID]) {
-                    return null;
-                }
-
-                return this.projects[projectID];
-            },
-            getTask(taskID) {
-                if (!this.tasks[taskID]) {
-                    return null;
-                }
-
-                return this.tasks[taskID];
-            },
-            getIntervalById(intervalID, userId) {
-                return this.intervals[userId].intervals.find(i => i.id === intervalID);
             },
             draw: throttle(function() {
                 this.canvas.clear();
@@ -405,31 +387,22 @@
                     });
 
                     rect.on('mousedown', e => {
-                        const { ids } = event;
-                        const { pointer, target } = e;
-                        const n = Math.floor(((pointer.x - target.left) * ids.length) / (target.width + 1));
-                        const x = target.left + (target.width * n) / ids.length;
-                        const y = target.top;
-                        const intervalID = ids[n];
-
                         this.$emit('selectedIntervals', event);
 
-                        if (x > maxLeftOffset) {
+                        if (e.target.left > maxLeftOffset) {
                             this.clickPopup = {
                                 show: true,
                                 x: maxLeftOffset,
-                                y,
+                                y: e.target.top,
                                 event,
-                                intervalID,
-                                borderX: defaultCornerOffset + x - maxLeftOffset,
+                                borderX: defaultCornerOffset + e.target.left - maxLeftOffset,
                             };
                         } else {
                             this.clickPopup = {
                                 show: true,
-                                x,
-                                y,
+                                x: e.target.left,
+                                y: e.target.top,
                                 event,
-                                intervalID,
                                 borderX: defaultCornerOffset,
                             };
                         }
