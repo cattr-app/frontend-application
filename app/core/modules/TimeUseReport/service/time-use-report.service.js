@@ -1,11 +1,19 @@
 import axios from 'axios';
+import ReportService from '@/services/report.service';
+import { getEndDay, getStartDay } from '@/utils/time';
 
-export default class TimeUseReportService {
+export default class TimeUseReportService extends ReportService {
     /**
      * @returns {Promise<AxiosResponse<T>>}
-     * @param filters
+     * @param startAt
+     * @param endAt
+     * @param users
      */
-    async getTimeUserReport(filters) {
-        return await axios.post('report/time', filters);
+    async getReport(startAt, endAt, users) {
+        return await axios.post('report/time', {
+            start_at: getStartDay(startAt),
+            end_at: getEndDay(endAt),
+            users,
+        });
     }
 }

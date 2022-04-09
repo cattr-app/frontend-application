@@ -35,6 +35,9 @@
     import UserSelect from '@/components/UserSelect';
     import Calendar from '@/components/Calendar';
 
+    const timeUseService = new TimeUseReportService();
+    const usersService = new UsersService();
+
     export default {
         components: {
             List,
@@ -49,8 +52,6 @@
                 datepickerDateStart: '',
                 datepickerDateEnd: '',
                 userReportsList: [],
-                user: new UsersService(),
-                timeUseService: new TimeUseReportService(),
                 isDataLoading: false,
                 userIDs: [],
                 sessionStorageKey: sessionStorageKey,
@@ -66,7 +67,7 @@
 
             async sendRequests() {
                 try {
-                    this.users = (await this.user.getAll()).data;
+                    this.users = (await usersService.getAll()).data;
                     await this.getReport();
                 } catch ({ response }) {
                     if (process.env.NODE_ENV === 'development') {
@@ -80,20 +81,12 @@
                 }
 
                 this.isDataLoading = true;
-                const start_at = moment
-                    .tz(this.datepickerDateStart, this.timezone)
-                    .startOf('day')
-                    .toISOString();
-                const end_at = moment
-                    .tz(this.datepickerDateEnd, this.timezone)
-                    .endOf('day')
-                    .toISOString();
                 try {
-                    const { data } = await this.timeUseService.getTimeUserReport({
-                        users: this.userIDs,
-                        start_at,
-                        end_at,
-                    });
+                    const { data } = await timeUseService.getReport(
+                        this.datepickerDateStart,
+                        this.datepickerDateEnd,
+                        this.userIDs,
+                    );
                     this.userReportsList = data.data;
                 } catch ({ response }) {
                     if (process.env.NODE_ENV === 'development') {

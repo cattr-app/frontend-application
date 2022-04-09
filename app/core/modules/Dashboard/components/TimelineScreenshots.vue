@@ -66,7 +66,7 @@
             };
         },
         computed: {
-            ...mapGetters('timeline', ['tasks', 'intervals', 'timezone']),
+            ...mapGetters('dashboard', ['tasks', 'intervals', 'timezone']),
             ...mapGetters('user', ['user']),
             projects() {
                 return Object.keys(this.tasks)

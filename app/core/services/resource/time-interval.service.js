@@ -51,26 +51,6 @@ export default class TimeIntervalService extends ResourceService {
     }
 
     /**
-     * @returns {Promise<AxiosResponse<T>>}
-     * @param userIds
-     * @param projectIds
-     * @param startAt
-     * @param endAt
-     * @param config
-     */
-    getDashboardIntervals(userIds, projectIds, startAt, endAt, config = {}) {
-        const url = 'report/dashboard';
-        const data = {
-            users: userIds,
-            projects: projectIds,
-            start_at: startAt,
-            end_at: endAt,
-        };
-
-        return axios.post(url, data, config);
-    }
-
-    /**
      * @param id
      * @returns {Promise<AxiosResponse<T>>}
      */

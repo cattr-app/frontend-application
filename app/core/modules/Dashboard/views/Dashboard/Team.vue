@@ -81,7 +81,7 @@
     import moment from 'moment';
     import 'moment-timezone';
     import throttle from 'lodash/throttle';
-    import { mapActions, mapGetters } from 'vuex';
+    import { mapMutations, mapGetters } from 'vuex';
     import Calendar from '@/components/Calendar';
     import UserSelect from '@/components/UserSelect';
     import ProjectSelect from '@/components/ProjectSelect';
@@ -91,7 +91,6 @@
     import TimezonePicker from '@/components/TimezonePicker';
     import DashboardReportService from '_internal/Dashboard/services/dashboard.service';
     import ProjectService from '@/services/resource/project.service';
-    import { downloadBlob } from '@/utils/file';
     import { getDateToday, getEndOfDayInTimezone, getStartOfDayInTimezone } from '@/utils/time';
     import ExportDropdown from '@/components/ExportDropdown';
     import TimeIntervalEdit from '../../components/TimeIntervalEdit';
@@ -145,7 +144,7 @@
             this.service.unloadIntervals();
         },
         computed: {
-            ...mapGetters('timeline', ['intervals', 'timePerDay', 'users', 'timezone', 'service']),
+            ...mapGetters('dashboard', ['intervals', 'timePerDay', 'users', 'timezone', 'service']),
             graphUsers() {
                 const { worked } = this;
 
@@ -166,20 +165,13 @@
                         return this.sortDir === 'asc' ? order : -order;
                     });
             },
-            exportFilename() {
-                const days = moment(this.end).diff(this.start, 'days');
-
-                return days > 1
-                    ? `Dashboard Report from ${this.start} to ${this.end}`
-                    : `Dashboard Report ${this.start}`;
-            },
         },
         methods: {
             getDateToday,
             getStartOfDayInTimezone,
             getEndOfDayInTimezone,
-            ...mapActions({
-                setTimezone: 'timeline/setTimezone',
+            ...mapMutations({
+                setTimezone: 'dashboard/setTimezone',
             }),
             load: throttle(async function(withLoadingIndicator = true) {
                 this.isDataLoading = withLoadingIndicator;
@@ -231,7 +223,7 @@
                 localStorage['team.sort-dir'] = this.sortDir;
             },
             async onExport(format) {
-                await this.reportService.queueReport(
+                const { data } = await this.reportService.downloadReport(
                     this.start,
                     moment
                         .utc(this.end)
@@ -241,6 +233,8 @@
                     this.projectIDs,
                     format,
                 );
+
+                window.open(data.data.url, '_blank');
             },
             onSelectedIntervals(event) {
                 this.selectedIntervals = event ? [event] : [];

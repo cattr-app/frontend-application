@@ -54,7 +54,7 @@
             },
         },
         computed: {
-            ...mapGetters('timeline', ['intervals']),
+            ...mapGetters('dashboard', ['intervals']),
         },
         filters: {
             truncate(value) {

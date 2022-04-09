@@ -145,7 +145,7 @@
             };
         },
         computed: {
-            ...mapGetters('timeline', ['intervals', 'timezone']),
+            ...mapGetters('dashboard', ['intervals', 'timezone']),
             ...mapGetters('user', ['companyData']),
             height() {
                 return this.users.length * rowHeight + titleHeight + subtitleHeight;

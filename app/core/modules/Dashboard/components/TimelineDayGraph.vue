@@ -21,7 +21,7 @@
                 </div>
             </template>
 
-            <a :style="{ left: `${hoverPopup.borderX}px` }" class="corner"></a>
+            <a :style="{ left: `${hoverPopup.borderX}px` }" class="corner" />
         </div>
 
         <div
@@ -128,7 +128,7 @@
             ScreenshotModal,
         },
         computed: {
-            ...mapGetters('timeline', ['tasks', 'intervals']),
+            ...mapGetters('dashboard', ['tasks', 'intervals']),
             ...mapGetters('user', ['user', 'companyData']),
             height() {
                 return timelineHeight + titleHeight + subtitleHeight;

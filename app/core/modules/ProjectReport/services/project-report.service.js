@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { getStartDay, getEndDay } from '@/utils/time';
+import ReportService from '@/services/report.service';
 
-export default class ProjectReportService {
+export default class ProjectReportService extends ReportService {
     /**
      * @returns {Promise<AxiosResponse<T>>}
      * @param startAt
@@ -26,7 +27,7 @@ export default class ProjectReportService {
      * @param projects
      * @param format
      */
-    getReportFile(startAt, endAt, users, projects, format) {
+    downloadReport(startAt, endAt, users, projects, format) {
         const params = {
             start_at: getStartDay(startAt),
             end_at: getEndDay(endAt),

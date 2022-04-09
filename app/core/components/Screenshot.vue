@@ -136,8 +136,9 @@
                     return;
                 }
 
-                return moment(this.interval.start_at)
-                    .tz(timezone)
+                return moment
+                    .tz(this.interval.start_at, this.companyData['timezone'])
+                    .tz(this.timezone)
                     .format('HH:mm');
             },
         },

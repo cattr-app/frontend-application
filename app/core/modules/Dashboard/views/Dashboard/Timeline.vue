@@ -83,7 +83,7 @@
 <script>
     import moment from 'moment';
     import throttle from 'lodash/throttle';
-    import { mapGetters, mapActions } from 'vuex';
+    import { mapGetters, mapMutations } from 'vuex';
     import Calendar from '@/components/Calendar';
     import TimelineSidebar from '../../components/TimelineSidebar';
     import TimelineDayGraph from '../../components/TimelineDayGraph';
@@ -142,7 +142,7 @@
             this.service.unloadIntervals();
         },
         computed: {
-            ...mapGetters('timeline', ['service', 'intervals', 'timePerDay', 'timePerProject', 'timezone']),
+            ...mapGetters('dashboard', ['service', 'intervals', 'timePerDay', 'timePerProject', 'timezone']),
             ...mapGetters('user', ['user']),
             userEvents() {
                 if (!this.user || !this.user.id || !this.intervals[this.user.id]) {
@@ -163,8 +163,8 @@
             getDateToday,
             getStartOfDayInTimezone,
             getEndOfDayInTimezone,
-            ...mapActions({
-                setTimezone: 'timeline/setTimezone',
+            ...mapMutations({
+                setTimezone: 'dashboard/setTimezone',
             }),
             loadData: throttle(async function(withLoadingIndicator = true) {
                 this.isDataLoading = withLoadingIndicator;
@@ -197,7 +197,7 @@
                 this.selectedIntervals = event ? [event] : [];
             },
             async onExport(format) {
-                await dashboardService.queueReport(
+                const { data } = await dashboardService.downloadReport(
                     this.start,
                     moment
                         .utc(this.end)
@@ -208,11 +208,7 @@
                     format,
                 );
 
-                this.$Notify({
-                    type: 'success',
-                    title: this.$t('message.success'),
-                    message: this.$t('message.report_has_been_queued'),
-                });
+                window.open(data.data.url, '_blank');
             },
             onBulkRemove(intervals) {
                 const intervalIds = intervals.map(interval => interval.id);

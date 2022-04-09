@@ -1,15 +1,12 @@
 import moment from 'moment';
 import 'moment-timezone';
-import TimelineService from '@/services/resource/timeline.service';
-import ProjectService from '@/services/resource/project.service';
 import TasksService from '@/services/resource/task.service';
-import TimeIntervalService from '@/services/resource/time-interval.service';
 import UserService from '@/services/resource/user.service';
+import DashboardService from '_internal/Dashboard/services/dashboard.service';
 
 const state = {
     service: null,
     intervals: {},
-    projects: {},
     tasks: {},
     users: [],
     timezone: moment.tz.guess(),
@@ -18,7 +15,6 @@ const state = {
 const getters = {
     service: state => state.service,
     intervals: state => state.intervals,
-    projects: state => state.projects,
     tasks: state => state.tasks,
     users: state => state.users,
     timePerProject: (state, getters) => {
@@ -115,9 +111,6 @@ const mutations = {
     setIntervals(state, intervals) {
         state.intervals = intervals;
     },
-    setProjects(state, projects) {
-        state.projects = projects;
-    },
     setTasks(state, tasks) {
         state.tasks = tasks;
     },
@@ -131,29 +124,7 @@ const mutations = {
 
 const actions = {
     init(context) {
-        const timeIntervalService = new TimeIntervalService();
-        const projectService = new ProjectService();
-        const taskService = new TasksService();
-        const userService = new UserService();
-
-        const service = new TimelineService(context, timeIntervalService, projectService, taskService, userService);
-
-        context.commit('setService', service);
-    },
-    setIntervals({ commit }, intervals) {
-        commit('setIntervals', intervals);
-    },
-    setProjects({ commit }, projects) {
-        commit('setProjects', projects);
-    },
-    setTasks({ commit }, tasks) {
-        commit('setTasks', tasks);
-    },
-    setUsers({ commit }, users) {
-        commit('setUsers', users);
-    },
-    setTimezone({ commit }, timezone) {
-        commit('setTimezone', timezone);
+        context.commit('setService', new DashboardService(context, new TasksService(), new UserService()));
     },
 };
 

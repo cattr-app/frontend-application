@@ -126,7 +126,7 @@
             },
             async onExport(format) {
                 try {
-                    await reportService.getReportFile(
+                    const { data } = await reportService.downloadReport(
                         this.datepickerDateStart,
                         this.datepickerDateEnd,
                         this.userIds,
@@ -134,11 +134,7 @@
                         format,
                     );
 
-                    this.$Notify({
-                        type: 'success',
-                        title: this.$t('message.success'),
-                        message: this.$t('message.report_has_been_queued'),
-                    });
+                    window.open(data.data.url, '_blank');
                 } catch ({ response }) {
                     if (process.env.NODE_ENV === 'development') {
                         console.log(response ? response : 'request to reports is canceled');
