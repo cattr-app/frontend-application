@@ -57,7 +57,7 @@ export default class PriorityService extends ResourceService {
      * @param config
      * @returns {Promise<AxiosResponse<T>>}
      */
-    getWithFilters(filters, config = {}) {
-        return axios.post('priorities/list', filters, config);
+    async getWithFilters(filters, config = {}) {
+        return (await axios.post('priorities/list', filters, config)).data;
     }
 }

@@ -45,10 +45,11 @@ export default class UserService extends ResourceService {
     /**
      *
      * @param filters
+     * @param config
      * @returns {Promise<AxiosResponse<T>>}
      */
-    getWithFilters(filters) {
-        return axios.post('users/list', filters);
+    getWithFilters(filters, config = {}) {
+        return axios.post('users/list', filters, config);
     }
 
     /**

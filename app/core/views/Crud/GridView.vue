@@ -232,7 +232,6 @@
                 queryParams: {
                     with: withParam,
                     withCount,
-                    paginate: true,
                     perPage: this.$route.meta.itemsPerPage || defaultItemsPerPage,
                     page: this.$route.query.page,
                     search: {
@@ -377,11 +376,11 @@
                 }
 
                 try {
-                    const res = await this.service.getWithFilters(queryParams);
-                    const { data, total, current_page } = res.data;
+                    const res = await this.service.getWithFilters(queryParams, { headers: { 'X-Paginate': true } });
+                    const { data, pagination } = res.data;
 
-                    this.totalItems = total;
-                    this.page = current_page;
+                    this.totalItems = pagination.total;
+                    this.page = pagination.currentPage;
 
                     this.tableData = data;
                 } catch ({ response }) {

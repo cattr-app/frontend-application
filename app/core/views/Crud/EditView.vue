@@ -294,7 +294,7 @@
                             this.$route.params[this.service.getIdParam()],
                             this.filters,
                         );
-                        this.values = { ...this.values, ...data };
+                        this.values = { ...this.values, ...data.data };
                     } catch ({ response }) {
                         if (
                             response &&
