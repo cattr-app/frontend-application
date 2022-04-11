@@ -5,11 +5,11 @@
         </at-modal>
 
         <div class="color-input__color">
-            <div class="at-input__original" :style="{ background: value }" @click.prevent="modal = true"></div>
+            <div class="at-input__original" :style="{ background: value }" @click.prevent="modal = true" />
         </div>
 
         <at-button class="color-input__remove" @click.prevent="$emit('change', null)">
-            <span class="icon icon-x"></span>
+            <span class="icon icon-x" />
         </at-button>
     </div>
 </template>
@@ -38,7 +38,7 @@
         height: 40px;
         cursor: pointer;
         border-radius: 5px;
-        padding: 0px;
+        padding: 0;
     }
 
     .color-input {
@@ -46,11 +46,11 @@
             display: flex;
             flex-flow: row nowrap;
 
-            & /deep/ .at-modal {
+            & >>> .at-modal {
                 width: 225px !important;
             }
 
-            & /deep/ .at-modal__body {
+            & >>> .at-modal__body {
                 padding: 0;
             }
         }

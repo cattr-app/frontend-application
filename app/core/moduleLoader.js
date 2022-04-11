@@ -1,5 +1,5 @@
 import path from 'path';
-import Module from './arch/module';
+import Module from '@/arch/module';
 import EventEmitter from 'events';
 import kebabCase from 'lodash/kebabCase';
 import isObject from 'lodash/isObject';

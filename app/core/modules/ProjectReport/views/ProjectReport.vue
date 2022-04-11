@@ -9,7 +9,9 @@
             <ProjectSelect class="controls-row__item" @change="onProjectsChange" />
 
             <div class="controls-row__item controls-row__item--left-auto">
-                <small v-if="reportTimezone">{{ $t('project-report.report_timezone', [reportTimezone]) }}</small>
+                <small v-if="companyData.timezone">
+                    {{ $t('project-report.report_timezone', [companyData.timezone]) }}
+                </small>
             </div>
 
             <ExportDropdown
@@ -17,28 +19,26 @@
                 position="left-top"
                 trigger="hover"
                 @export="onExport"
-            >
-            </ExportDropdown>
+            />
         </div>
 
         <div class="at-container">
             <div class="total-time-row">
                 <span class="total-time-label">{{ $t('field.total_time') }}</span>
-                <span class="total-time-value">{{ formatDurationString(totalTime) }}</span>
+                <span class="total-time-value">{{ totalTime }}</span>
             </div>
 
             <div v-if="Object.keys(projects).length && !isDataLoading">
-                <project
+                <ProjectLine
                     v-for="project in projects"
                     :key="project.id"
                     :project="project"
                     :start="datepickerDateStart"
                     :end="datepickerDateEnd"
-                    @handUpdateProp="handUpdateProp"
-                ></project>
+                />
             </div>
             <div v-else class="at-container__inner no-data">
-                <preloader v-if="isDataLoading"></preloader>
+                <preloader v-if="isDataLoading" />
                 <span>{{ $t('message.no_data') }}</span>
             </div>
         </div>
@@ -46,32 +46,30 @@
 </template>
 
 <script>
-    import UsersService from '@/services/resource/user.service';
-    import ProjectService from '@/services/resource/project.service';
     import Calendar from '@/components/Calendar';
     import UserSelect from '@/components/UserSelect';
-    import ProjectReportService from '@/services/reports/project-report.service';
-    import Project from './ProjectReport/Project';
+    import ProjectReportService from '_internal/ProjectReport/services/project-report.service';
+    import ProjectLine from './ProjectReport/ProjectLine';
     import { getDateToday, getStartDate, getEndDate, formatDurationString } from '@/utils/time';
     import ProjectSelect from '@/components/ProjectSelect';
     import Preloader from '@/components/Preloader';
-    import moment from 'moment';
     import ExportDropdown from '@/components/ExportDropdown';
-    import { getMimeType, downloadBlob } from '@/utils/file';
     import { mapGetters } from 'vuex';
+
+    const reportService = new ProjectReportService();
 
     export default {
         name: 'ProjectReport',
         components: {
             UserSelect,
             Calendar,
-            Project,
+            ProjectLine,
             ProjectSelect,
             Preloader,
             ExportDropdown,
         },
         data() {
-            const today = this.getDateToday();
+            const today = getDateToday();
             const sessionStorageKey = 'amazingcat.session.storage.project_report';
 
             return {
@@ -79,46 +77,20 @@
                 projects: [],
                 projectsList: [],
                 projectReportsList: {},
-                datepickerDateStart: this.getStartDate(today),
-                datepickerDateEnd: this.getEndDate(today),
+                datepickerDateStart: getStartDate(today),
+                datepickerDateEnd: getEndDate(today),
                 reportTimezone: null,
                 userIds: [],
-                usersService: new UsersService(),
-                projectService: new ProjectService(),
-                reportService: new ProjectReportService(),
                 sessionStorageKey: sessionStorageKey,
             };
         },
         computed: {
             ...mapGetters('user', ['companyData']),
-            exportFilename() {
-                const days = moment(this.datepickerDateEnd).diff(this.datepickerDateStart, 'days');
-                return days > 1
-                    ? `Project Report from ${this.datepickerDateStart} to ${this.datepickerDateEnd}`
-                    : `Project Report ${this.datepickerDateStart}`;
-            },
             totalTime() {
-                return this.projects.reduce((total, current) => total + current.project_time, 0);
-            },
-        },
-        watch: {
-            companyData() {
-                this.fetchData();
+                return formatDurationString(this.projects.reduce((acc, cur) => acc + cur.time, 0));
             },
         },
         methods: {
-            getStartDate,
-            getEndDate,
-            getDateToday,
-            formatDurationString,
-            handUpdateProp(data) {
-                const project = this.projects.find(project => project.id === data.project.id);
-                const user = project.users.find(user => user.id === data.user.id);
-                const task = user.tasks.find(task => task.id === data.task.id);
-                const screenshots = task.screenshots?.[data.keys.date]?.[data.keys.hours];
-                for (const screenshotIndex in screenshots)
-                    if (screenshots[screenshotIndex].id === data.screenshot.id) delete screenshots[screenshotIndex];
-            },
             onUsersSelect(uids) {
                 this.userIds = uids;
                 this.fetchData();
@@ -135,23 +107,15 @@
             },
             async fetchData() {
                 this.isDataLoading = true;
-                const timezone = this.companyData.timezone;
                 try {
-                    const { data } = await this.reportService.getProjects({
-                        uids: this.userIds,
-                        start_at: moment
-                            .tz(this.datepickerDateStart, timezone)
-                            .startOf('day')
-                            .toISOString(),
-                        end_at: moment
-                            .tz(this.datepickerDateEnd, timezone)
-                            .endOf('day')
-                            .toISOString(),
-                        pids: this.projectsList,
-                    });
+                    const { data } = await reportService.getReport(
+                        this.datepickerDateStart,
+                        this.datepickerDateEnd,
+                        this.userIds,
+                        this.projectsList,
+                    );
 
-                    this.$set(this, 'projects', data.projects);
-                    this.reportTimezone = data.timezone;
+                    this.$set(this, 'projects', data.data);
                 } catch ({ response }) {
                     if (process.env.NODE_ENV === 'development') {
                         console.warn(response ? response : 'request to projects is canceled');
@@ -161,24 +125,16 @@
                 this.isDataLoading = false;
             },
             async onExport(format) {
-                const mimetype = getMimeType(format);
-
-                const config = {
-                    headers: { Accept: mimetype },
-                };
-
                 try {
-                    const { data } = await this.reportService.getReport(
+                    const { data } = await reportService.downloadReport(
                         this.datepickerDateStart,
                         this.datepickerDateEnd,
                         this.userIds,
                         this.projectsList,
-                        config,
+                        format,
                     );
 
-                    const blob = new Blob([data], { type: mimetype });
-                    const fileName = `${this.exportFilename}.${format}`;
-                    downloadBlob(blob, fileName);
+                    window.open(data.data.url, '_blank');
                 } catch ({ response }) {
                     if (process.env.NODE_ENV === 'development') {
                         console.log(response ? response : 'request to reports is canceled');

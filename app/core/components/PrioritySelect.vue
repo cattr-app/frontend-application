@@ -45,7 +45,7 @@
         async created() {
             try {
                 this.options = await this.service.getAll().then(({ data }) => {
-                    return data.map(option => {
+                    return data.data.map(option => {
                         return {
                             value: option.id,
                             label: option['name'],
@@ -102,15 +102,15 @@
     .priority-select {
         border-radius: 5px;
 
-        & /deep/ .at-select__selection {
+        & >>> .at-select__selection {
             background: transparent;
         }
 
-        & /deep/ .at-select__dropdown .at-select__option {
+        & >>> .at-select__dropdown .at-select__option {
             padding: 0;
         }
 
-        & /deep/ .at-select {
+        & >>> .at-select {
             color: inherit;
         }
     }

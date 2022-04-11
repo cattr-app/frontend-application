@@ -10,13 +10,27 @@
 <script>
     import * as Sentry from '@sentry/browser';
     import moment from 'moment';
-    import { getLangCookie, setLangCookie } from './i18n';
+    import { getLangCookie, setLangCookie } from '@/i18n';
 
     export const config = { beforeLayout: null };
 
     export default {
         name: 'App',
         async created() {
+            if (!(await this.$store.dispatch('httpRequest/getCattrStatus'))) {
+                if (this.$route.name !== 'api.error') {
+                    await this.$router.replace({ name: 'api.error' });
+                    return;
+                }
+
+                return;
+            } else {
+                if (this.$route.name === 'api.error') {
+                    await this.$router.replace('/');
+                    return;
+                }
+            }
+
             const installed = await this.$store.dispatch('httpRequest/getInstallationStatus');
             if (!installed) {
                 if (this.$route.name !== 'setup') {

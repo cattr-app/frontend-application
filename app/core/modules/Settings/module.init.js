@@ -11,7 +11,7 @@ export function init(context, router) {
         label: 'navigation.company_settings',
         icon: 'icon-settings',
         to: {
-            name: 'Settings.company.general',
+            name: 'company.settings.general',
         },
         displayCondition: store => store.getters['user/user'].is_admin === 1,
     });

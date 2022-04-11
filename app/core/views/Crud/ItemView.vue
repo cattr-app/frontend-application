@@ -71,7 +71,7 @@
 </template>
 
 <script>
-    import RenderableField from '../../components/RenderableField';
+    import RenderableField from '@/components/RenderableField';
     import { Skeleton } from 'vue-loading-skeleton';
 
     export default {
@@ -141,7 +141,7 @@
                 const id = this.$route.params[this.service.getIdParam()];
 
                 try {
-                    const data = (await this.service.getItem(id, this.filters)).data;
+                    const { data } = (await this.service.getItem(id, this.filters)).data;
                     this.values = data;
                 } catch ({ response }) {
                     if (response.data.error_type === 'query.item_not_found') {

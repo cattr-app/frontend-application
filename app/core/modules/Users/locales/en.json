@@ -5,6 +5,10 @@
   "users": {
     "grid-title": "Users",
     "crud-title": "User",
+    "statuses": {
+      "active": "Active",
+      "disabled": "Disabled"
+    },
     "role": {
       "name": "Role",
       "manager": "Manager",

@@ -14,27 +14,23 @@
         </div>
         <div class="at-container">
             <div class="at-container__inner">
-                <template v-if="this.screenshots.length > 0">
+                <template v-if="this.intervals.length > 0">
                     <div class="row">
-                        <div
-                            v-for="screenshot in this.screenshots"
-                            :key="screenshot.id"
-                            class="col-4 screenshots__card"
-                        >
+                        <div v-for="interval in this.intervals" :key="interval.id" class="col-4 screenshots__card">
                             <Screenshot
                                 class="screenshot"
                                 :disableModal="true"
-                                :screenshot="screenshot"
-                                :task="screenshot.time_interval.task"
+                                :interval="interval"
+                                :task="interval.task"
                                 :user="modal.user"
-                                @click="showImage(screenshot)"
+                                @click="showImage(interval)"
                             />
                         </div>
                     </div>
 
                     <ScreenshotModal
                         :project="modal.project"
-                        :screenshot="modal.screenshot"
+                        :interval="modal.interval"
                         :show="modal.show"
                         :showNavigation="true"
                         :task="modal.task"
@@ -54,7 +50,7 @@
         </div>
         <div class="screenshots__pagination">
             <at-pagination
-                :total="screenshotsTotal"
+                :total="intervalsTotal"
                 :current="page"
                 :page-size="limit"
                 @page-change="loadPage"
@@ -70,7 +66,7 @@
     import ScreenshotModal from '@/components/ScreenshotModal';
     import UserSelect from '@/components/UserSelect';
     import ProjectService from '@/services/resource/project.service';
-    import ScreenshotService from '@/services/resource/screenshot.service';
+    import TimeIntervalService from '@/services/resource/time-interval.service';
     import { getStartOfDayInTimezone, getEndOfDayInTimezone } from '@/utils/time';
     import Preloader from '@/components/Preloader';
     import ProjectSelect from '@/components/ProjectSelect';
@@ -91,19 +87,19 @@
             const sessionStorageKey = 'amazingcat.session.storage.screenshots';
 
             return {
-                screenshots: [],
+                intervals: [],
                 userIDs: null,
                 projectsList: [],
                 datepickerDateStart: '',
                 datepickerDateEnd: '',
                 projectService: new ProjectService(),
-                screenshotsService: new ScreenshotService(),
+                intervalService: new TimeIntervalService(),
                 modal: {
                     show: false,
                 },
                 limit: limit,
                 page: 1,
-                screenshotsTotal: 0,
+                intervalsTotal: 0,
                 localStorageKey: localStorageKey,
                 sessionStorageKey: sessionStorageKey,
                 isDataLoading: false,
@@ -147,25 +143,25 @@
                 }
             },
             showPrevious() {
-                const currentIndex = this.screenshots.findIndex(x => x.id === this.modal.screenshot.id);
+                const currentIndex = this.intervals.findIndex(x => x.id === this.modal.interval.id);
 
                 if (currentIndex !== 0) {
-                    this.modal.screenshot = this.screenshots[currentIndex - 1];
+                    this.modal.interval = this.intervals[currentIndex - 1];
                 }
             },
             showNext() {
-                const currentIndex = this.screenshots.findIndex(x => x.id === this.modal.screenshot.id);
+                const currentIndex = this.intervals.findIndex(x => x.id === this.modal.interval.id);
 
-                if (currentIndex + 1 !== this.screenshots.length) {
-                    this.modal.screenshot = this.screenshots[currentIndex + 1];
+                if (currentIndex + 1 !== this.intervals.length) {
+                    this.modal.interval = this.intervals[currentIndex + 1];
                 }
             },
-            showImage(screenshot) {
+            showImage(interval) {
                 this.modal = {
-                    screenshot,
-                    user: screenshot.time_interval.user,
-                    task: screenshot.time_interval.task,
-                    project: screenshot.time_interval.task?.project,
+                    interval,
+                    user: interval.user,
+                    task: interval.task,
+                    project: interval.task?.project,
                     show: true,
                 };
             },
@@ -194,10 +190,10 @@
                 this.isDataLoading = true;
 
                 try {
-                    const { data } = await this.screenshotsService.getWithFilters({
-                        'timeInterval.user_id': ['in', this.userIDs],
-                        'timeInterval.task.project_id': ['in', this.projectsList],
-                        'timeInterval.start_at': [
+                    const { data } = await this.intervalService.getAll({
+                        user_id: ['in', this.userIDs],
+                        'task.project_id': ['in', this.projectsList],
+                        start_at: [
                             'between',
                             [
                                 this.getStartOfDayInTimezone(this.datepickerDateStart, this.companyData.timezone),
@@ -208,11 +204,11 @@
                         paginate: true,
                         perPage: this.limit,
                         page: this.page,
-                        with: 'timeInterval.task, timeInterval.task.project, timeInterval.user',
+                        with: 'task, task.project, user',
                     });
 
-                    this.screenshotsTotal = data.total;
-                    this.screenshots = data.data;
+                    this.intervalsTotal = data.total;
+                    this.intervals = data.data;
                 } catch ({ response }) {
                     return;
                 }
@@ -221,14 +217,14 @@
             },
             async removeScreenshot(id) {
                 try {
-                    await this.screenshotsService.deleteItem(id);
+                    await this.intervalService.deleteItem(id);
                     this.$Notify({
                         type: 'success',
                         title: this.$t('notification.screenshot.delete.success.title'),
                         message: this.$t('notification.screenshot.delete.success.message'),
                     });
 
-                    this.screenshots = this.screenshots.filter(screen => screen.id !== id);
+                    this.intervals = this.intervals.filter(interval => interval.id !== id);
                     this.onHide();
                 } catch (e) {
                     this.$Notify({

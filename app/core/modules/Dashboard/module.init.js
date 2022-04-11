@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import store from '@/store';
+import storeModule from './storeModule';
 import './policies';
 
 export const ModuleConfig = {
@@ -63,6 +63,8 @@ export function init(context) {
         en: require('./locales/en'),
         ru: require('./locales/ru'),
     });
+
+    context.registerVuexModule(storeModule);
 
     return context;
 }

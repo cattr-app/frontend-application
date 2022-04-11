@@ -17,7 +17,7 @@
                 </li>
             </template>
         </v-select>
-        <i class="icon icon-chevron-down at-select__arrow"></i>
+        <i class="icon icon-chevron-down at-select__arrow" />
     </div>
 </template>
 
@@ -103,6 +103,11 @@
                 moment.tz.names().map(timezoneName => {
                     if (this.timezones.some(t => t.value === timezoneName)) {
                         return;
+                    }
+
+                    //Asia/Kolkata
+                    if (timezoneName === 'Asia/Calcutta') {
+                        timezoneName = 'Asia/Kolkata';
                     }
 
                     if (typeof timezoneName !== 'string') return;

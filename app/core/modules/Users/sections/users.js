@@ -414,7 +414,7 @@ export default (context, router) => {
             title: 'field.status',
             key: 'active',
             render(h, { item }) {
-                const status = i18n.t('field.statuses.' + (item.active ? 'active' : 'disabled'));
+                const status = i18n.t('users.statuses.' + (item.active ? 'active' : 'disabled'));
 
                 return h('span', [status]);
             },

@@ -3,8 +3,8 @@
         <div class="controls-row flex-between">
             <div class="flex">
                 <Calendar
-                    class="controls-row__item"
                     :sessionStorageKey="sessionStorageKey"
+                    class="controls-row__item"
                     @change="onCalendarChange"
                 />
 
@@ -12,14 +12,14 @@
 
                 <ProjectSelect class="controls-row__item" @change="onProjectsChange" />
 
-                <TimezonePicker class="controls-row__item" :value="timezone" @onTimezoneChange="onTimezoneChange" />
+                <TimezonePicker :value="timezone" class="controls-row__item" @onTimezoneChange="onTimezoneChange" />
             </div>
 
             <div class="flex">
                 <router-link
                     v-if="$can('viewManualTime', 'dashboard')"
-                    to="/time-intervals/new"
                     class="controls-row__item"
+                    to="/time-intervals/new"
                 >
                     <at-button class="controls-row__btn" icon="icon-edit">{{ $t('control.add_time') }}</at-button>
                 </router-link>
@@ -29,8 +29,7 @@
                     position="left"
                     trigger="hover"
                     @export="onExport"
-                >
-                </ExportDropdown>
+                />
             </div>
         </div>
 
@@ -39,13 +38,10 @@
                 <div class="row">
                     <div class="col-8 col-lg-6">
                         <TeamSidebar
-                            class="sidebar"
-                            :users="graphUsers"
-                            :worked="worked"
-                            :currentTasks="currentTasks"
-                            :currentProjects="currentProjects"
                             :sort="sort"
                             :sortDir="sortDir"
+                            :users="graphUsers"
+                            class="sidebar"
                             @sort="onSort"
                         />
                     </div>
@@ -53,30 +49,29 @@
                     <div class="col-16 col-lg-18">
                         <TeamDayGraph
                             v-if="type === 'day'"
-                            class="graph"
                             :users="graphUsers"
-                            :events="events"
-                            :timezone="timezone"
+                            class="graph"
                             @selectedIntervals="onSelectedIntervals"
                         />
                         <TeamTableGraph
                             v-else
-                            class="graph"
-                            :start="start"
                             :end="end"
-                            :users="graphUsers"
+                            :start="start"
                             :timePerDay="timePerDay"
+                            :users="graphUsers"
+                            class="graph"
                         />
                     </div>
 
-                    <time-interval-edit
-                        :interval-ids="selectedIntervalIds"
-                        @remove="onBulkRemove"
-                        @edit="load"
+                    <TimeIntervalEdit
+                        v-if="selectedIntervals.length"
+                        :intervals="selectedIntervals"
                         @close="clearIntervals"
-                    ></time-interval-edit>
+                        @edit="load"
+                        @remove="onBulkRemove"
+                    />
                 </div>
-                <preloader v-if="isDataLoading" class="team__loader" :is-transparent="true"></preloader>
+                <preloader v-if="isDataLoading" :is-transparent="true" class="team__loader" />
             </div>
         </div>
     </div>
@@ -86,7 +81,7 @@
     import moment from 'moment';
     import 'moment-timezone';
     import throttle from 'lodash/throttle';
-    import { mapActions, mapGetters } from 'vuex';
+    import { mapMutations, mapGetters } from 'vuex';
     import Calendar from '@/components/Calendar';
     import UserSelect from '@/components/UserSelect';
     import ProjectSelect from '@/components/ProjectSelect';
@@ -94,10 +89,9 @@
     import TeamDayGraph from '../../components/TeamDayGraph';
     import TeamTableGraph from '../../components/TeamTableGraph';
     import TimezonePicker from '@/components/TimezonePicker';
-    import DashboardReportService from '@/services/reports/dashboard-report.service';
+    import DashboardReportService from '_internal/Dashboard/services/dashboard.service';
     import ProjectService from '@/services/resource/project.service';
-    import { downloadBlob, getMimeType } from '@/utils/file';
-    import { getDateToday, getEndDay, getEndOfDayInTimezone, getStartDay, getStartOfDayInTimezone } from '@/utils/time';
+    import { getDateToday, getEndOfDayInTimezone, getStartOfDayInTimezone } from '@/utils/time';
     import ExportDropdown from '@/components/ExportDropdown';
     import TimeIntervalEdit from '../../components/TimeIntervalEdit';
     import cloneDeep from 'lodash/cloneDeep';
@@ -134,35 +128,23 @@
                 projectService: new ProjectService(),
                 reportService: new DashboardReportService(),
                 showExportModal: false,
-                selectedIntervalIds: [],
-                selectedScreenshots: [],
                 selectedIntervals: [],
                 sessionStorageKey: sessionStorageKey,
                 isDataLoading: false,
             };
         },
-        created() {
+        async created() {
             localStorage['dashboard.tab'] = 'team';
-            this.service.loadUsers();
-            this.load();
+
+            await this.load();
             this.updateHandle = setInterval(() => this.load(false), updateInterval);
         },
         beforeDestroy() {
             clearInterval(this.updateHandle);
             this.service.unloadIntervals();
-            this.service.unloadScreenshots();
         },
         computed: {
-            ...mapGetters('timeline', [
-                'service',
-                'intervals',
-                'screenshots',
-                'events',
-                'timePerDay',
-                'users',
-                'latestIntervals',
-                'timezone',
-            ]),
+            ...mapGetters('dashboard', ['intervals', 'timePerDay', 'users', 'timezone', 'service']),
             graphUsers() {
                 const { worked } = this;
 
@@ -183,74 +165,13 @@
                         return this.sortDir === 'asc' ? order : -order;
                     });
             },
-            worked() {
-                if (!this.intervals) {
-                    return {};
-                }
-
-                return Object.keys(this.intervals).reduce((result, userID) => {
-                    const { duration } = this.intervals[userID];
-
-                    return {
-                        ...result,
-                        [userID]: duration,
-                    };
-                }, {});
-            },
-            currentTasks() {
-                if (!this.latestIntervals) {
-                    return {};
-                }
-
-                return Object.keys(this.latestIntervals).reduce((result, userID) => {
-                    const { intervals } = this.latestIntervals[userID];
-                    if (intervals.length) {
-                        const interval = intervals[intervals.length - 1];
-                        const task = interval.task;
-                        if (task) {
-                            return {
-                                ...result,
-                                [userID]: task,
-                            };
-                        }
-                    }
-
-                    return result;
-                }, {});
-            },
-            currentProjects() {
-                if (!this.latestIntervals) {
-                    return {};
-                }
-
-                return Object.keys(this.latestIntervals).reduce((result, userID) => {
-                    const task = this.currentTasks[userID];
-                    if (task) {
-                        return {
-                            ...result,
-                            [userID]: task.project,
-                        };
-                    }
-
-                    return result;
-                }, {});
-            },
-            exportFilename() {
-                const days = moment(this.end).diff(this.start, 'days');
-
-                return days > 1
-                    ? `Dashboard Report from ${this.start} to ${this.end}`
-                    : `Dashboard Report ${this.start}`;
-            },
         },
         methods: {
-            getStartDay,
-            getEndDay,
             getDateToday,
             getStartOfDayInTimezone,
             getEndOfDayInTimezone,
-            ...mapActions({
-                setTimezone: 'timeline/setTimezone',
+            ...mapMutations({
+                setTimezone: 'dashboard/setTimezone',
             }),
             load: throttle(async function(withLoadingIndicator = true) {
                 this.isDataLoading = withLoadingIndicator;
@@ -260,16 +181,10 @@
                     return;
                 }
 
-                this.service.loadLatestIntervals(this.userIDs, this.projectIDs);
-
                 const startAt = this.getStartOfDayInTimezone(this.start, this.timezone);
                 const endAt = this.getEndOfDayInTimezone(this.end, this.timezone);
 
                 await this.service.load(this.userIDs, this.projectIDs, startAt, endAt);
-
-                if (this.type === 'day') {
-                    await this.service.loadScreenshots(this.userIDs, startAt, endAt);
-                }
 
                 this.isDataLoading = false;
             }, 1000),
@@ -279,7 +194,6 @@
                 this.end = end;
 
                 this.service.unloadIntervals();
-                this.service.unloadScreenshots();
 
                 this.load();
             },
@@ -309,42 +223,21 @@
                 localStorage['team.sort-dir'] = this.sortDir;
             },
             async onExport(format) {
-                const mimetype = getMimeType(format);
-
-                const config = {
-                    headers: { Accept: mimetype },
-                };
-
-                let sortBy;
-                if (this.sort === 'user') sortBy = 'name';
-                if (this.sort === 'worked') sortBy = 'time_worked';
-
-                const params = {
-                    start_at: this.start,
-                    end_at: moment
+                const { data } = await this.reportService.downloadReport(
+                    this.start,
+                    moment
                         .utc(this.end)
                         .add(1, 'day')
                         .format('YYYY-MM-DD'),
-                    user_ids: this.userIDs,
-                    project_ids: this.projectIDs,
-                    order_by: sortBy,
-                    order_dir: this.sortDir,
-                    timezone: this.timezone,
-                };
+                    this.userIDs,
+                    this.projectIDs,
+                    format,
+                );
 
-                const response = await this.reportService.getReport(params, config);
-                const blob = new Blob([response.data], { type: mimetype });
-                const fileName = `${this.exportFilename}.${format}`;
-                downloadBlob(blob, fileName);
+                window.open(data.data.url, '_blank');
             },
             onSelectedIntervals(event) {
-                this.selectedIntervalIds = event.ids;
-                this.selectedScreenshots = this.screenshots.filter(screenshot =>
-                    this.selectedIntervalIds.includes(screenshot.time_interval_id),
-                );
-                this.selectedIntervals = Object.values(this.intervals).reduce((acc, curr) => {
-                    return [...acc, ...curr.intervals.filter(interval => event.ids.includes(interval.id))];
-                }, []);
+                this.selectedIntervals = event ? [event] : [];
             },
             onBulkRemove(intervals) {
                 const intervalIds = intervals.map(interval => interval.id);
@@ -364,21 +257,10 @@
                 });
                 this.$store.dispatch('timeline/setIntervals', totalIntervals);
 
-                this.$store.dispatch(
-                    'timeline/setScreenshots',
-                    this.screenshots.filter(screenshot => intervalIds.indexOf(screenshot.time_interval_id) === -1),
-                );
-
                 this.clearIntervals();
             },
-            recalculateStatistic(screenshots) {
-                const intervals = screenshots.map(screenshot => screenshot.time_interval);
-                this.onBulkRemove(intervals);
-            },
             clearIntervals() {
-                this.selectedScreenshots = [];
                 this.selectedIntervals = [];
-                this.selectedIntervalIds = [];
             },
 
             // for send invites to new users

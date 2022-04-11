@@ -1,4 +1,4 @@
-import ResourceService from './resource.service';
+import ResourceService from '@/services/resource.service';
 import axios from 'axios';
 
 export default class TimeIntervalService extends ResourceService {
@@ -51,22 +51,10 @@ export default class TimeIntervalService extends ResourceService {
     }
 
     /**
+     * @param id
      * @returns {Promise<AxiosResponse<T>>}
-     * @param userIds
-     * @param projectIds
-     * @param startAt
-     * @param endAt
-     * @param config
      */
-    getDashboardIntervals(userIds, projectIds, startAt, endAt, config = {}) {
-        const url = 'time-intervals/dashboard';
-        const data = {
-            user_ids: userIds,
-            project_ids: projectIds,
-            start_at: startAt,
-            end_at: endAt,
-        };
-
-        return axios.post(url, data, config);
+    deleteItem(id) {
+        return axios.post('time-intervals/remove', { id });
     }
 }

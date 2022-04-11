@@ -96,7 +96,7 @@
             };
         },
         computed: {
-            ...mapGetters('timeline', ['timePerProject']),
+            ...mapGetters('dashboard', ['timePerProject']),
             ...mapGetters('user', ['user']),
             userProjects() {
                 if (!this.user || !this.user.id) {

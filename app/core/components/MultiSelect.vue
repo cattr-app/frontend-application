@@ -35,7 +35,7 @@
 </template>
 
 <script>
-    import ResourceService from '../services/resource/resource.service';
+    import ResourceService from '../services/resource.service';
 
     export default {
         props: {

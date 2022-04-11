@@ -4,18 +4,17 @@
             <span class="modal-title">{{ $t('field.screenshot') }}</span>
         </template>
 
-        <a target="_blank">
-            <AppImage
-                v-if="screenshot && screenshot.id"
-                class="modal-screenshot"
-                :src="getScreenshotPath(screenshot)"
-            />
-            <at-progress
-                class="screenshot__activity-bar"
-                :stroke-width="7"
-                :percent="screenshot.time_interval.activity_fill || 0"
-            />
-        </a>
+        <AppImage
+            v-if="interval && interval.id"
+            class="modal-screenshot"
+            :src="getScreenshotPath(interval)"
+            :openable="true"
+        />
+        <at-progress
+            class="screenshot__activity-bar"
+            :stroke-width="7"
+            :percent="+(+interval.activity_fill / 2 || 0)"
+        />
 
         <div v-if="showNavigation" class="modal-left">
             <at-button type="primary" icon="icon-arrow-left" @click="$emit('showPrevious')"></at-button>
@@ -49,42 +48,48 @@
                         </span>
                     </div>
 
-                    <div v-if="screenshot" class="modal-field">
+                    <div v-if="interval" class="modal-field">
                         <span class="modal-label">{{ $t('field.created_at') }}:</span>
-                        <span class="modal-value">{{ formatDate(screenshot.time_interval.start_at) }}</span>
+                        <span class="modal-value">{{ formatDate(interval.start_at) }}</span>
                     </div>
                 </div>
                 <div class="col">
-                    <div v-if="screenshot.time_interval.activity_fill === null" class="screenshot__activity">
+                    <div v-if="interval.activity_fill === null" class="screenshot__activity">
                         {{ $t('tooltip.activity_progress.not_tracked') }}
                     </div>
-                    <div v-else class="screenshot__activity">
+                    <div v-else class="screenshot__activity modal-field">
                         <div class="modal-field">
                             <span class="modal-label">{{ $tc('tooltip.activity_progress.overall', 0) }}</span>
                             <span class="modal-value">
-                                {{ screenshot.time_interval.activity_fill + '%' }}
+                                {{ interval.activity_fill + '%' }}
                             </span>
                         </div>
 
-                        <div v-if="screenshot.time_interval.mouse_fill !== null" class="modal-field">
+                        <div v-if="interval.mouse_fill !== null" class="modal-field">
                             <span class="modal-label">
                                 {{ $t('tooltip.activity_progress.just_mouse') }}
                             </span>
 
                             <span class="modal-value">
-                                {{ screenshot.time_interval.mouse_fill + '%' }}
+                                {{ interval.mouse_fill + '%' }}
                             </span>
                         </div>
-                        <div v-if="screenshot.time_interval.keyboard_fill !== null" class="modal-field">
+                        <div v-if="interval.keyboard_fill !== null" class="modal-field">
                             <span class="modal-label">{{ $t('tooltip.activity_progress.just_keyboard') }}</span>
                             <span class="modal-value">
-                                {{ screenshot.time_interval.keyboard_fill + '%' }}
+                                {{ interval.keyboard_fill + '%' }}
                             </span>
                         </div>
                     </div>
+                    <div v-if="interval" class="modal-duration modal-field">
+                        <span class="modal-label">{{ $t('field.duration') }}:</span>
+                        <span class="modal-value">{{
+                            $t('field.duration_value', [formatDate(interval.start_at), formatDate(interval.end_at)])
+                        }}</span>
+                    </div>
                 </div>
             </div>
-            <div class="row">
+            <div v-if="canRemove" class="row">
                 <at-button class="modal-remove" type="text" icon="icon-trash-2" @click="onRemove" />
             </div>
         </template>
@@ -96,8 +101,8 @@
     import AppImage from './AppImage';
     import { mapGetters } from 'vuex';
 
-    export function screenshotPathProvider(screenshot) {
-        return screenshot.path;
+    export function screenshotPathProvider(interval) {
+        return `time-intervals/${interval.id}/screenshot`;
     }
 
     export const config = { screenshotPathProvider };
@@ -118,7 +123,7 @@
             task: {
                 type: Object,
             },
-            screenshot: {
+            interval: {
                 type: Object,
             },
             user: {
@@ -128,12 +133,13 @@
                 type: Boolean,
                 default: false,
             },
+            canRemove: {
+                type: Boolean,
+                default: true,
+            },
         },
         computed: {
             ...mapGetters('user', ['companyData']),
-            baseURL() {
-                return (process.env.VUE_APP_API_URL || `${window.location.origin}/api`) + '/';
-            },
         },
         methods: {
             formatDate(value) {
@@ -146,14 +152,10 @@
                 this.$emit('close');
             },
             onRemove() {
-                this.$emit('remove', this.screenshot.id);
+                this.$emit('remove', this.interval.id);
             },
-            getScreenshotPath(screenshot) {
-                if (screenshot.path === 'uploads/static/none.png') {
-                    return 'none';
-                }
-
-                return config.screenshotPathProvider(screenshot);
+            getScreenshotPath(interval) {
+                return config.screenshotPathProvider(interval);
             },
         },
     };
@@ -281,6 +283,10 @@
         &-value,
         &-value a {
             color: #2e2ef9;
+        }
+
+        &-duration {
+            padding-right: 3em;
         }
     }
 </style>

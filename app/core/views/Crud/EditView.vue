@@ -225,8 +225,8 @@
 </template>
 
 <script>
-    import RenderableField from '../../components/RenderableField';
-    import ResourceSelect from '../../components/ResourceSelect';
+    import RenderableField from '@/components/RenderableField';
+    import ResourceSelect from '@/components/ResourceSelect';
     import { ValidationObserver, ValidationProvider } from 'vee-validate';
     import { ucfirst } from '@/utils/string';
 
@@ -294,7 +294,7 @@
                             this.$route.params[this.service.getIdParam()],
                             this.filters,
                         );
-                        this.values = { ...this.values, ...data };
+                        this.values = { ...this.values, ...data.data };
                     } catch ({ response }) {
                         if (
                             response &&

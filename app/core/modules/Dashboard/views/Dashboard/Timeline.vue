@@ -28,9 +28,9 @@
                             to="/time-intervals/new"
                             class="controls-row__item"
                         >
-                            <at-button class="controls-row__btn" icon="icon-edit">{{
-                                $t('control.add_time')
-                            }}</at-button>
+                            <at-button class="controls-row__btn" icon="icon-edit">
+                                {{ $t('control.add_time') }}
+                            </at-button>
                         </router-link>
 
                         <ExportDropdown
@@ -38,8 +38,7 @@
                             position="left-top"
                             trigger="hover"
                             @export="onExport"
-                        >
-                        </ExportDropdown>
+                        />
                     </div>
                 </div>
 
@@ -62,19 +61,19 @@
                     />
 
                     <TimelineScreenshots
-                        v-if="type === 'day' && screenshots && screenshots.length"
+                        v-if="type === 'day' && intervals && Object.keys(intervals).length"
                         ref="timelineScreenshots"
                         @on-remove="recalculateStatistic"
                         @onSelectedIntervals="setSelectedIntervals"
                     />
-                    <preloader v-if="isDataLoading" class="timeline__loader" :is-transparent="true"></preloader>
+                    <preloader v-if="isDataLoading" class="timeline__loader" :is-transparent="true" />
 
-                    <time-interval-edit
-                        :interval-ids="selectedIntervalIds"
+                    <TimeIntervalEdit
+                        :intervals="selectedIntervals"
                         @remove="onBulkRemove"
                         @edit="loadData"
                         @close="clearIntervals"
-                    ></time-interval-edit>
+                    />
                 </div>
             </div>
         </div>
@@ -84,16 +83,15 @@
 <script>
     import moment from 'moment';
     import throttle from 'lodash/throttle';
-    import { mapGetters, mapActions } from 'vuex';
+    import { mapGetters, mapMutations } from 'vuex';
     import Calendar from '@/components/Calendar';
     import TimelineSidebar from '../../components/TimelineSidebar';
     import TimelineDayGraph from '../../components/TimelineDayGraph';
     import TimelineCalendarGraph from '../../components/TimelineCalendarGraph';
     import TimelineScreenshots from '../../components/TimelineScreenshots';
     import TimezonePicker from '@/components/TimezonePicker';
-    import DashboardReportService from '@/services/reports/dashboard-report.service';
-    import { getMimeType, downloadBlob } from '@/utils/file';
-    import { getDateToday, getEndDay, getStartDay } from '@/utils/time';
+    import DashboardService from '_internal/Dashboard/services/dashboard.service';
+    import { getDateToday } from '@/utils/time';
     import { getStartOfDayInTimezone, getEndOfDayInTimezone } from '@/utils/time';
     import ExportDropdown from '@/components/ExportDropdown';
     import cloneDeep from 'lodash/cloneDeep';
@@ -101,6 +99,8 @@
     import Preloader from '@/components/Preloader';
 
     const updateInterval = 60 * 1000;
+
+    const dashboardService = new DashboardService();
 
     export default {
         name: 'Timeline',
@@ -126,10 +126,7 @@
                 datepickerDateStart: '',
                 datepickerDateEnd: '',
                 activeTask: +localStorage.getItem('timeline.active-task') || 0,
-                reportService: new DashboardReportService(),
                 showExportModal: false,
-                selectedIntervalIds: [],
-                selectedScreenshots: [],
                 selectedIntervals: [],
                 sessionStorageKey: sessionStorageKey,
                 isDataLoading: false,
@@ -143,25 +140,16 @@
         beforeDestroy() {
             clearInterval(this.updateHandle);
             this.service.unloadIntervals();
-            this.service.unloadScreenshots();
         },
         computed: {
-            ...mapGetters('timeline', [
-                'service',
-                'screenshots',
-                'events',
-                'intervals',
-                'timePerDay',
-                'timePerProject',
-                'timezone',
-            ]),
+            ...mapGetters('dashboard', ['service', 'intervals', 'timePerDay', 'timePerProject', 'timezone']),
             ...mapGetters('user', ['user']),
             userEvents() {
-                if (!this.user || !this.user.id || !this.events[this.user.id]) {
+                if (!this.user || !this.user.id || !this.intervals[this.user.id]) {
                     return [];
                 }
 
-                return this.events[this.user.id];
+                return this.intervals[this.user.id];
             },
             userTimePerDay() {
                 if (!this.user || !this.user.id || !this.timePerDay[this.user.id]) {
@@ -170,22 +158,13 @@
 
                 return this.timePerDay[this.user.id];
             },
-            exportFilename() {
-                const days = moment(this.end).diff(this.start, 'days');
-
-                return days > 1
-                    ? `Dashboard Report from ${this.start} to ${this.end}`
-                    : `Dashboard Report ${this.start}`;
-            },
         },
         methods: {
-            getStartDay,
-            getEndDay,
             getDateToday,
             getStartOfDayInTimezone,
             getEndOfDayInTimezone,
-            ...mapActions({
-                setTimezone: 'timeline/setTimezone',
+            ...mapMutations({
+                setTimezone: 'dashboard/setTimezone',
             }),
             loadData: throttle(async function(withLoadingIndicator = true) {
                 this.isDataLoading = withLoadingIndicator;
@@ -197,16 +176,11 @@
                 }
 
                 const userIDs = [this.user.id];
-                const projectIDs = [];
 
                 const startAt = this.getStartOfDayInTimezone(this.start, this.timezone);
                 const endAt = this.getEndOfDayInTimezone(this.end, this.timezone);
 
-                await this.service.load(userIDs, projectIDs, startAt, endAt);
-
-                if (this.type === 'day') {
-                    await this.service.loadScreenshots(userIDs, startAt, endAt);
-                }
+                await this.service.load(userIDs, null, startAt, endAt);
 
                 this.isDataLoading = false;
             }, 1000),
@@ -216,44 +190,25 @@
                 this.end = end;
 
                 this.service.unloadIntervals();
-                this.service.unloadScreenshots();
 
                 this.loadData();
             },
             onIntervalsSelect(event) {
-                this.activeTask = event.task_id;
-                localStorage['timeline.active-task'] = event.task_id;
-
-                this.selectedIntervalIds = event.ids;
-                this.selectedScreenshots = this.screenshots.filter(screenshot =>
-                    this.selectedIntervalIds.includes(screenshot.time_interval.id),
-                );
-                this.selectedIntervals = Object.values(this.intervals).reduce((acc, curr) => {
-                    return [...acc, ...curr.intervals.filter(interval => event.ids.includes(interval.id))];
-                }, []);
+                this.selectedIntervals = event ? [event] : [];
             },
             async onExport(format) {
-                const mimetype = getMimeType(format);
-
-                const config = {
-                    headers: { Accept: mimetype },
-                };
-
-                const params = {
-                    start_at: this.start,
-                    end_at: moment
+                const { data } = await dashboardService.downloadReport(
+                    this.start,
+                    moment
                         .utc(this.end)
                         .add(1, 'day')
                         .format('YYYY-MM-DD'),
-                    user_ids: [this.user.id],
-                    project_ids: this.projectIDs,
-                    timezone: this.timezone,
-                };
+                    [this.user.id],
+                    this.projectIDs,
+                    format,
+                );
 
-                const response = await this.reportService.getReport(params, config);
-                const blob = new Blob([response.data], { type: mimetype });
-                const fileName = `${this.exportFilename}.${format}`;
-                downloadBlob(blob, fileName);
+                window.open(data.data.url, '_blank');
             },
             onBulkRemove(intervals) {
                 const intervalIds = intervals.map(interval => interval.id);
@@ -261,8 +216,10 @@
                 intervals.forEach(interval => {
                     const userIntervals = cloneDeep(this.intervals[interval.user_id]);
                     const deletedDuration = moment(interval.end_at).diff(interval.start_at, 'seconds');
+
+                    console.log(userIntervals);
                     userIntervals.duration -= deletedDuration;
-                    userIntervals.intervals = userIntervals.intervals
+                    userIntervals.items = userIntervals.items
                         .map(interval => ({
                             ...interval,
                             ids: interval.ids.filter(id => intervalIds.indexOf(id) === -1),
@@ -273,36 +230,22 @@
                 });
                 this.$store.dispatch('timeline/setIntervals', totalIntervals);
 
-                this.$store.dispatch(
-                    'timeline/setScreenshots',
-                    this.screenshots.filter(screenshot => intervalIds.indexOf(screenshot.time_interval_id) === -1),
-                );
-
                 this.clearIntervals();
             },
             onTimezoneChange(timezone) {
                 this.setTimezone(timezone);
             },
-            recalculateStatistic(screenshots) {
-                const intervals = screenshots.map(screenshot => screenshot.time_interval);
+            recalculateStatistic(intervals) {
                 this.onBulkRemove(intervals);
             },
             setSelectedIntervals(intervalIds) {
-                this.selectedScreenshots = this.screenshots.filter(screenshot =>
-                    intervalIds.includes(screenshot.time_interval_id),
-                );
-                this.selectedIntervals = Object.values(this.intervals).reduce((acc, curr) => {
-                    return [...acc, ...curr.intervals.filter(interval => intervalIds.includes(interval.id))];
-                }, []);
-                this.selectedIntervalIds = intervalIds;
+                this.selectedIntervals = intervalIds;
             },
             clearIntervals() {
                 if (this.$refs.timelineScreenshots) {
                     this.$refs.timelineScreenshots.clearSelectedIntervals();
                 }
-                this.selectedScreenshots = [];
                 this.selectedIntervals = [];
-                this.selectedIntervalIds = [];
             },
         },
         watch: {

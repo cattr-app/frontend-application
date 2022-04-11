@@ -32,7 +32,7 @@ const responseInterceptor = response => {
 const responseErrorInterceptor = error => {
     setLoading(false);
 
-    if (!has(error, 'response.status')) {
+    if (!has(error, 'response.status') || (error.request.responseType === 'blob' && error.request.status === 404)) {
         return Promise.reject(error);
     }
 
@@ -48,7 +48,9 @@ const responseErrorInterceptor = error => {
         default:
             Vue.prototype.$Notify.error({
                 title: 'Error',
-                message: has(error, 'response.data.message') ? error.response.data.message : 'Internal server error',
+                message: has(error, 'response.data.error.message')
+                    ? error.response.data.error.message
+                    : 'Internal server error',
                 duration: 5000,
             });
     }

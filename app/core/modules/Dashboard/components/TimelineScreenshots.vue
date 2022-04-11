@@ -1,31 +1,31 @@
 <template>
     <div class="screenshots">
         <h3 class="screenshots__title">{{ $t('field.screenshots') }}</h3>
-        <at-checkbox-group v-model="selectedIntervalIds">
+        <at-checkbox-group v-model="selectedIntervals">
             <div class="row">
                 <div
-                    v-for="(screenshot, index) in screenshots"
-                    :key="screenshot.id"
+                    v-for="(interval, index) in intervals[this.user.id]"
+                    :key="interval.id"
                     class="col-4 col-xl-3 screenshots__item"
                 >
                     <div class="screenshot" :index="index" @click.shift.prevent.stop="onShiftClick(index)">
                         <Screenshot
                             :disableModal="true"
-                            :project="getProject(screenshot)"
-                            :screenshot="screenshot"
-                            :task="getTask(screenshot)"
+                            :project="{ id: interval.project_id, name: interval.project_name }"
+                            :interval="interval"
+                            :task="interval.task"
                             :user="user"
                             :timezone="timezone"
-                            @click="showPopup(screenshot, $event)"
+                            @click="showPopup(interval, $event)"
                         />
                         <div @click="onCheckboxClick(index)">
-                            <at-checkbox class="screenshot__checkbox" :label="screenshot.time_interval_id" />
+                            <at-checkbox class="screenshot__checkbox" :label="interval.id" />
                         </div>
                     </div>
                 </div>
                 <ScreenshotModal
                     :project="modal.project"
-                    :screenshot="modal.screenshot"
+                    :interval="modal.interval"
                     :show="modal.show"
                     :showNavigation="true"
                     :task="modal.task"
@@ -44,7 +44,7 @@
     import { mapGetters } from 'vuex';
     import Screenshot from '@/components/Screenshot';
     import ScreenshotModal from '@/components/ScreenshotModal';
-    import ScreenshotService from '@/services/resource/screenshot.service';
+    import TimeIntervalService from '@/services/resource/time-interval.service';
 
     export default {
         name: 'TimelineScreenshots',
@@ -54,10 +54,10 @@
         },
         data() {
             return {
-                screenshotsService: new ScreenshotService(),
-                selectedIntervalIds: [],
+                intervalsService: new TimeIntervalService(),
+                selectedIntervals: [],
                 modal: {
-                    screenshot: null,
+                    interval: null,
                     project: null,
                     task: null,
                     show: false,
@@ -66,7 +66,7 @@
             };
         },
         computed: {
-            ...mapGetters('timeline', ['tasks', 'screenshots', 'timezone']),
+            ...mapGetters('dashboard', ['tasks', 'intervals', 'timezone']),
             ...mapGetters('user', ['user']),
             projects() {
                 return Object.keys(this.tasks)
@@ -86,15 +86,17 @@
                     this.firstSelectedCheckboxIndex = index;
                 }
 
-                this.selectedIntervalIds = this.screenshots
+                this.selectedIntervals = this.intervals[this.user.id]
                     .slice(
                         Math.min(index, this.firstSelectedCheckboxIndex),
                         Math.max(index, this.firstSelectedCheckboxIndex) + 1,
                     )
-                    .map(el => el.time_interval_id);
+                    .map(i => i.id);
             },
             onCheckboxClick(index) {
-                if (this.firstSelectedCheckboxIndex === null) this.firstSelectedCheckboxIndex = index;
+                if (this.firstSelectedCheckboxIndex === null) {
+                    this.firstSelectedCheckboxIndex = index;
+                }
             },
             onKeyDown(e) {
                 if (e.key === 'ArrowLeft') {
@@ -105,81 +107,61 @@
                     this.showNext();
                 }
             },
-            showPopup(screenshot, e) {
+            showPopup(interval, e) {
                 if (e.shiftKey) {
                     return;
                 }
 
-                if (typeof screenshot !== 'object' || screenshot.id === null) {
+                if (typeof interval !== 'object' || interval.id === null) {
                     return;
                 }
 
-                this.modal.project = this.getProject(screenshot);
-                this.modal.task = this.getTask(screenshot);
-                this.modal.screenshot = screenshot;
-
-                this.modal.show = true;
+                this.modal = {
+                    show: true,
+                    project: { id: interval.project_id, name: interval.project_name },
+                    user: interval,
+                    task: { id: interval.task_id, name: interval.task_name },
+                    interval,
+                };
             },
             onHide() {
                 this.modal.show = false;
             },
             showPrevious() {
-                const currentIndex = this.screenshots.findIndex(el => el.id === this.modal.screenshot.id);
+                const intervals = this.intervals[this.modal.user.user_id];
 
-                if (currentIndex !== 0) {
-                    this.updateDataModal(currentIndex - 1);
+                const currentIndex = intervals.findIndex(x => x.id === this.modal.interval.id);
+
+                if (currentIndex > 0) {
+                    const interval = intervals[currentIndex - 1];
+                    if (interval) {
+                        this.modal.interval = interval;
+                        this.modal.user = interval;
+                        this.modal.project = { id: interval.project_id, name: interval.project_name };
+                        this.modal.task = { id: interval.task_id, name: interval.task_name };
+                    }
                 }
             },
             showNext() {
-                const currentIndex = this.screenshots.findIndex(el => el.id === this.modal.screenshot.id);
+                const intervals = this.intervals[this.modal.user.user_id];
 
-                if (currentIndex + 1 !== this.screenshots.length) {
-                    this.updateDataModal(currentIndex + 1);
+                const currentIndex = intervals.findIndex(x => x.id === this.modal.interval.id);
+
+                if (currentIndex < intervals.length - 1) {
+                    const interval = intervals[currentIndex + 1];
+                    if (interval) {
+                        this.modal.interval = interval;
+                        this.modal.user = interval;
+                        this.modal.project = { id: interval.project_id, name: interval.project_name };
+                        this.modal.task = { id: interval.task_id, name: interval.task_name };
+                    }
                 }
             },
-            updateDataModal(currentIndex) {
-                this.modal.screenshot = this.screenshots[currentIndex];
-                this.modal.project = this.getProject(this.modal.screenshot);
-                this.modal.task = this.getTask(this.modal.screenshot);
-            },
-            getProjectByID(id) {
-                if (!this.projects || !this.projects[id]) {
-                    return null;
-                }
-
-                return this.projects[id];
-            },
-            getProject(screenshot) {
-                if (!screenshot.time_interval) {
-                    return null;
-                }
-
-                const task = this.getTask(screenshot);
-                if (!task) {
-                    return null;
-                }
-
-                return this.getProjectByID(task.project_id);
-            },
-            getTaskByID(id) {
-                if (!this.tasks || !this.tasks[id]) {
-                    return null;
-                }
-
-                return this.tasks[id];
-            },
-            getTask(screenshot) {
-                if (!screenshot.time_interval) {
-                    return null;
-                }
-
-                return this.getTaskByID(screenshot.time_interval.task_id);
-            },
-            async onRemove(screenshotID) {
+            async onRemove(intervalID) {
                 try {
-                    await this.screenshotsService.deleteItem(screenshotID);
+                    await this.intervalsService.deleteItem(intervalID);
 
-                    this.$emit('on-remove', [this.modal.screenshot]);
+                    this.$emit('on-remove', [this.modal.interval]);
 
                     this.$Notify({
                         type: 'success',
@@ -197,14 +179,19 @@
                 }
             },
             clearSelectedIntervals() {
-                this.selectedIntervalIds = [];
+                this.selectedIntervals = [];
             },
         },
         watch: {
-            selectedIntervalIds(intervalIds) {
-                if (intervalIds.length === 0) this.firstSelectedCheckboxIndex = null;
+            selectedIntervals(intervalIds) {
+                if (intervalIds.length === 0) {
+                    this.firstSelectedCheckboxIndex = null;
+                }
 
-                this.$emit('onSelectedIntervals', intervalIds);
+                this.$emit(
+                    'onSelectedIntervals',
+                    this.intervals[this.user.id].filter(i => intervalIds.indexOf(i.id) !== -1),
+                );
             },
         },
     };

@@ -49,7 +49,9 @@ export default class Module {
             throw new Error('Vuex Module must be an object.');
         }
 
-        Store.registerModule(this.moduleName, vuexModule);
+        Store.registerModule(this.moduleName.toLowerCase(), { ...vuexModule, namespaced: true });
+
+        Store.dispatch(`${this.moduleName.toLowerCase()}/init`);
         return this;
     }
 

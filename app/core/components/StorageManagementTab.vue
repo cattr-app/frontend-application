@@ -58,7 +58,9 @@
 </template>
 <script>
     import moment from 'moment';
-    import axios from 'axios';
+    import AboutService from '@/services/resource/about.service';
+
+    const aboutService = new AboutService();
 
     export default {
         name: 'StorageManagementTab',
@@ -90,9 +92,9 @@
                 this.thinRequested = true;
 
                 try {
-                    const { data } = await axios.post('about/storage');
+                    const { status } = await aboutService.startCleanup();
 
-                    if (data.success) {
+                    if (status === 204) {
                         this.$Message.success('Thin has been queued!');
 
                         this.storage.thinning.now = true;
@@ -134,7 +136,7 @@
         async mounted() {
             this.isLoading = true;
             try {
-                this.storage = (await axios.get('about/storage')).data;
+                this.storage = await aboutService.getStorageInfo();
             } catch ({ response }) {
                 if (process.env.NODE_ENV === 'development') {
                     console.warn(response ? response : 'request to storage is canceled');

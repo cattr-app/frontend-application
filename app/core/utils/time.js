@@ -7,6 +7,7 @@ export function formatDate(date, format = 'YYYY-MM-DD h:mm:ss') {
 
 export function formatDurationString(time) {
     const duration = moment.duration(+time, 'seconds');
+
     const hours = Math.floor(duration.asHours());
     const minutes = Math.round(duration.asMinutes()) - 60 * hours;
     const durationAsSeconds = duration.asSeconds();

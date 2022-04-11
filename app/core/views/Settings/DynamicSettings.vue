@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1 class="page-title settings__title">{{ $t(section.label) }}</h1>
+        <h1 v-if="this.section" class="page-title settings__title">{{ $t(this.section.label) }}</h1>
 
         <template v-if="this.section && values">
             <component
@@ -8,7 +8,7 @@
                 v-for="(component, index) of this.section.topComponents"
                 :key="index"
                 :parent="this"
-            ></component>
+            />
             <validation-observer ref="form">
                 <div class="data-entries">
                     <template v-for="(fields, groupKey) of this.groups">
@@ -49,7 +49,7 @@
                                                     :class="{
                                                         'at-select--error at-input--error has-error': errors.length > 0,
                                                     }"
-                                                ></renderable-field>
+                                                />
                                                 <small>{{ errors[0] }}</small>
                                             </validation-provider>
 
@@ -321,8 +321,7 @@
                 this.isLoading = true;
 
                 try {
-                    const { data } = await this.section.service.save(this.values);
-                    await this.$store.dispatch('settings/updateSection', { pathName: this.$route.name, data });
+                    await this.section.service.save(this.values);
 
                     this.$Notify({
                         type: 'success',

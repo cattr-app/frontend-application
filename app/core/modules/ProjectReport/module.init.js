@@ -8,7 +8,7 @@ export function init(context) {
     context.addRoute({
         path: '/report/projects',
         name: 'report.projects',
-        component: () => import(/* webpackChunkName: "projectreport" */ './views/ProjectReport.vue'),
+        component: () => import(/* webpackChunkName: "project-report" */ './views/ProjectReport.vue'),
         meta: {
             auth: true,
         },

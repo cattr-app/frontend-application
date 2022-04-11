@@ -5,6 +5,10 @@
   "users": {
     "grid-title": "Пользователи",
     "crud-title": "Пользователь",
+    "statuses": {
+      "active": "Активен",
+      "disabled": "Отключен"
+    },
     "role": {
       "name": "Роль",
       "manager": "Менеджер",

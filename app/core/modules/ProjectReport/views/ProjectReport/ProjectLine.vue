@@ -2,92 +2,87 @@
     <div class="project">
         <div class="project__header">
             <h1 class="project__title">{{ project.name }}</h1>
-            <span class="h3">{{ formatDurationString(project.project_time) }}</span>
+            <span class="h3">{{ formatDurationString(project.time) }}</span>
         </div>
         <at-collapse simple class="list__item">
             <at-collapse-item v-for="user in project.users" :key="user.id" class="list__item">
                 <div slot="title" class="row flex-middle">
                     <div class="col-3 col-xs-2 col-md-1">
-                        <user-avatar :user="user" :size="avatarSize"></user-avatar>
+                        <user-avatar :user="user" :size="avatarSize" />
                     </div>
                     <div class="col-8 col-md-10 col-lg-11">
                         <span class="h5">{{ user.full_name }}</span>
                     </div>
                     <div class="col-4 col-md-3 col-lg-2">
-                        <span class="h4">{{ formatDurationString(user.tasks_time) }}</span>
+                        <span class="h4">{{ formatDurationString(user.time) }}</span>
                     </div>
                     <div class="col-10">
                         <at-progress
                             status="success"
                             :stroke-width="15"
-                            :percent="getUserPercentage(user.tasks_time, project.project_time)"
+                            :percent="getUserPercentage(user.time, project.time)"
                         />
                     </div>
                 </div>
 
                 <at-collapse simple accordion @on-change="handleCollapseTask(user, $event)">
-                    <at-collapse-item v-for="task in user.tasks" :key="`tasks-${task.id}`" :name="task.id">
+                    <at-collapse-item v-for="task in user.tasks" :key="`tasks-${task.id}`" :name="`${task.id}`">
                         <div slot="title" class="row">
                             <div class="col-10 col-md-11 col-lg-12">
                                 <span class="h4">{{ task.task_name }}</span>
                             </div>
                             <div class="col-4 col-md-3 col-lg-2">
-                                <span class="h4">{{ formatDurationString(task.duration) }}</span>
+                                <span class="h4">{{ formatDurationString(task.time) }}</span>
                             </div>
                             <div class="col-10">
                                 <at-progress
                                     status="success"
                                     :stroke-width="15"
-                                    :percent="getUserPercentage(task.duration, user.tasks_time)"
+                                    :percent="getUserPercentage(task.time, user.time)"
                                 />
                             </div>
                         </div>
                         <at-collapse class="project__screenshots screenshots" accordion @on-change="handleCollapseDate">
                             <span class="screenshots__title">{{ $t('field.screenshots') }}</span>
                             <at-collapse-item
-                                v-for="(dateScreens, date) of task.screenshots"
-                                :key="date"
-                                :name="`${task.id}-${date}`"
+                                v-for="(interval, key) of task.intervals"
+                                :key="key"
+                                :name="`${task.id}-${key}`"
                             >
                                 <div slot="title" class="row">
                                     <div class="col-12">
                                         <span class="h5 screenshots__date"
                                             >{{
-                                                moment(date)
+                                                moment(interval.date)
                                                     .locale($i18n.locale)
                                                     .format('MMMM DD, YYYY')
                                             }}
                                         </span>
                                     </div>
                                     <div class="col-12">
-                                        <span class="h5">{{ getDateTime(task, date) }}</span>
+                                        <span class="h5">{{ formatDurationString(interval.time) }}</span>
                                     </div>
                                 </div>
 
-                                <template v-if="isDateOpened(`${task.id}-${date}`)">
-                                    <template v-for="(hourScreens, idx) in dateScreens">
-                                        <div :key="`screen-${task.id}-${date}-${idx}`" class="row">
+                                <template v-if="isDateOpened(`${task.id}-${key}`)">
+                                    <template v-for="(hourScreens, idx) in interval.items">
+                                        <div :key="`screen-${task.id}-${key}-${idx}`" class="row">
                                             <div
-                                                v-for="(screenshot, index) in getHourRow(hourScreens)"
+                                                v-for="(interval, index) in getHourRow(hourScreens)"
                                                 :key="index"
                                                 class="col-12 col-md-6 col-lg-4"
                                             >
                                                 <Screenshot
-                                                    v-if="screenshot"
+                                                    v-if="interval"
                                                     :key="index"
                                                     class="screenshots__item"
-                                                    :screenshot="screenshot"
+                                                    :interval="interval"
                                                     :user="user"
                                                     :task="task"
                                                     :disableModal="true"
                                                     :showNavigation="true"
                                                     :showTask="false"
-                                                    @click="
-                                                        onShow(dateScreens, screenshot, user, task, project, {
-                                                            date,
-                                                            hours: idx,
-                                                        })
-                                                    "
+                                                    @click="onShow(interval.items, interval, user, task, project)"
                                                 />
 
                                                 <div
@@ -108,15 +103,15 @@
 
         <ScreenshotModal
             :show="modal.show"
-            :screenshot="modal.screenshot"
+            :interval="modal.interval"
             :project="modal.project"
             :task="modal.task"
             :user="modal.user"
             :showNavigation="true"
+            :canRemove="false"
             @close="onHide"
             @showPrevious="onShowPrevious"
             @showNext="onShowNext"
-            @remove="onRemove"
         />
     </div>
 </template>
@@ -126,12 +121,13 @@
     import Screenshot from '@/components/Screenshot';
     import ScreenshotModal from '@/components/ScreenshotModal';
     import UserAvatar from '@/components/UserAvatar';
-    import ProjectReportService from '@/services/reports/project-report.service';
-    import ScreenshotService from '@/services/resource/screenshot.service';
-    import { getEndDay, getStartDay, formatDurationString } from '@/utils/time';
+    import IntervalService from '@/services/resource/time-interval.service';
+    import { formatDurationString } from '@/utils/time';
+
+    const intervalService = new IntervalService();
 
     export default {
-        name: 'Project',
+        name: 'ProjectLine',
         components: {
             Screenshot,
             ScreenshotModal,
@@ -141,16 +137,14 @@
             return {
                 modal: {
                     show: false,
-                    dateScreenshots: {},
-                    screenshot: null,
+                    intervals: {},
+                    interval: null,
                     project: null,
                     user: null,
                     task: null,
                 },
                 openedDates: [],
                 avatarSize: 35,
-                reportService: new ProjectReportService(),
-                screenshotsService: new ScreenshotService(),
                 taskDurations: {},
                 screenshotsPerRow: 6,
             };
@@ -175,37 +169,16 @@
         },
         methods: {
             moment,
-            getStartDay,
-            getEndDay,
             formatDurationString,
-            async onRemove(id) {
-                try {
-                    await this.screenshotsService.deleteItem(id);
-                    this.$Notify({
-                        type: 'success',
-                        title: this.$t('notification.screenshot.delete.success.title'),
-                        message: this.$t('notification.screenshot.delete.success.message'),
-                    });
-                    this.$emit('handUpdateProp', this.modal);
-                    this.onHide(id);
-                } catch (e) {
-                    this.$Notify({
-                        type: 'error',
-                        title: this.$t('notification.screenshot.delete.error.title'),
-                        message: this.$t('notification.screenshot.delete.error.message'),
-                    });
-                }
-            },
-            onShow(dateScreenshots, screenshot, user, task, project, keys) {
+            onShow(intervals, interval, user, task, project) {
                 this.modal = {
                     ...this.modal,
                     show: true,
-                    dateScreenshots,
-                    screenshot,
+                    intervals,
+                    interval,
                     user,
                     task,
                     project,
-                    keys,
                 };
             },
             onHide() {
@@ -221,16 +194,7 @@
                 }
             },
             onShowPrevious() {
-                const screenshots = Object.values(this.modal.dateScreenshots).reduce((total, current) => {
-                    if (Array.isArray(current)) {
-                        return total.concat(current);
-                    } else {
-                        return total.concat(Object.values(current));
-                    }
-                }, []);
-                const currentIndex = screenshots
-                    .filter(screenshot => screenshot)
-                    .findIndex(screenshot => +screenshot.id === +this.modal.screenshot.id);
+                const currentIndex = this.modal.intervals.findIndex(i => +i.id === +this.modal.interval.id);
                 if (currentIndex === -1 || currentIndex === 0) {
                     return;
                 }
@@ -238,28 +202,19 @@
                 this.modal = {
                     ...this.modal,
                     show: true,
-                    screenshot: screenshots[currentIndex - 1],
+                    interval: this.modal.intervals[currentIndex - 1],
                 };
             },
             onShowNext() {
-                const screenshots = Object.values(this.modal.dateScreenshots).reduce((total, current) => {
-                    if (Array.isArray(current)) {
-                        return total.concat(current);
-                    } else {
-                        return total.concat(Object.values(current));
-                    }
-                }, []);
-                const currentIndex = screenshots
-                    .filter(screenshot => screenshot)
-                    .findIndex(screenshot => +screenshot.id === +this.modal.screenshot.id);
-                if (currentIndex === -1 || currentIndex === screenshots.length - 1) {
+                const currentIndex = this.modal.intervals.findIndex(i => +i.id === +this.modal.interval.id);
+                if (currentIndex === -1 || currentIndex === this.modal.intervals.length - 1) {
                     return;
                 }
 
                 this.modal = {
                     ...this.modal,
                     show: true,
-                    screenshot: screenshots[currentIndex + 1],
+                    interval: this.modal.intervals[currentIndex + 1],
                 };
             },
             isDateOpened(collapseId) {
@@ -277,10 +232,6 @@
             },
             formatDate(value) {
                 return moment(value).format('DD.MM.YYYY HH:mm:ss');
-            },
-            getDateTime(task, date) {
-                date = moment(date).format('YYYY-MM-DD');
-                return this.formatDurationString(task.dates[date]);
             },
             getUserPercentage(seconds, totalTime) {
                 if (!totalTime) {
