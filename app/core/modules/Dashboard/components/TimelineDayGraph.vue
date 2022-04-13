@@ -351,7 +351,7 @@
                         height: 30,
                         rx: 3,
                         ry: 3,
-                        fill: event.is_manual ? '#c4b52d' : '#2dc48d',
+                        fill: event.is_manual == '1' ? '#c4b52d' : '#2dc48d',
                         stroke: 'transparent',
                         strokeWidth: 0,
                         ...fabricObjectOptions,

@@ -107,7 +107,7 @@ export default class DashboardService extends ReportService {
 
     loadUsers() {
         return this.userService
-            .getAll({})
+            .getAll({headers: {'X-Paginate': false}})
             .then(response => {
                 const { data } = response;
                 this.context.commit('setUsers', data.data);
@@ -135,7 +135,7 @@ export default class DashboardService extends ReportService {
             .then(response => {
                 if (typeof response !== 'undefined') {
                     const { data } = response;
-                    const tasks = data.reduce((tasks, task) => {
+                    const tasks = data.data.reduce((tasks, task) => {
                         tasks[task.id] = task;
                         return tasks;
                     }, {});

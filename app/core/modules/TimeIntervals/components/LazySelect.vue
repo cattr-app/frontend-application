@@ -62,7 +62,7 @@
                 this.options = await this.service.getWithFilters(filters).then(({ data }) => {
                     loading(false);
 
-                    return data.map(task => {
+                    return data.data.map(task => {
                         const label =
                             typeof task.project !== 'undefined'
                                 ? `${task.task_name} (${task.project.name})`
