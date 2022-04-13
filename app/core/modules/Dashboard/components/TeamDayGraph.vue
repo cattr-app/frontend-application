@@ -352,7 +352,7 @@
                                 height: rowHeight / 2,
                                 rx: 2,
                                 ry: 2,
-                                fill: event.is_manual ? '#c4b52d' : '#2DC48D',
+                                fill: event.is_manual == '1' ? '#c4b52d' : '#2DC48D',
                                 stroke: 'transparent',
                                 strokeWidth: 0,
                                 ...fabricObjectOptions,

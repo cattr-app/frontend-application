@@ -171,7 +171,7 @@
 
             this.isLoading = true;
             try {
-                const { data } = await this.usersService.getAll();
+                const { data } = await this.usersService.getAll({headers: {'X-Paginate': false}});
                 this.users = data.data;
             } catch ({ response }) {
                 if (process.env.NODE_ENV === 'development') {
