@@ -231,7 +231,6 @@ export default (context, router) => {
 
     const grid = usersContext.createGrid('users.grid-title', 'users', CoreUsersService, { with: ['role'] });
     grid.addToMetaProperties('navigation', navigation, grid.getRouterConfig());
-    grid.addToMetaProperties('itemsPerPage', 50, grid.getRouterConfig());
     grid.addToMetaProperties('style', 'compact', grid.getRouterConfig());
     grid.addToMetaProperties('sortable', true, grid.getRouterConfig());
 

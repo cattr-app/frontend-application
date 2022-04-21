@@ -155,8 +155,6 @@
     import StatusSelect from '@/components/StatusSelect';
     import UserSelect from '@/components/UserSelect';
 
-    const defaultItemsPerPage = 10;
-
     export default {
         name: 'GridView',
         components: {
@@ -228,11 +226,11 @@
 
                 page: +(this.$route.query.page || 1),
                 totalItems: 0,
+                itemsPerPage: 15,
                 values: [],
                 queryParams: {
                     with: withParam,
                     withCount,
-                    perPage: this.$route.meta.itemsPerPage || defaultItemsPerPage,
                     page: this.$route.query.page,
                     search: {
                         query: this.$route.query.search,
@@ -380,6 +378,7 @@
                     const { data, pagination } = res.data;
 
                     this.totalItems = pagination.total;
+                    this.itemsPerPage = pagination.perPage;
                     this.page = pagination.currentPage;
 
                     this.tableData = data;
@@ -622,9 +621,6 @@
                 } else {
                     return this.$t('filter.enter-single', [this.$t(last.filterName)]);
                 }
-            },
-            itemsPerPage() {
-                return this.$route.meta.itemsPerPage || defaultItemsPerPage;
             },
             crudClass() {
                 const styles = {};
