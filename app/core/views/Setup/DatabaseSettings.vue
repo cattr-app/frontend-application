@@ -119,10 +119,6 @@
                 try {
                     const { data } = await new ApiService().checkConnectionDatabase(this.databaseForm);
 
-                    if (!data.status) {
-                        throw 'No connection';
-                    }
-
                     this.status = 'success';
                     this.message = this.$t(`setup.header.database_settings.success`);
                     this.$emit('setStorage', this.databaseForm);
