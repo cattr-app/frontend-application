@@ -6,10 +6,10 @@
         </div>
         <div v-for="(user, key) in users" :key="key" class="row">
             <div class="col-16 row team_sidebar__user_row">
-                <div class="col-5">
+                <div class="col-4">
                     <UserAvatar :user="user" />
                 </div>
-                <div class="team_sidebar__user_info">
+                <div class="team_sidebar__user_info col-offset-1">
                     <div class="team_sidebar__user_name">{{ user.full_name }}</div>
                     <div class="team_sidebar__user_task">
                         <router-link
