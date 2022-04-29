@@ -1,3 +1,4 @@
+@use "sass:math";
 @import "~@amazingcat/at-ui/src/stylesheet/src/mixins/index";
 @import "~@amazingcat/at-ui/src/stylesheet/src/variables/timing-function";
 
@@ -406,7 +407,7 @@ $alert-border-color-info    : $blue-100;
 /* Badge */
 $badge-height               : 18px;
 $badge-padding              : 0 6px;
-$badge-border-radius        : $badge-height / 2;
+$badge-border-radius        : math.div($badge-height, 2);
 $badge-font-size            : $font-size-smer;
 $badge-font-color           : $color-white;
 

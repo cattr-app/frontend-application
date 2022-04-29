@@ -1,3 +1,4 @@
+@use "sass:math";
 /**
  * Badge Style
  */
@@ -31,7 +32,7 @@
   }
   &--corner {
     position: absolute;
-    top: (-$badge-height / 2) + 1;
+    top: math.div(-$badge-height, 2) + 1;
     right: 0;
     transform: translateX(50%);
   }
@@ -39,7 +40,7 @@
     padding: 0;
     width: $badge-dot-size;
     height: $badge-dot-size;
-    top: (-$badge-dot-size / 2) + 1;
+    top: math.div(-$badge-dot-size, 2) + 1;
   }
   &--success {
     .at-badge__content {

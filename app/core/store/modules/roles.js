@@ -22,9 +22,9 @@ const actions = {
 
         const { data } = await new RoleService().getAll();
 
-        dispatch('setRoles', data);
+        dispatch('setRoles', data.data);
 
-        return data;
+        return data.data;
     },
 
     setRoles({ commit }, roles) {

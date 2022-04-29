@@ -1,3 +1,4 @@
+@use "sass:math";
 /**
  * Menu Style
  */
@@ -408,7 +409,7 @@
           position: absolute;
           right: 0;
           top: 50%;
-          margin-top: -$menu-icon-size / 2;
+          margin-top: math.div(-$menu-icon-size, 2);
           transform: rotate(-90deg);
         }
       }
@@ -528,7 +529,7 @@
           position: absolute;
           right: 0;
           top: 50%;
-          margin-top: -$menu-icon-size / 2;
+          margin-top: math.div(-$menu-icon-size, 2);
         }
       }
       .at-menu__submenu-icon {
