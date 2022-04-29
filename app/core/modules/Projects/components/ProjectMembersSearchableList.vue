@@ -2,11 +2,11 @@
     <div>
         <at-input v-model="search" class="search-input" :placeholder="$t('control.search')">
             <template slot="prepend">
-                <i class="icon icon-search"></i>
+                <i class="icon icon-search" />
             </template>
         </at-input>
         <ul class="user-list">
-            <preloader v-if="loading" class="user-list__preloader"></preloader>
+            <preloader v-if="loading" class="user-list__preloader" />
             <template v-else>
                 <project-members-user
                     v-for="(user, index) in filteredUsers"

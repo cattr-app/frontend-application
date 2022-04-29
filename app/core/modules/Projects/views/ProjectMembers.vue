@@ -96,7 +96,7 @@
                 this.projectUsers = this.project.users;
 
                 const params = { global_scope: true };
-                const users = await this.usersService.getAll({ params });
+                const users = await this.usersService.getAll({ params, headers: { 'X-Paginate': false } });
                 this.users = users.data.data;
             } catch (e) {
                 //
