@@ -378,6 +378,7 @@ export function init(context, router) {
                 return h(UserSelect, {
                     props: {
                         value,
+                        localStorageKey: 'user-select.task',
                     },
                     on: {
                         change: function(value) {

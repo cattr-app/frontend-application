@@ -7,7 +7,7 @@ module.exports = {
     trailingComma: 'all',
     bracketSpacing: true,
     arrowParens: 'avoid',
-    endOfLine: 'auto',
+    endOfLine: 'lf',
     vueIndentScriptAndStyle: true,
     overrides: [
         {

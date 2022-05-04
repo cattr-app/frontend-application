@@ -4,7 +4,7 @@
 
         <span v-show="userIDs.length" class="user-select__clear icon icon-x at-select__clear" @click="clearSelection" />
 
-        <span class="icon icon-chevron-down at-select__arrow"></span>
+        <span class="icon icon-chevron-down at-select__arrow" />
 
         <transition name="slide-up">
             <div v-show="showPopup" class="at-select__dropdown at-select__dropdown--bottom" @click.stop>
@@ -124,8 +124,6 @@
     import UsersService from '@/services/resource/user.service';
     import Preloader from '@/components/Preloader';
 
-    const localStorageKey = 'user-select.users';
-
     export default {
         name: 'UserSelect',
         components: {
@@ -143,14 +141,18 @@
                 type: String,
                 default: 'normal',
             },
+            localStorageKey: {
+                type: String,
+                default: 'user-select.users',
+            },
         },
         data() {
             let userIDs = [];
             if (typeof this.value !== 'undefined' && this.value.length) {
                 userIDs = this.value;
             } else {
-                if (localStorage.getItem(localStorageKey)) {
-                    userIDs = JSON.parse(localStorage.getItem(localStorageKey));
+                if (localStorage.getItem(this.localStorageKey)) {
+                    userIDs = JSON.parse(localStorage.getItem(this.localStorageKey));
                 }
             }
 
@@ -179,9 +181,9 @@
                 }
             }
 
-            if (!localStorage.getItem(localStorageKey)) {
+            if (!localStorage.getItem(this.localStorageKey)) {
                 this.userIDs = this.users.filter(user => user.active).map(user => user.id);
-                localStorage.setItem(localStorageKey, JSON.stringify(this.userIDs));
+                localStorage.setItem(this.localStorageKey, JSON.stringify(this.userIDs));
             }
 
             // remove nonexistent users from selected
@@ -189,7 +191,7 @@
 
             if (this.userIDs.length > existingUserIDs.length) {
                 this.userIDs = existingUserIDs;
-                localStorage.setItem(localStorageKey, JSON.stringify(this.userIDs));
+                localStorage.setItem(this.localStorageKey, JSON.stringify(this.userIDs));
             }
 
             if (this.userIDs.length) {
@@ -277,7 +279,7 @@
                 }
 
                 this.changed = true;
-                localStorage[localStorageKey] = JSON.stringify(this.userIDs);
+                localStorage[this.localStorageKey] = JSON.stringify(this.userIDs);
             },
             selectAllActiveUsers() {
                 // If some users already selected we are going to clear it
@@ -299,7 +301,7 @@
                 }
 
                 this.changed = true;
-                localStorage[localStorageKey] = JSON.stringify(this.userIDs);
+                localStorage[this.localStorageKey] = JSON.stringify(this.userIDs);
             },
             selectAllInactiveUsers() {
                 if (!this.selectedInactiveUsers.length) {
@@ -320,7 +322,7 @@
                 }
 
                 this.changed = true;
-                localStorage[localStorageKey] = JSON.stringify(this.userIDs);
+                localStorage[this.localStorageKey] = JSON.stringify(this.userIDs);
             },
             onTabChange({ name }) {
                 this.userSelectTab = name;
