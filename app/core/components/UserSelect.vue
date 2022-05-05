@@ -173,7 +173,7 @@
 
             this.isLoading = true;
             try {
-                const { data } = await this.usersService.getAll({headers: {'X-Paginate': false}});
+                const { data } = await this.usersService.getAll({ headers: { 'X-Paginate': false } });
                 this.users = data.data;
             } catch ({ response }) {
                 if (process.env.NODE_ENV === 'development') {
@@ -269,7 +269,7 @@
             clearSelection() {
                 this.userIDs = [];
                 this.$emit('change', this.userIDs);
-                localStorage[localStorageKey] = JSON.stringify(this.userIDs);
+                localStorage[this.localStorageKey] = JSON.stringify(this.userIDs);
             },
             toggleUser(userID) {
                 if (this.userIDs.includes(userID)) {
