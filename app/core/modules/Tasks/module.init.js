@@ -42,7 +42,7 @@ export function init(context, router) {
     //tasksContext.routerPrefix = 'projects/:project_id/tasks/list';
 
     const crud = tasksContext.createCrud('tasks.crud-title', 'tasks', TasksService, {
-        with: 'priority, project, users, status, changes, changes.user, comments, comments.user',
+        with: ['priority', 'project', 'users', 'status', 'changes', 'changes.user', 'comments', 'comments.user'],
     });
 
     const crudViewRoute = crud.view.getViewRouteName();
@@ -60,7 +60,7 @@ export function init(context, router) {
     crud.edit.addToMetaProperties('permissions', 'tasks/edit', crud.edit.getRouterConfig());
 
     const grid = tasksContext.createGrid('tasks.grid-title', 'tasks', TasksService, {
-        with: 'priority, project, users, status',
+        with: ['priority', 'project', 'users', 'status'],
         is_active: true,
     });
     grid.addToMetaProperties('navigation', navigation, grid.getRouterConfig());
