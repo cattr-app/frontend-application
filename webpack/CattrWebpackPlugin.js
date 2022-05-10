@@ -1,8 +1,16 @@
 const { writeFileSync, readdirSync, mkdirSync, copyFileSync, existsSync } = require('fs');
-const { join } = require('path');
+const { join, resolve } = require('path');
 const { merge } = require('lodash');
 
-const env = require('../app/etc/env');
+let env = require(resolve(__dirname, '..', 'app', 'etc', 'env.js'));
+
+if (existsSync(resolve(__dirname, '..', 'app', 'etc', `env.${process.env.NODE_ENV}.js`))) {
+    env = { ...env, ...require(resolve(__dirname, '..', 'app', 'etc', `env.${process.env.NODE_ENV}.js`)) };
+}
+
+if (existsSync(resolve(__dirname, '..', 'app', 'etc', 'env.local.js'))) {
+    env = { ...env, ...require(resolve(__dirname, '..', 'app', 'etc', 'env.local.js')) };
+}
 
 const dirIterator = (sourcePath, destPath) => {
     readdirSync(sourcePath, { withFileTypes: true })
