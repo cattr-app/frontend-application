@@ -60,7 +60,7 @@ export function init(context, router) {
     crud.edit.addToMetaProperties('permissions', 'tasks/edit', crud.edit.getRouterConfig());
 
     const grid = tasksContext.createGrid('tasks.grid-title', 'tasks', TasksService, {
-        with: ['priority', 'project', 'users', 'status'],
+        with: ['priority', 'project', 'users', 'status', 'can'],
         is_active: true,
     });
     grid.addToMetaProperties('navigation', navigation, grid.getRouterConfig());
