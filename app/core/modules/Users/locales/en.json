@@ -11,6 +11,9 @@
     },
     "role": {
       "name": "Role",
+      "1": "Manager",
+      "3": "Auditor",
+      "2": "User",
       "manager": "Manager",
       "auditor": "Auditor",
       "user": "User"
