@@ -1,77 +1,30 @@
-build_test:
-  image: node:lts-alpine
-  stage: build
-  script:
-    - apk add git
-    - npm install
-    - npm run compile
-    - npm run build
+stages:
+  - test
+  - deploy
 
-demo_deploy:
-  image: alpine
+sast:
+  variables:
+    SAST_EXCLUDED_ANALYZERS: bandit, brakeman, flawfinder, gosec, kubesec, phpcs-security-audit,
+      pmd-apex, security-code-scan, sobelow, spotbugs
+  stage: test
+
+publish:
+  image: docker:19.03.12
   stage: deploy
-  only:
-    - release
-  before_script:
-    - 'which ssh-agent || ( apk add --update openssh )'
-    - eval $(ssh-agent -s)
-    - echo "$DEMO_KEY" | base64 -d | ssh-add -
-    - mkdir ~/.ssh
-    - ssh-keyscan -H $DEMO_HOST >> ~/.ssh/known_hosts
-  script:
-    - ssh $DEMO_USER@$DEMO_HOST 'cd cattr/demo && docker-compose build --no-cache --force-rm demo'
-    - ssh $DEMO_USER@$DEMO_HOST 'cd cattr/demo && docker-compose down -v && docker-compose up -d demo'
-
-live_deploy:
-  image: alpine
-  stage: deploy
-  only:
-    - pre-release
-  before_script:
-    - 'which ssh-agent || ( apk add --update openssh )'
-    - eval $(ssh-agent -s)
-    - echo "$CI_KEY" | base64 -d | ssh-add -
-    - mkdir ~/.ssh
-    - ssh-keyscan -H $CI_HOST >> ~/.ssh/known_hosts
-  script:
-    - ssh $CI_USER@$CI_HOST 'cd cattr/frontend && git pull'
-    - ssh $CI_USER@$CI_HOST 'cd cattr/frontend && git submodule update --init --force'
-    - ssh $CI_USER@$CI_HOST 'source .zshrc && cd cattr/frontend && npm install'
-    - ssh $CI_USER@$CI_HOST 'source .zshrc && cd cattr/frontend && npm run compile'
-    - ssh $CI_USER@$CI_HOST 'source .zshrc && cd cattr/frontend && npm run clean'
-    - ssh $CI_USER@$CI_HOST 'source .zshrc && cd cattr/frontend && npm run build'
-    - ssh $CI_USER@$CI_HOST 'cd cattr/frontend && sentry-cli releases deploys `cat package.json | grep version | grep -o ":.*" | grep -o "\".*\"" | sed "s/\"//g"` new -e "production"'
-
-staging_deploy:
-  image: alpine
-  stage: deploy
-  only:
-    - staging
-  before_script:
-    - 'which ssh-agent || ( apk add --update openssh )'
-    - eval $(ssh-agent -s)
-    - echo "$STAGING_KEY" | base64 -d | ssh-add -
-    - mkdir ~/.ssh
-    - ssh-keyscan -H $STAGING_HOST >> ~/.ssh/known_hosts
-  script:
-    - ssh $STAGING_USER@$STAGING_HOST 'cd frontend && git pull'
-    - ssh $STAGING_USER@$STAGING_HOST 'cd frontend && git submodule update --init --force'
-    - ssh $STAGING_USER@$STAGING_HOST 'source .zshrc && cd frontend && npm install'
-    - ssh $STAGING_USER@$STAGING_HOST 'source .zshrc && cd frontend && npm run compile'
-    - ssh $STAGING_USER@$STAGING_HOST 'source .zshrc && cd frontend && npm run clean'
-    - ssh $STAGING_USER@$STAGING_HOST 'source .zshrc && cd frontend && npm run build'
-    - ssh $STAGING_USER@$STAGING_HOST 'cd frontend && sentry-cli releases deploys `cat package.json | grep version | grep -o ":.*" | grep -o "\".*\"" | sed "s/\"//g"` new -e "staging"'
-
-npm_publish:
-  image: node:lts-alpine
-  stage: publish
   only:
     - tags
+  services:
+    - docker:19.03.12-dind
   script:
-    - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
-    - npm publish --access=public
+    - export APP_VERSION=$(echo "$CI_COMMIT_TAG" | sed 's/^v//g')
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE:$APP_VERSION --build-arg APP_VERSION=$APP_VERSION .
+    - docker image tag $CI_REGISTRY_IMAGE:$APP_VERSION $CI_REGISTRY_IMAGE:latest
+    - docker push $CI_REGISTRY_IMAGE:$APP_VERSION
+    - docker push $CI_REGISTRY_IMAGE:latest
 
-stages:
-  - build
-  - deploy
-  - publish
+include:
+  - template: Security/SAST.gitlab-ci.yml
+  - template: Security/Dependency-Scanning.gitlab-ci.yml
+  - template: Security/Secret-Detection.gitlab-ci.yml
+  - template: Security/License-Scanning.gitlab-ci.yml
