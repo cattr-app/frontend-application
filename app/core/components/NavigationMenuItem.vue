@@ -13,7 +13,7 @@
 </template>
 
 <script>
-    import { findComponentsUpward } from '@amazingcat/at-ui/src/utils/util';
+    import { findComponentsUpward } from '@cattr/ui-kit/src/utils/util';
 
     export default {
         name: 'NavigationMenuItem',

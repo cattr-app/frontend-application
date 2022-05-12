@@ -1,14 +1,13 @@
 {
-  "name": "@amazingcat/cattr-frontend",
-  "version": "4.0.0-alpha",
+  "name": "@cattr/frontend",
   "description": "Frontend application for Cattr",
   "homepage": "https://cattr.app",
-  "license": "SSPL-1.0",
+  "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "compile": "npx vue-cli-service modules:compile",
+    "compile": "vue-cli-service modules:compile",
     "clean": "git clean -fX output/*"
   },
   "husky": {
@@ -17,14 +16,18 @@
     }
   },
   "main": "app/core/index.js",
+  "workspaces": [
+    "app/compiler",
+    "app/vendor_modules/*/*"
+  ],
   "dependencies": {
-    "@amazingcat/at-ui": "^1.3.6s",
-    "@amazingcat/cattr-frontend-module-demo": "^1.1.1",
-    "@amazingcat/cattr-frontend-module-gitlab-integration": "^2.0.1",
-    "@amazingcat/cattr-frontend-module-redmine-integration": "^2.0.1",
-    "@amazingcat/vue-cli-plugin-cattr-compiler": "^1.3.1",
+    "@cattr/gitlab-integration": "^2.0.0",
+    "@cattr/redmine-integration": "^4.0.0",
+    "@cattr/ui-kit": "^1.3.6",
+    "@cattr/vue-cli-plugin-compiler": "workspace:*",
     "@sentry/browser": "^5.17.0",
     "@sentry/integrations": "^5.17.0",
+    "autoprefixer": "^9.8.8",
     "axios": "^0.26.0",
     "axios-concurrency": "^1.0.3",
     "caret-pos": "^2.0.0",
@@ -36,8 +39,10 @@
     "js-md5": "^0.7.3",
     "lodash": "^4.17.20",
     "mapbox-gl": "^2.6.1",
+    "mini-css-extract-plugin": "^1.6.0",
     "moment": "^2.26.0",
     "moment-timezone": "^0.5.31",
+    "postcss": "^7.0.0",
     "semver": "^7.3.2",
     "validator": "^12.1.0",
     "vee-validate": "^3.3.3",
@@ -56,7 +61,8 @@
     "vue-select": "^3.10.3",
     "vue2-datepicker": "^3.6.0",
     "vue2-editor": "^2.10.2",
-    "vuex": "^3.4.0"
+    "vuex": "^3.4.0",
+    "webpack": "^4.0.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^8.3.5",
@@ -78,5 +84,6 @@
     "sass-loader": "^8.0.0",
     "vue-template-compiler": "^2.6.10",
     "webpack-bundle-analyzer": "^3.8.0"
-  }
+  },
+  "packageManager": "yarn@3.2.0"
 }

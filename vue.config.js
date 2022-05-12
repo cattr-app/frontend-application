@@ -25,7 +25,7 @@ Object.keys(env).forEach(p => {
     process.env[`VUE_APP_${p}`] = env[p];
 });
 
-process.env.VUE_APP_VERSION = process.env.npm_package_version;
+process.env.VUE_APP_VERSION = process.env.APP_VERSION;
 process.env.VUE_APP_SENTRY_DSN = process.env.SENTRY_DSN;
 process.env.VUE_APP_DOCKER_VERSION = process.env.IMAGE_VERSION;
 
