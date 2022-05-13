@@ -86,9 +86,7 @@ export function fieldsToFillProvider() {
             displayable: context => {
                 // If we edit an existing user
                 // then we don't display this field
-                if (context.values.id) return false;
-
-                return true;
+                return !context.values.id;
             },
         },
         {
@@ -422,8 +420,7 @@ export default (context, router) => {
             title: 'field.role',
             key: 'role_id',
             render(h, { item }) {
-                const role = i18n.t('users.role.' + item.role.name);
-
+                const role = i18n.t('users.role.' + item.role_id);
                 return h('span', [role]);
             },
         },
