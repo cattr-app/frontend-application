@@ -179,6 +179,7 @@
             }
 
             const withParam = gridData.with;
+            const whereParam = gridData.where || {};
             const withCount = gridData.withCount;
 
             const filterFieldsModel = {};
@@ -230,6 +231,7 @@
                 values: [],
                 queryParams: {
                     with: withParam,
+                    where: whereParam,
                     withCount,
                     page: this.$route.query.page,
                     search: {
@@ -296,12 +298,12 @@
                     ) {
                         const filter = this.filterFields.find(filter => filter.key === field);
                         if (filter && filter.fieldOptions && filter.fieldOptions.type === 'text') {
-                            this.queryParams[field] = ['like', `%${this.filterFieldsModel[field]}%`];
+                            this.queryParams['where'][field] = ['like', `%${this.filterFieldsModel[field]}%`];
                         } else {
-                            this.queryParams[field] = this.filterFieldsModel[field];
+                            this.queryParams['where'][field] = this.filterFieldsModel[field];
                         }
                     } else {
-                        delete this.queryParams[field];
+                        delete this.queryParams['where'][field];
                     }
                 });
             },

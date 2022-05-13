@@ -61,7 +61,6 @@ export function init(context, router) {
 
     const grid = tasksContext.createGrid('tasks.grid-title', 'tasks', TasksService, {
         with: ['priority', 'project', 'users', 'status', 'can'],
-        is_active: true,
     });
     grid.addToMetaProperties('navigation', navigation, grid.getRouterConfig());
 
@@ -568,7 +567,7 @@ export function init(context, router) {
             fieldOptions: { type: 'user-select' },
         },
         {
-            key: 'status_id',
+            key: 'status.id',
             label: 'tasks.status',
             fieldOptions: { type: 'status-select' },
         },
