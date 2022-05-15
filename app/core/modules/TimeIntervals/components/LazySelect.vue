@@ -10,7 +10,7 @@
         >
             <div slot="no-options">{{ $t('time_intervals.task_select.no_options') }}</div>
         </v-select>
-        <i class="icon icon-chevron-down at-select__arrow"></i>
+        <i class="icon icon-chevron-down at-select__arrow" />
     </div>
 </template>
 
@@ -54,9 +54,9 @@
             async fetchTasks(query, loading) {
                 loading(true);
 
-                const filters = { task_name: ['like', `%${query}%`], with: 'project' };
+                const filters = { search: { query, fields: ['task_name'] }, with: ['project'] };
                 if (this.userID) {
-                    filters['users.id'] = this.userID;
+                    filters['where'] = { 'users.id': this.userID };
                 }
 
                 this.options = await this.service.getWithFilters(filters).then(({ data }) => {
