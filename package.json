@@ -21,8 +21,8 @@
     "app/vendor_modules/*/*"
   ],
   "dependencies": {
-    "@cattr/gitlab-integration": "^2.0.0",
-    "@cattr/redmine-integration": "^4.0.0",
+    "@cattr/gitlab-integration": "2.0.1",
+    "@cattr/redmine-integration": "4.0.1",
     "@cattr/ui-kit": "^1.3.6",
     "@cattr/vue-cli-plugin-compiler": "workspace:*",
     "@sentry/browser": "^5.17.0",
