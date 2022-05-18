@@ -1325,7 +1325,7 @@ __metadata:
   resolution: "@cattr/frontend@workspace:."
   dependencies:
     "@cattr/gitlab-integration": 2.0.1
-    "@cattr/redmine-integration": 4.0.1
+    "@cattr/redmine-integration": ^4.0.1
     "@cattr/ui-kit": ^1.3.6
     "@cattr/vue-cli-plugin-compiler": "workspace:*"
     "@commitlint/cli": ^8.3.5
@@ -1394,7 +1394,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cattr/redmine-integration@4.0.1, @cattr/redmine-integration@workspace:app/vendor_modules/AmazingCat/RedmineIntegration":
+"@cattr/redmine-integration@^4.0.1, @cattr/redmine-integration@workspace:app/vendor_modules/AmazingCat/RedmineIntegration":
   version: 0.0.0-use.local
   resolution: "@cattr/redmine-integration@workspace:app/vendor_modules/AmazingCat/RedmineIntegration"
   languageName: unknown
