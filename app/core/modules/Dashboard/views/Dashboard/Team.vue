@@ -240,22 +240,17 @@
                 this.selectedIntervals = event ? [event] : [];
             },
             onBulkRemove(intervals) {
-                const intervalIds = intervals.map(interval => interval.id);
                 const totalIntervals = cloneDeep(this.intervals);
                 intervals.forEach(interval => {
-                    const userIntervals = cloneDeep(this.intervals[interval.user_id]);
+                    let userIntervals = cloneDeep(this.intervals[interval.user_id]).filter(
+                        userInterval => interval.id !== userInterval.id,
+                    );
                     const deletedDuration = moment(interval.end_at).diff(interval.start_at, 'seconds');
                     userIntervals.duration -= deletedDuration;
-                    userIntervals.intervals = userIntervals.intervals
-                        .map(interval => ({
-                            ...interval,
-                            ids: interval.ids.filter(id => intervalIds.indexOf(id) === -1),
-                        }))
-                        .filter(interval => interval.ids.length);
 
                     totalIntervals[interval.user_id] = userIntervals;
                 });
-                this.$store.dispatch('timeline/setIntervals', totalIntervals);
+                this.$store.commit('dashboard/setIntervals', totalIntervals);
 
                 this.clearIntervals();
             },

@@ -436,8 +436,6 @@
                     ...this.clickPopup,
                     show: false,
                 };
-
-                this.onHide();
             },
             async onRemove() {
                 try {
