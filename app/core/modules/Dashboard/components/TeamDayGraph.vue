@@ -437,7 +437,7 @@
                     show: false,
                 };
 
-                this.onHide();
+                // this.onHide();
             },
             async onRemove() {
                 try {
