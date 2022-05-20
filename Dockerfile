@@ -4,15 +4,15 @@ COPY . /app
 
 WORKDIR /app
 
-RUN yarn && \
-    yarn compile && \
-    yarn build
-
 ARG APP_VERSION
 ARG NODE_ENV=production
 ENV NODE_ENV $NODE_ENV
 ENV APP_VERSION $APP_VERSION
-ENV IMAGE_VERSION=4.0.1
+ENV IMAGE_VERSION=4.0.2
+
+RUN yarn && \
+    yarn compile && \
+    yarn build
 
 FROM bitnami/nginx:latest AS nginx
 
