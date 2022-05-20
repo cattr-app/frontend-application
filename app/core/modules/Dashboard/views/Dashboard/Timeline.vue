@@ -51,6 +51,7 @@
                         :events="userEvents"
                         :timezone="timezone"
                         @selectedIntervals="onIntervalsSelect"
+                        @remove="onBulkRemove"
                     />
                     <TimelineCalendarGraph
                         v-else
@@ -211,24 +212,18 @@
                 window.open(data.data.url, '_blank');
             },
             onBulkRemove(intervals) {
-                const intervalIds = intervals.map(interval => interval.id);
+                console.log(intervals);
                 const totalIntervals = cloneDeep(this.intervals);
                 intervals.forEach(interval => {
-                    const userIntervals = cloneDeep(this.intervals[interval.user_id]);
+                    const userIntervals = cloneDeep(totalIntervals[interval.user_id]).filter(
+                        userInterval => interval.id !== userInterval.id,
+                    );
                     const deletedDuration = moment(interval.end_at).diff(interval.start_at, 'seconds');
-
-                    console.log(userIntervals);
                     userIntervals.duration -= deletedDuration;
-                    userIntervals.items = userIntervals.items
-                        .map(interval => ({
-                            ...interval,
-                            ids: interval.ids.filter(id => intervalIds.indexOf(id) === -1),
-                        }))
-                        .filter(interval => interval.ids.length);
 
                     totalIntervals[interval.user_id] = userIntervals;
                 });
-                this.$store.dispatch('timeline/setIntervals', totalIntervals);
+                this.$store.commit('dashboard/setIntervals', totalIntervals);
 
                 this.clearIntervals();
             },

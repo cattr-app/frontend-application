@@ -242,7 +242,7 @@
             onBulkRemove(intervals) {
                 const totalIntervals = cloneDeep(this.intervals);
                 intervals.forEach(interval => {
-                    let userIntervals = cloneDeep(this.intervals[interval.user_id]).filter(
+                    const userIntervals = cloneDeep(totalIntervals[interval.user_id]).filter(
                         userInterval => interval.id !== userInterval.id,
                     );
                     const deletedDuration = moment(interval.end_at).diff(interval.start_at, 'seconds');

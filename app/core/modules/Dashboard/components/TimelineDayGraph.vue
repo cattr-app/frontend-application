@@ -417,14 +417,18 @@
             }),
             onClick(e) {
                 if (
-                    e.target &&
-                    e.target.parentElement &&
-                    !e.target.parentElement.classList.contains(this.canvas.wrapperEl.classList) &&
-                    !e.target.closest('.time-interval-edit-panel') &&
-                    !e.target.closest('.screenshot') &&
-                    !e.target.closest('.modal') &&
-                    !e.target.closest('.at-modal') &&
-                    !e.target.closest('.popup')
+                    (e.target &&
+                        e.target.parentElement &&
+                        !e.target.parentElement.classList.contains(this.canvas.wrapperEl.classList) &&
+                        !e.target.closest('.time-interval-edit-panel') &&
+                        !e.target.closest('.screenshot') &&
+                        !e.target.closest('.modal') &&
+                        !e.target.closest('.at-modal') &&
+                        !e.target.closest('.popup')) ||
+                    (e.target.closest('.time-interval-edit-panel') &&
+                        e.target.closest('.time-interval-edit-panel__btn') &&
+                        e.target.closest('.at-btn--error')) ||
+                    (e.target.closest('.modal') && e.target.closest('.modal-remove'))
                 ) {
                     if (this.clickPopup.show) {
                         this.clickPopup.show = false;
@@ -452,8 +456,9 @@
                         title: this.$t('notification.screenshot.delete.success.title'),
                         message: this.$t('notification.screenshot.delete.success.message'),
                     });
-
-                    this.modal.show = false;
+                    this.onHide();
+                    this.$emit('selectedIntervals', null);
+                    this.$emit('remove', [this.modal.interval]);
                 } catch (e) {
                     this.$Notify({
                         type: 'error',
