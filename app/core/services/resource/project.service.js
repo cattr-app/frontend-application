@@ -59,6 +59,10 @@ export default class ProjectService extends ResourceService {
         return axios.post(`projects/${isNew ? 'create' : 'edit'}`, data);
     }
 
+    getMembers(id) {
+        return axios.post('project-members/list', { project_id: id });
+    }
+
     bulkEditMembers(data) {
         return axios.post('project-members/bulk-edit', data);
     }
