@@ -9,6 +9,6 @@
     "Alex V <alex@cattr.app>"
   ],
   "dependencies": {
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.21"
   }
 }
