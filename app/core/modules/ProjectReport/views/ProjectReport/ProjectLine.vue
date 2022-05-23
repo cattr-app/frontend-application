@@ -51,12 +51,8 @@
                             >
                                 <div slot="title" class="row">
                                     <div class="col-12">
-                                        <span class="h5 screenshots__date"
-                                            >{{
-                                                moment(interval.date)
-                                                    .locale($i18n.locale)
-                                                    .format('MMMM DD, YYYY')
-                                            }}
+                                        <span class="h5 screenshots__date">
+                                            {{ moment(interval.date).locale($i18n.locale).format('MMMM DD, YYYY') }}
                                         </span>
                                     </div>
                                     <div class="col-12">

@@ -14,12 +14,7 @@ export function getLangCookie() {
 
 // Set root domain cookie, ex: *.cattr.app
 export function setLangCookie(lang) {
-    const rootDomain = location.hostname
-        .split('.')
-        .reverse()
-        .splice(0, 2)
-        .reverse()
-        .join('.');
+    const rootDomain = location.hostname.split('.').reverse().splice(0, 2).reverse().join('.');
     document.cookie = 'lang=' + lang + '; domain=' + rootDomain;
 }
 

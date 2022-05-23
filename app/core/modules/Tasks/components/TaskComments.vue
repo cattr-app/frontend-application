@@ -83,12 +83,7 @@
         computed: {
             visibleUsers() {
                 return this.users.filter(user => {
-                    return (
-                        user.full_name
-                            .replace(/\s/g, '')
-                            .toLocaleLowerCase()
-                            .indexOf(this.userFilter) === 0
-                    );
+                    return user.full_name.replace(/\s/g, '').toLocaleLowerCase().indexOf(this.userFilter) === 0;
                 });
             },
         },

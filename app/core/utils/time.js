@@ -32,35 +32,23 @@ export function getStartDate(date) {
 }
 
 export function getEndDate(date) {
-    return moment(date)
-        .add(1, 'day')
-        .format('YYYY-MM-DD');
+    return moment(date).add(1, 'day').format('YYYY-MM-DD');
 }
 
 export function getStartDay(date) {
-    return moment(date)
-        .startOf('day')
-        .toISOString();
+    return moment(date).startOf('day').toISOString();
 }
 
 export function getEndDay(date) {
-    return moment(date)
-        .endOf('day')
-        .toISOString();
+    return moment(date).endOf('day').toISOString();
 }
 
 export function getStartOfDayInTimezone(date, timezone) {
-    return moment
-        .tz(date, timezone)
-        .startOf('day')
-        .toISOString();
+    return moment.tz(date, timezone).startOf('day').toISOString();
 }
 
 export function getEndOfDayInTimezone(date, timezone) {
-    return moment
-        .tz(date, timezone)
-        .endOf('day')
-        .toISOString();
+    return moment.tz(date, timezone).endOf('day').toISOString();
 }
 
 const zones = {

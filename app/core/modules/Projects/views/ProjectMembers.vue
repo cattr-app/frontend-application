@@ -92,7 +92,9 @@
 
                 const project = await this.projectService.getItem(this.$route.params[this.projectService.getIdParam()]);
                 this.project = project.data.data;
-                const projectUsers = await this.projectService.getMembers(this.$route.params[this.projectService.getIdParam()]);
+                const projectUsers = await this.projectService.getMembers(
+                    this.$route.params[this.projectService.getIdParam()],
+                );
                 this.projectUsers = projectUsers.data.data.users;
 
                 const params = { global_scope: true };

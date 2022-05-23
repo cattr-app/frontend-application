@@ -12,9 +12,7 @@
             @search="search = $event"
         >
             <template #list-footer>
-                <li v-show="hasNextPage" ref="load" class="vs__dropdown-option">
-                    Loading...
-                </li>
+                <li v-show="hasNextPage" ref="load" class="vs__dropdown-option">Loading...</li>
             </template>
         </v-select>
         <i class="icon icon-chevron-down at-select__arrow" />

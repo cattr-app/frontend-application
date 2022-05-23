@@ -136,10 +136,7 @@
                     return;
                 }
 
-                return moment
-                    .tz(this.interval.start_at, this.companyData['timezone'])
-                    .tz(timezone)
-                    .format('HH:mm');
+                return moment.tz(this.interval.start_at, this.companyData['timezone']).tz(timezone).format('HH:mm');
             },
         },
         methods: {

@@ -187,7 +187,7 @@
                 this.setScroll(0);
             },
             formatDuration: formatDurationString,
-            draw: throttle(function() {
+            draw: throttle(function () {
                 this.canvas.clear();
 
                 const width = this.contentWidth;
@@ -216,10 +216,7 @@
                 );
 
                 for (let column = 0; column < this.columns; ++column) {
-                    const date = start
-                        .clone()
-                        .locale(this.$i18n.locale)
-                        .add(column, 'days');
+                    const date = start.clone().locale(this.$i18n.locale).add(column, 'days');
                     const left = this.columnWidth * column;
 
                     // Column headers - day
@@ -437,7 +434,7 @@
 
                 this.canvas.requestRenderAll();
             }, 100),
-            onResize: throttle(function() {
+            onResize: throttle(function () {
                 if (!this.$refs.canvasWrapper) {
                     return;
                 }

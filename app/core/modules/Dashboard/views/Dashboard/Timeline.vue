@@ -167,7 +167,7 @@
             ...mapMutations({
                 setTimezone: 'dashboard/setTimezone',
             }),
-            loadData: throttle(async function(withLoadingIndicator = true) {
+            loadData: throttle(async function (withLoadingIndicator = true) {
                 this.isDataLoading = withLoadingIndicator;
 
                 if (!this.user || !this.user.id) {
@@ -200,10 +200,7 @@
             async onExport(format) {
                 const { data } = await dashboardService.downloadReport(
                     this.start,
-                    moment
-                        .utc(this.end)
-                        .add(1, 'day')
-                        .format('YYYY-MM-DD'),
+                    moment.utc(this.end).add(1, 'day').format('YYYY-MM-DD'),
                     [this.user.id],
                     this.projectIDs,
                     format,

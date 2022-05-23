@@ -231,7 +231,7 @@
                     }
                 }
             },
-            draw: throttle(function() {
+            draw: throttle(function () {
                 this.canvas.clear();
 
                 const width = this.canvas.getWidth();
@@ -255,9 +255,7 @@
                 );
 
                 for (let column = 0; column < columns; ++column) {
-                    const date = moment()
-                        .startOf('day')
-                        .add(column, 'hours');
+                    const date = moment().startOf('day').add(column, 'hours');
                     const left = columnWidth * column;
 
                     // Column headers - hours
@@ -418,7 +416,7 @@
 
                 this.canvas.requestRenderAll();
             }, 100),
-            onResize: throttle(function() {
+            onResize: throttle(function () {
                 if (!this.$refs.canvasWrapper) {
                     return;
                 }

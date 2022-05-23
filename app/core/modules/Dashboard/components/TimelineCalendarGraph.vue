@@ -57,7 +57,7 @@
         },
         methods: {
             formatDuration: formatDurationString,
-            draw: throttle(function() {
+            draw: throttle(function () {
                 this.canvas.clear();
 
                 const width = this.canvas.getWidth();
@@ -89,10 +89,7 @@
 
                 // Column headers
                 for (let column = 0; column < columns; column++) {
-                    const date = firstDay
-                        .clone()
-                        .locale(this.$i18n.locale)
-                        .add(column, 'days');
+                    const date = firstDay.clone().locale(this.$i18n.locale).add(column, 'days');
                     this.canvas.add(
                         new fabric.Textbox(date.format('dddd').toUpperCase(), {
                             left: column * columnWidth,
@@ -232,7 +229,7 @@
 
                 this.canvas.requestRenderAll();
             }),
-            onResize: throttle(function() {
+            onResize: throttle(function () {
                 if (!this.$refs.canvasWrapper) {
                     return;
                 }

@@ -56,7 +56,7 @@
                                             <validation-provider
                                                 v-else-if="
                                                     field.fieldOptions.type === 'input' ||
-                                                        field.fieldOptions.type === 'text'
+                                                    field.fieldOptions.type === 'text'
                                                 "
                                                 v-slot="{ errors }"
                                                 :rules="field.rules || ''"

@@ -10,7 +10,7 @@
             </template>
         </at-input>
 
-        <span class="calendar-icon icon icon-calendar"></span>
+        <span class="calendar-icon icon icon-calendar" />
 
         <transition name="slide-up">
             <div
@@ -188,17 +188,11 @@
                 switch (this.tab) {
                     case 'date':
                     default:
-                        return moment(this.start, 'YYYY-MM-DD')
-                            .locale(this.$i18n.locale)
-                            .format('MMM DD, YYYY');
+                        return moment(this.start, 'YYYY-MM-DD').locale(this.$i18n.locale).format('MMM DD, YYYY');
 
                     case 'week': {
-                        const start = moment(this.start, 'YYYY-MM-DD')
-                            .locale(this.$i18n.locale)
-                            .startOf('isoWeek');
-                        const end = moment(this.end, 'YYYY-MM-DD')
-                            .locale(this.$i18n.locale)
-                            .endOf('isoWeek');
+                        const start = moment(this.start, 'YYYY-MM-DD').locale(this.$i18n.locale).startOf('isoWeek');
+                        const end = moment(this.end, 'YYYY-MM-DD').locale(this.$i18n.locale).endOf('isoWeek');
                         if (start.month() === end.month()) {
                             return start.format('MMM DD-') + end.format('DD, YYYY');
                         }
@@ -272,9 +266,7 @@
                 switch (this.tab) {
                     case 'day':
                     default: {
-                        const date = moment(this.start)
-                            .subtract(1, 'day')
-                            .format('YYYY-MM-DD');
+                        const date = moment(this.start).subtract(1, 'day').format('YYYY-MM-DD');
                         start = date;
                         end = date;
                         break;
@@ -296,12 +288,8 @@
 
                     case 'range': {
                         const diff = moment(this.end).diff(this.start, 'days') + 1;
-                        start = moment(this.start)
-                            .subtract(diff, 'days')
-                            .format('YYYY-MM-DD');
-                        end = moment(this.end)
-                            .subtract(diff, 'days')
-                            .format('YYYY-MM-DD');
+                        start = moment(this.start).subtract(diff, 'days').format('YYYY-MM-DD');
+                        end = moment(this.end).subtract(diff, 'days').format('YYYY-MM-DD');
                         break;
                     }
                 }
@@ -314,9 +302,7 @@
                 switch (this.tab) {
                     case 'day':
                     default: {
-                        const date = moment(this.start)
-                            .add(1, 'day')
-                            .format('YYYY-MM-DD');
+                        const date = moment(this.start).add(1, 'day').format('YYYY-MM-DD');
                         start = date;
                         end = date;
                         break;
@@ -338,12 +324,8 @@
 
                     case 'range': {
                         const diff = moment(this.end).diff(this.start, 'days') + 1;
-                        start = moment(this.start)
-                            .add(diff, 'days')
-                            .format('YYYY-MM-DD');
-                        end = moment(this.end)
-                            .add(diff, 'days')
-                            .format('YYYY-MM-DD');
+                        start = moment(this.start).add(diff, 'days').format('YYYY-MM-DD');
+                        end = moment(this.end).add(diff, 'days').format('YYYY-MM-DD');
                         break;
                     }
                 }
@@ -370,21 +352,13 @@
                     }
 
                     case 'week':
-                        start = moment(value)
-                            .startOf('isoWeek')
-                            .format('YYYY-MM-DD');
-                        end = moment(value)
-                            .endOf('isoWeek')
-                            .format('YYYY-MM-DD');
+                        start = moment(value).startOf('isoWeek').format('YYYY-MM-DD');
+                        end = moment(value).endOf('isoWeek').format('YYYY-MM-DD');
                         break;
 
                     case 'month':
-                        start = moment(value)
-                            .startOf('month')
-                            .format('YYYY-MM-DD');
-                        end = moment(value)
-                            .endOf('month')
-                            .format('YYYY-MM-DD');
+                        start = moment(value).startOf('month').format('YYYY-MM-DD');
+                        end = moment(value).endOf('month').format('YYYY-MM-DD');
                         break;
 
                     case 'range':

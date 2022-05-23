@@ -249,7 +249,7 @@
                     }
                 }
             },
-            draw: throttle(function() {
+            draw: throttle(function () {
                 this.canvas.clear();
 
                 const width = this.canvas.getWidth();
@@ -278,9 +278,7 @@
                 const maxLeftOffset = canvasWidth - popupWidth + 2 * canvasPadding;
 
                 for (let i = 0; i < columns; ++i) {
-                    const date = moment()
-                        .startOf('day')
-                        .add(i, 'hours');
+                    const date = moment().startOf('day').add(i, 'hours');
                     const left = columnWidth * i;
 
                     // Column header - hour
@@ -334,10 +332,7 @@
                         .tz(event.start_at, this.companyData.timezone)
                         .tz(this.timezone)
                         .diff(
-                            moment
-                                .tz(event.start_at, this.companyData.timezone)
-                                .tz(this.timezone)
-                                .startOf('day'),
+                            moment.tz(event.start_at, this.companyData.timezone).tz(this.timezone).startOf('day'),
                             'hours',
                             true,
                         );
@@ -435,7 +430,7 @@
                     }
                 }
             },
-            onResize: throttle(function() {
+            onResize: throttle(function () {
                 if (!this.$refs.canvasWrapper) {
                     return;
                 }

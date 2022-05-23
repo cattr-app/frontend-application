@@ -114,9 +114,7 @@
         mounted() {
             window.addEventListener('click', this.hidePopup);
 
-            const dateTimeStr = moment()
-                .startOf('day')
-                .toISOString();
+            const dateTimeStr = moment().startOf('day').toISOString();
             this.inputHandler(dateTimeStr);
             this.$emit('change', dateTimeStr);
             this.$nextTick(async () => {
@@ -152,9 +150,7 @@
                 }
             },
             onDateChange(value) {
-                const dateTime = moment(value)
-                    .hour(this.hour)
-                    .minute(this.minute);
+                const dateTime = moment(value).hour(this.hour).minute(this.minute);
                 const dateTimeStr = dateTime.toISOString();
 
                 this.inputHandler(dateTimeStr);

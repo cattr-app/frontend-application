@@ -173,7 +173,7 @@
             ...mapMutations({
                 setTimezone: 'dashboard/setTimezone',
             }),
-            load: throttle(async function(withLoadingIndicator = true) {
+            load: throttle(async function (withLoadingIndicator = true) {
                 this.isDataLoading = withLoadingIndicator;
                 if (!this.userIDs.length || !this.projectIDs.length) {
                     this.isDataLoading = false;
@@ -225,10 +225,7 @@
             async onExport(format) {
                 const { data } = await this.reportService.downloadReport(
                     this.start,
-                    moment
-                        .utc(this.end)
-                        .add(1, 'day')
-                        .format('YYYY-MM-DD'),
+                    moment.utc(this.end).add(1, 'day').format('YYYY-MM-DD'),
                     this.userIDs,
                     this.projectIDs,
                     format,
