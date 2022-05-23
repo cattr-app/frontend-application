@@ -212,7 +212,6 @@
                 window.open(data.data.url, '_blank');
             },
             onBulkRemove(intervals) {
-                console.log(intervals);
                 const totalIntervals = cloneDeep(this.intervals);
                 intervals.forEach(interval => {
                     const userIntervals = cloneDeep(totalIntervals[interval.user_id]).filter(
