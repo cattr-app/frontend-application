@@ -8,7 +8,6 @@ const { existsSync } = require('fs');
 const isDevMod = process.env.NODE_ENV === 'development';
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const SentryPlugin = require('@sentry/webpack-plugin');
 const CattrWebpackPlugin = require('./webpack/CattrWebpackPlugin');
 
 let env = require(resolve(__dirname, 'app', 'etc', 'env.js'));
@@ -74,25 +73,6 @@ module.exports = {
                 filename: '[name].css',
                 chunkFilename: '[id].css',
                 ignoreOrder: true,
-            }),
-            new SentryPlugin({
-                release: process.env.VUE_APP_VERSION,
-                dryRun: isDevMod || !('SENTRY_DSN' in process.env),
-                include: '.',
-                ext: ['js', 'map', 'jsbundle', 'bundle', 'vue', 'json'],
-                ignore: [
-                    'node_modules',
-                    'vue.config.js',
-                    'babel.config.js',
-                    'postcss.config.js',
-                    'prettier.config.js',
-                    'dist',
-                ],
-                setCommits: require('fs').existsSync('.git')
-                    ? {
-                          auto: true,
-                      }
-                    : undefined,
             }),
             new BundleAnalyzerPlugin({
                 analyzerMode: isDevMod && process.env.npm_lifecycle_event !== 'build' ? 'server' : 'disabled',

@@ -14,10 +14,11 @@ import moment from 'vue-moment';
 import i18n from '@/i18n';
 import VueLazyload from 'vue-lazyload';
 import '@/plugins/vee-validate';
-import '@/plugins/sentry';
 import '@/policies';
 import Gate from '@/plugins/gate';
 import vueKanban from 'vue-kanban';
+import * as Sentry from '@sentry/vue';
+import { BrowserTracing } from '@sentry/tracing';
 
 //Global components
 import installGlobalComponents from './global-extension';
@@ -41,6 +42,28 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 localModuleLoader(router);
+
+if (
+    process.env.NODE_ENV !== 'development' &&
+    'VUE_APP_SENTRY_DSN' in process.env &&
+    process.env.VUE_APP_SENTRY_DSN !== 'undefined'
+) {
+    Sentry.init({
+        Vue,
+        release: process.env.VUE_APP_VERSION,
+        environment: process.env.NODE_ENV,
+        dsn: process.env.VUE_APP_SENTRY_DSN,
+        integrations: [
+            new BrowserTracing({
+                routingInstrumentation: Sentry.vueRouterInstrumentation(router),
+            }),
+        ],
+        tracesSampleRate: 0.2,
+    });
+
+    if ('VUE_APP_DOCKER_VERSION' in process.env && process.env.VUE_APP_DOCKER_VERSION !== 'undefined')
+        Sentry.setTag('docker', process.env.VUE_APP_DOCKER_VERSION);
+}
 
 const app = new Vue({
     router,

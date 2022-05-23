@@ -558,7 +558,6 @@ export function init(context, router) {
             label: 'tasks.projects',
             fieldOptions: {
                 type: 'project-select',
-                hidden: true,
             },
         },
         {
