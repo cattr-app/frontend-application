@@ -8,7 +8,10 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "compile": "vue-cli-service modules:compile",
-    "clean": "git clean -fX output/*"
+    "clean": "git clean -fX output/*",
+    "postinstall": "husky install",
+    "prepack": "pinst --disable",
+    "postpack": "pinst --enable"
   },
   "husky": {
     "hooks": {
@@ -27,7 +30,7 @@
     "@cattr/vue-cli-plugin-compiler": "workspace:*",
     "@sentry/tracing": "^6.19.7",
     "@sentry/vue": "^6.19.7",
-    "autoprefixer": "^10.4.7",
+    "autoprefixer": "^9.8.8",
     "axios": "^0.27.2",
     "axios-concurrency": "^1.0.4",
     "caret-pos": "^2.0.0",
@@ -65,8 +68,8 @@
     "webpack": "^4.46.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "^8.3.6",
-    "@commitlint/config-conventional": "^8.3.6",
+    "@commitlint/cli": "^17.0.0",
+    "@commitlint/config-conventional": "^17.0.0",
     "@vue/cli-plugin-babel": "^4.5.17",
     "@vue/cli-plugin-eslint": "^4.5.17",
     "@vue/cli-plugin-router": "^4.5.17",
@@ -76,13 +79,14 @@
     "eslint": "^5.16.0",
     "eslint-plugin-prettier": "^3.4.1",
     "eslint-plugin-vue": "^5.2.3",
-    "husky": "^4.3.8",
+    "husky": "^8.0.0",
     "prettier": "2.6.2",
     "resolve-url-loader": "^3.1.4",
     "sass": "^1.52.1",
     "sass-loader": "^8.0.2",
     "vue-template-compiler": "^2.6.14",
-    "webpack-bundle-analyzer": "^3.9.0"
+    "webpack-bundle-analyzer": "^3.9.0",
+    "pinst": "^3.0.0"
   },
   "packageManager": "yarn@3.2.0"
 }
