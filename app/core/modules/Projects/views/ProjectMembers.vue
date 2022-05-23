@@ -92,8 +92,8 @@
 
                 const project = await this.projectService.getItem(this.$route.params[this.projectService.getIdParam()]);
                 this.project = project.data.data;
-
-                this.projectUsers = this.project.users;
+                const projectUsers = await this.projectService.getMembers(this.$route.params[this.projectService.getIdParam()]);
+                this.projectUsers = projectUsers.data.data.users;
 
                 const params = { global_scope: true };
                 const users = await this.usersService.getAll({ params, headers: { 'X-Paginate': false } });
