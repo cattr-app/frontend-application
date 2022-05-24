@@ -1340,13 +1340,14 @@ __metadata:
     eslint-plugin-prettier: ^3.4.1
     eslint-plugin-vue: ^5.2.3
     fabric: ^3.6.6
-    husky: ^8.0.1
+    husky: ^8.0.0
     js-md5: ^0.7.3
     lodash: ^4.17.21
     mapbox-gl: ^2.8.2
     mini-css-extract-plugin: ^1.6.2
     moment: ^2.29.3
     moment-timezone: ^0.5.34
+    pinst: ^3.0.0
     postcss: ^7.0.39
     prettier: 2.6.2
     resolve-url-loader: ^3.1.4
@@ -7605,7 +7606,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"husky@npm:^8.0.1":
+"husky@npm:^8.0.0":
   version: 8.0.1
   resolution: "husky@npm:8.0.1"
   bin:
@@ -10478,6 +10479,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"pinst@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "pinst@npm:3.0.0"
+  bin:
+    pinst: bin.js
+  checksum: 4ae48a6a60f79c37071233af51b4d91bfc85cfa3c12b66ccda60cdb642b4d14a4ab0cb3587afc55b1f6192cea1772a5e4822026a0d0d3528296edef00cc2d61f
+  languageName: node
+  linkType: hard
+
 "pkg-dir@npm:^1.0.0":
   version: 1.0.0
   resolution: "pkg-dir@npm:1.0.0"
@@ -13307,7 +13317,7 @@ __metadata:
 
 "typescript@patch:typescript@^4.6.4#~builtin<compat/typescript>":
   version: 4.6.4
-  resolution: "typescript@patch:typescript@npm%3A4.6.4#~builtin<compat/typescript>::version=4.6.4&hash=bda367"
+  resolution: "typescript@patch:typescript@npm%3A4.6.4#~builtin<compat/typescript>::version=4.6.4&hash=7ad353"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
