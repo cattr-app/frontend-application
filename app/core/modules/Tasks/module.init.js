@@ -351,7 +351,7 @@ export function init(context, router) {
                         placeholder: i18n.t('field.description'),
                     },
                     on: {
-                        input: function(text) {
+                        input: function (text) {
                             props.inputHandler(text);
                         },
                     },
@@ -380,7 +380,7 @@ export function init(context, router) {
                         localStorageKey: 'user-select.task',
                     },
                     on: {
-                        change: function(value) {
+                        change: function (value) {
                             props.inputHandler(value);
                         },
                     },

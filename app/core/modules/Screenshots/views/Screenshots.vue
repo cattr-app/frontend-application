@@ -6,10 +6,10 @@
                 <Calendar :sessionStorageKey="sessionStorageKey" @change="onCalendarChange" />
             </div>
             <div class="controls-row__item">
-                <UserSelect @change="onUsersChange"></UserSelect>
+                <UserSelect @change="onUsersChange" />
             </div>
             <div class="controls-row__item">
-                <ProjectSelect @change="onProjectsChange"></ProjectSelect>
+                <ProjectSelect @change="onProjectsChange" />
             </div>
         </div>
         <div class="at-container">
@@ -191,20 +191,19 @@
 
                 try {
                     const { data } = await this.intervalService.getAll({
-                        user_id: ['in', this.userIDs],
-                        'task.project_id': ['in', this.projectsList],
-                        start_at: [
-                            'between',
-                            [
-                                this.getStartOfDayInTimezone(this.datepickerDateStart, this.companyData.timezone),
-                                this.getEndOfDayInTimezone(this.datepickerDateEnd, this.companyData.timezone),
+                        where: {
+                            user_id: ['in', this.userIDs],
+                            'task.project_id': ['in', this.projectsList],
+                            start_at: [
+                                'between',
+                                [
+                                    this.getStartOfDayInTimezone(this.datepickerDateStart, this.companyData.timezone),
+                                    this.getEndOfDayInTimezone(this.datepickerDateEnd, this.companyData.timezone),
+                                ],
                             ],
-                        ],
-
-                        paginate: true,
-                        perPage: this.limit,
+                        },
                         page: this.page,
-                        with: 'task, task.project, user',
+                        with: ['task', 'task.project', 'user'],
                     });
 
                     this.intervalsTotal = data.total;

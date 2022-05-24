@@ -47,9 +47,7 @@ export function init(context, router) {
                 const value =
                     typeof props.currentValue === 'string'
                         ? props.currentValue
-                        : moment()
-                              .startOf('hour')
-                              .toISOString();
+                        : moment().startOf('hour').toISOString();
 
                 return h(DatetimeInput, {
                     props: {
@@ -58,9 +56,7 @@ export function init(context, router) {
                     },
                     on: {
                         change: value => {
-                            value = moment(value)
-                                .add(10, 'minutes')
-                                .toISOString();
+                            value = moment(value).add(10, 'minutes').toISOString();
                             props.setValue('end_at', value);
 
                             // Set is_manual for task here, because it`s stupid to fill it manually each time
@@ -76,11 +72,7 @@ export function init(context, router) {
             key: 'end_at',
             render: (h, props) => {
                 const value =
-                    typeof props.currentValue === 'string'
-                        ? props.currentValue
-                        : moment()
-                              .startOf('day')
-                              .toISOString();
+                    typeof props.currentValue === 'string' ? props.currentValue : moment().startOf('day').toISOString();
 
                 return h(DatetimeInput, {
                     props: {
