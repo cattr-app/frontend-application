@@ -205,8 +205,7 @@
                         page: this.page,
                         with: ['task', 'task.project', 'user'],
                     });
-
-                    this.intervalsTotal = data.total;
+                    this.intervalsTotal = data.pagination.total;
                     this.intervals = data.data;
                 } catch ({ response }) {
                     return;
