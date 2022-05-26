@@ -29,7 +29,7 @@
                     :show="modal.show"
                     :showNavigation="true"
                     :task="modal.task"
-                    :user="user"
+                    :user="modal.user"
                     @close="onHide"
                     @remove="onRemove"
                     @showNext="showNext"
