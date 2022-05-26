@@ -46,7 +46,7 @@
 
                 <div>
                     <router-link :to="`/tasks/view/${clickPopup.event.task_id}`">
-                        {{ clickPopup.event.task_id }}
+                        {{ clickPopup.event.task_name }}
                     </router-link>
 
                     <router-link :to="`/projects/view/${clickPopup.event.project_id}`">
