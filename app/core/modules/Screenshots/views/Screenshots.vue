@@ -82,7 +82,7 @@
             ProjectSelect,
         },
         data() {
-            const limit = 30;
+            const limit = 15;
             const localStorageKey = 'user-select.users';
             const sessionStorageKey = 'amazingcat.session.storage.screenshots';
 
