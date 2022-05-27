@@ -6,6 +6,7 @@
     "grid-title": "Users",
     "crud-title": "User",
     "statuses": {
+      "any": "Any",
       "active": "Active",
       "disabled": "Disabled"
     },

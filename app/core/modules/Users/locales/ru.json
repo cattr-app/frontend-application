@@ -6,6 +6,7 @@
     "grid-title": "Пользователи",
     "crud-title": "Пользователь",
     "statuses": {
+      "any": "Любой",
       "active": "Активен",
       "disabled": "Отключен"
     },

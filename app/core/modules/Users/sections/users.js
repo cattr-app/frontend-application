@@ -329,23 +329,23 @@ export default (context, router) => {
     grid.addFilterField([
         {
             key: 'active',
-            label: 'field.status',
-            placeholder: 'field.statuses.any',
+            label: 'field.statuses',
+            placeholder: 'users.statuses.any',
             saveToQuery: true,
             fieldOptions: {
                 type: 'select',
                 options: [
                     {
                         value: '',
-                        label: 'field.statuses.any',
+                        label: 'users.statuses.any',
                     },
                     {
                         value: '0',
-                        label: 'field.statuses.disabled',
+                        label: 'users.statuses.disabled',
                     },
                     {
                         value: '1',
-                        label: 'field.statuses.active',
+                        label: 'users.statuses.active',
                     },
                 ],
             },
