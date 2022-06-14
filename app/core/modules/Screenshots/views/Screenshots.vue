@@ -67,7 +67,7 @@
     import UserSelect from '@/components/UserSelect';
     import ProjectService from '@/services/resource/project.service';
     import TimeIntervalService from '@/services/resource/time-interval.service';
-    import { getStartOfDayInTimezone, getEndOfDayInTimezone } from '@/utils/time';
+    import { getStartOfDayInTimezone, getEndOfDayInTimezone, convertTimezones } from '@/utils/time';
     import Preloader from '@/components/Preloader';
     import ProjectSelect from '@/components/ProjectSelect';
     import moment from 'moment';
@@ -179,8 +179,8 @@
                 }
             },
             onCalendarChange({ start, end }) {
-                this.datepickerDateStart = start;
-                this.datepickerDateEnd = end;
+                this.datepickerDateStart = start + 'T00:00:00';
+                this.datepickerDateEnd = end + 'T23:59:59';
                 this.getScreenshots();
             },
             async getScreenshots() {
@@ -198,8 +198,22 @@
                             start_at: [
                                 'between',
                                 [
-                                    this.getStartOfDayInTimezone(this.datepickerDateStart, 'gmt'),
-                                    this.getEndOfDayInTimezone(this.datepickerDateEnd, 'gmt'),
+                                    this.getStartOfDayInTimezone(
+                                        convertTimezones(
+                                            this.datepickerDateStart,
+                                            moment().utcOffset(),
+                                            this.companyData['timezone'],
+                                        ),
+                                        'gmt',
+                                    ),
+                                    this.getEndOfDayInTimezone(
+                                        convertTimezones(
+                                            this.datepickerDateEnd,
+                                            moment().utcOffset(),
+                                            this.companyData['timezone'],
+                                        ),
+                                        'gmt',
+                                    ),
                                 ],
                             ],
                         },
