@@ -225,10 +225,11 @@
             async onExport(format) {
                 const { data } = await this.reportService.downloadReport(
                     this.start,
-                    moment.utc(this.end).add(1, 'day').format('YYYY-MM-DD'),
+                    this.end,
                     this.userIDs,
                     this.projectIDs,
                     format,
+                    this.timezone,
                 );
 
                 window.open(data.data.url, '_blank');
