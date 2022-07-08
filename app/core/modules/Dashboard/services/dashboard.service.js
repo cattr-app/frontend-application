@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { getEndOfDayInTimezone, getStartOfDayInTimezone } from '@/utils/time';
 import ReportService from '@/services/report.service';
 import moment from 'moment';
 
@@ -12,12 +11,12 @@ export default class DashboardService extends ReportService {
         this.userService = userService;
     }
 
-    downloadReport(startAt, endAt, users, projects, format, timezone) {
+    downloadReport(startAt, endAt, users, projects, format) {
         return axios.post(
             'report/dashboard/download',
             {
-                start_at: getStartOfDayInTimezone(startAt, timezone),
-                end_at: getEndOfDayInTimezone(endAt, timezone),
+                start_at: startAt,
+                end_at: endAt,
                 users,
                 projects,
             },

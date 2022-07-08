@@ -224,12 +224,11 @@
             },
             async onExport(format) {
                 const { data } = await this.reportService.downloadReport(
-                    this.start,
-                    this.end,
+                    this.getStartOfDayInTimezone(this.start, this.timezone),
+                    this.getEndOfDayInTimezone(this.end, this.timezone),
                     this.userIDs,
                     this.projectIDs,
                     format,
-                    this.timezone,
                 );
 
                 window.open(data.data.url, '_blank');
