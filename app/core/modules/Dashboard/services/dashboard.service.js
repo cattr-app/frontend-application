@@ -11,7 +11,7 @@ export default class DashboardService extends ReportService {
         this.userService = userService;
     }
 
-    downloadReport(startAt, endAt, users, projects, format) {
+    downloadReport(startAt, endAt, users, projects, format, sortCol, sortDir) {
         return axios.post(
             'report/dashboard/download',
             {
@@ -19,6 +19,8 @@ export default class DashboardService extends ReportService {
                 end_at: endAt,
                 users,
                 projects,
+                sort_column: sortCol,
+                sort_direction: sortDir,
             },
             {
                 headers: { Accept: format },
