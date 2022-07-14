@@ -1,8 +1,30 @@
 <template>
     <div class="team_sidebar">
         <div class="row team_sidebar__heading">
-            <div class="col-16">{{ $t('dashboard.user') }}</div>
-            <div>{{ $t('dashboard.worked') }}</div>
+            <div class="col-16">
+                <span
+                    :class="{ 'team_sidebar__heading-active': this.sort === 'user' }"
+                    class="team_sidebar__heading-toggle"
+                    @click="selectColumn('user')"
+                    >{{ $t('dashboard.user') }}
+                    <template v-if="this.sort === 'user'">
+                        <i v-if="this.sortDir === 'asc'" class="icon icon-chevron-down"></i>
+                        <i v-else class="icon icon-chevron-up"></i>
+                    </template>
+                </span>
+            </div>
+            <div>
+                <span
+                    :class="{ 'team_sidebar__heading-active': this.sort === 'worked' }"
+                    class="team_sidebar__heading-toggle"
+                    @click="selectColumn('worked')"
+                    >{{ $t('dashboard.worked') }}
+                    <template v-if="this.sort === 'worked'">
+                        <i v-if="this.sortDir === 'desc'" class="icon icon-chevron-down"></i>
+                        <i v-else class="icon icon-chevron-up"></i>
+                    </template>
+                </span>
+            </div>
         </div>
         <div v-for="(user, key) in users" :key="key" class="row">
             <div class="col-16 row team_sidebar__user_row">
@@ -25,7 +47,7 @@
                 </div>
             </div>
             <div class="team_sidebar__user_worked">
-                {{ getWorked(user.id) }}
+                {{ formatDurationString(user.worked) }}
             </div>
         </div>
     </div>
@@ -62,12 +84,9 @@
             },
         },
         methods: {
-            getWorked(userId) {
-                return formatDurationString(
-                    this.intervals.hasOwnProperty(userId)
-                        ? this.intervals[userId].reduce((acc, el) => acc + el.duration, 0)
-                        : 0,
-                );
+            formatDurationString,
+            selectColumn(column) {
+                this.$emit('sort', column);
             },
         },
     };
@@ -78,7 +97,15 @@
         &__heading {
             font-weight: 600;
             color: #b1b1be;
-            margin-bottom: 20px;
+
+            &-active {
+                color: #59566e;
+            }
+            &-toggle {
+                cursor: pointer;
+                display: inline-block;
+                padding-bottom: 20px;
+            }
         }
 
         &__user {

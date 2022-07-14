@@ -146,10 +146,9 @@
         computed: {
             ...mapGetters('dashboard', ['intervals', 'timePerDay', 'users', 'timezone', 'service']),
             graphUsers() {
-                const { worked } = this;
-
                 return this.users
                     .filter(user => this.userIDs.includes(user.id))
+                    .map(user => ({ ...user, worked: this.getWorked(user.id) }))
                     .sort((a, b) => {
                         let order = 0;
                         if (this.sort === 'user') {
@@ -157,8 +156,8 @@
                             const bName = b.full_name.toUpperCase();
                             order = aName.localeCompare(bName);
                         } else if (this.sort === 'worked') {
-                            const aWorked = worked[a.id] || 0;
-                            const bWorked = worked[b.id] || 0;
+                            const aWorked = a.worked || 0;
+                            const bWorked = b.worked || 0;
                             order = aWorked - bWorked;
                         }
 
@@ -224,11 +223,13 @@
             },
             async onExport(format) {
                 const { data } = await this.reportService.downloadReport(
-                    this.start,
-                    moment.utc(this.end).add(1, 'day').format('YYYY-MM-DD'),
+                    this.getStartOfDayInTimezone(this.start, this.timezone),
+                    this.getEndOfDayInTimezone(this.end, this.timezone),
                     this.userIDs,
                     this.projectIDs,
                     format,
+                    this.sort,
+                    this.sortDir,
                 );
 
                 window.open(data.data.url, '_blank');
@@ -296,6 +297,11 @@
                 } else {
                     this.$Message.error(this.$t('invite.message.valid') + validation.emails);
                 }
+            },
+            getWorked(userId) {
+                return this.intervals.hasOwnProperty(userId)
+                    ? this.intervals[userId].reduce((acc, el) => acc + el.duration, 0)
+                    : 0;
             },
         },
         watch: {
