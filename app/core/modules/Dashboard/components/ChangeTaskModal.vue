@@ -143,8 +143,9 @@
         watch: {
             async projectId(projectId) {
                 try {
-                    const taskList = (await this.tasksService.getWithFilters({ project_id: projectId, with: 'users' }))
-                        .data;
+                    const taskList = (
+                        await this.tasksService.getWithFilters({ where: { project_id: projectId }, with: ['users'] })
+                    ).data.data;
                     this.tasksOptionList = taskList.map(option => ({
                         value: option.id,
                         label: option['task_name'],
