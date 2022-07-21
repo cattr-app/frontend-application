@@ -7,8 +7,8 @@ export default class PriorityService extends ResourceService {
      * @param config
      * @returns {Promise<AxiosResponse<T>>}
      */
-    getAll(config = {}) {
-        return axios.get('priorities/list', config);
+    async getAll(config = {}) {
+        return (await axios.get('priorities/list', config)).data.data;
     }
 
     /**
