@@ -78,8 +78,8 @@
             };
         },
         async mounted() {
-            this.statuses = (await this.statusService.getAll()).data;
-            this.priorities = (await this.priorityService.getAll()).data;
+            this.statuses = await this.statusService.getAll();
+            this.priorities = await this.priorityService.getAll();
         },
         methods: {
             fromNow,

@@ -7,8 +7,8 @@ export default class StatusService extends ResourceService {
      * @param config
      * @returns {Promise<AxiosResponse<T>>}
      */
-    getAll(config = {}) {
-        return axios.get('statuses/list', config);
+    async getAll(config = {}) {
+        return (await axios.get('statuses/list', config)).data.data;
     }
 
     /**
