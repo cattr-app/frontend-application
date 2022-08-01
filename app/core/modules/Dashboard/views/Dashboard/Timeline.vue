@@ -250,8 +250,31 @@
         },
     };
 </script>
-
+<style lang="scss">
+    //.modal-screenshot {
+    //    a {
+    //        max-height: inherit;
+    //
+    //        img {
+    //            max-height: inherit;
+    //            object-fit: scale-down;
+    //        }
+    //    }
+    //}
+</style>
 <style lang="scss" scoped>
+    .at-container::v-deep {
+        .modal-screenshot {
+            a {
+                max-height: inherit;
+
+                img {
+                    max-height: inherit;
+                    object-fit: fill;
+                }
+            }
+        }
+    }
     .at-container {
         position: relative;
         padding: 1em;
