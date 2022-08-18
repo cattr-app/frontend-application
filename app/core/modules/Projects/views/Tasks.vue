@@ -325,7 +325,7 @@
             const projectId = this.$route.params['id'];
 
             this.project = (await this.projectService.getItem(projectId)).data;
-            this.statuses = (await this.statusService.getAll()).data;
+            this.statuses = await this.statusService.getAll();
 
             this.tasks = (
                 await this.taskService.getWithFilters({
