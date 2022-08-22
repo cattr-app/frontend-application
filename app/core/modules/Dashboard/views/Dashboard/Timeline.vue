@@ -252,6 +252,18 @@
 </script>
 
 <style lang="scss" scoped>
+    .at-container::v-deep {
+        .modal-screenshot {
+            a {
+                max-height: inherit;
+
+                img {
+                    max-height: inherit;
+                    object-fit: fill;
+                }
+            }
+        }
+    }
     .at-container {
         position: relative;
         padding: 1em;
