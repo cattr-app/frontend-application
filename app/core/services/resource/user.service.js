@@ -7,8 +7,8 @@ export default class UsersService extends ResourceService {
      * @param config
      * @returns {Promise<AxiosResponse<T>>}
      */
-    getAll(config = {}) {
-        return axios.get('users/list', config);
+    async getAll(config = {}) {
+        return (await axios.get('users/list', config)).data.data;
     }
 
     /**

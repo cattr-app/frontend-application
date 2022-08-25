@@ -110,10 +110,8 @@ export default class DashboardService extends ReportService {
         return this.userService
             .getAll({ headers: { 'X-Paginate': false } })
             .then(response => {
-                const { data } = response;
-                this.context.commit('setUsers', data.data);
-
-                return data.data;
+                this.context.commit('setUsers', response);
+                return response;
             })
             .catch(e => {
                 if (!axios.isCancel(e)) {

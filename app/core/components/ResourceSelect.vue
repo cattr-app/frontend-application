@@ -8,12 +8,7 @@
             filterable
             clearable="clearable"
         >
-            <at-option
-                v-for="option of options"
-                :key="option.value"
-                :label="ucfirst(option.label)"
-                :value="option.value"
-            />
+            <at-option v-for="option of options" :key="option.id" :label="formattedLabel(option)" :value="option.id" />
         </at-select>
         <at-input v-else disabled></at-input>
     </div>
@@ -39,7 +34,7 @@
         },
         async created() {
             try {
-                this.options = await this.service.getOptionList();
+                this.options = await this.service.getAll({ headers: { 'X-Paginate': false } });
 
                 await this.$nextTick();
 
@@ -61,6 +56,26 @@
         },
         methods: {
             ucfirst,
+            getName(object = {}) {
+                const names = ['full_name'];
+                let key = 'name';
+
+                if (typeof object === 'object') {
+                    let keys = Object.keys(object);
+
+                    for (let i = 0; i <= names.length; i++) {
+                        if (keys.indexOf(names[i]) !== -1) {
+                            key = names[i];
+                            break;
+                        }
+                    }
+                    return object[key] ?? '';
+                }
+            },
+            formattedLabel(option) {
+                const name = this.getName(option);
+                return name ? this.ucfirst(name) : '';
+            },
         },
         computed: {
             model: {

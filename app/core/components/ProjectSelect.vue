@@ -39,12 +39,13 @@
             return {
                 projectService: new ProjectService(),
                 selectedProjectIds,
+                ids: [],
             };
         },
         methods: {
             onLoad(allSelectOptions) {
-                const allProjectIds = allSelectOptions.map(option => option.value);
-
+                const allProjectIds = allSelectOptions.map(option => option.id);
+                this.ids = allProjectIds;
                 // Select all options if storage is empty
                 if (!localStorage.getItem(localStorageKey)) {
                     this.selectedProjectIds = allProjectIds;

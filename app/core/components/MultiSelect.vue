@@ -17,8 +17,8 @@
             <at-option
                 v-for="option of options"
                 :key="option.id"
-                :value="option.value"
-                :label="option.label"
+                :value="option.id"
+                :label="option.name"
                 @on-select-close="onClose"
             >
             </at-option>
@@ -75,7 +75,7 @@
         },
         async created() {
             try {
-                const all = await this.service.getOptionList();
+                const all = await this.service.getAll({ headers: { 'X-Paginate': false } });
                 this.options.push(...all);
                 this.$emit('onOptionsLoad', this.options);
             } catch ({ response }) {
@@ -143,11 +143,12 @@
         },
         methods: {
             selectAll(predicate = () => true) {
+                console.log(this.$refs.select);
                 const query = this.$refs.select.query.toUpperCase();
                 this.model = this.options
-                    .filter(({ label }) => label.toUpperCase().indexOf(query) !== -1)
+                    .filter(({ name }) => name.toUpperCase().indexOf(query) !== -1)
                     .filter(predicate)
-                    .map(({ value }) => value);
+                    .map(({ id }) => id);
             },
             clearSelect() {
                 this.$emit('input', []);

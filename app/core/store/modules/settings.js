@@ -102,7 +102,7 @@ const addSectionToStore = async (store, section) => {
     if (!access || store.state.sections.findIndex(s => s.pathName === section.name) >= 0) {
         return;
     }
-    section.meta.service.getAll().then(({ data }) => {
+    section.meta.service.getAll().then(data => {
         section = {
             label: section.meta.label,
             fields: section.meta.fields,
