@@ -124,7 +124,7 @@
                 }
 
                 this.isDataLoading = false;
-            }, 600),
+            }, 300),
             async onExport(format) {
                 try {
                     const { data } = await reportService.downloadReport(
