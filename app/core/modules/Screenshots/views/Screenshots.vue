@@ -179,8 +179,8 @@
                 }
             },
             onCalendarChange({ start, end }) {
-                this.datepickerDateStart = start + 'T00:00:00';
-                this.datepickerDateEnd = end + 'T23:59:59';
+                this.datepickerDateStart = start;
+                this.datepickerDateEnd = end;
                 this.getScreenshots();
             },
             async getScreenshots() {
@@ -199,21 +199,10 @@
                                 'between',
                                 [
                                     this.getStartOfDayInTimezone(
-                                        convertTimezones(
-                                            this.datepickerDateStart,
-                                            moment().utcOffset(),
-                                            this.companyData['timezone'],
-                                        ),
-                                        'gmt',
+                                        this.datepickerDateStart,
+                                        this.companyData['timezone'],
                                     ),
-                                    this.getEndOfDayInTimezone(
-                                        convertTimezones(
-                                            this.datepickerDateEnd,
-                                            moment().utcOffset(),
-                                            this.companyData['timezone'],
-                                        ),
-                                        'gmt',
-                                    ),
+                                    this.getEndOfDayInTimezone(this.datepickerDateEnd, this.companyData['timezone']),
                                 ],
                             ],
                         },
