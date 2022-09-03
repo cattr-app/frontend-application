@@ -199,8 +199,8 @@
             },
             async onExport(format) {
                 const { data } = await dashboardService.downloadReport(
-                    this.start,
-                    moment.utc(this.end).add(1, 'day').format('YYYY-MM-DD'),
+                    this.getStartOfDayInTimezone(this.start, this.timezone),
+                    this.getEndOfDayInTimezone(this.end, this.timezone),
                     [this.user.id],
                     this.projectIDs,
                     format,
