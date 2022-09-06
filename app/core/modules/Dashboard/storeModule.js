@@ -3,6 +3,7 @@ import 'moment-timezone';
 import TasksService from '@/services/resource/task.service';
 import UserService from '@/services/resource/user.service';
 import DashboardService from '_internal/Dashboard/services/dashboard.service';
+import rootStore from '@/store';
 
 const state = {
     service: null,
@@ -62,9 +63,11 @@ const getters = {
                 return result;
             }
 
+            const companyTimezone = rootStore.getters['user/companyData'].timezone;
+
             const userTimePerDay = userEvents.reduce((result, event) => {
-                const startAt = moment.tz(event.start_at, state.timezone);
-                const endAt = moment.tz(event.end_at, state.timezone);
+                const startAt = moment.tz(event.start_at, companyTimezone).tz(state.timezone);
+                const endAt = moment.tz(event.end_at, companyTimezone).tz(state.timezone);
 
                 const startDate = startAt.format('YYYY-MM-DD');
                 const endDate = endAt.format('YYYY-MM-DD');
