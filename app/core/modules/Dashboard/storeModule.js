@@ -3,6 +3,7 @@ import 'moment-timezone';
 import TasksService from '@/services/resource/task.service';
 import UserService from '@/services/resource/user.service';
 import DashboardService from '_internal/Dashboard/services/dashboard.service';
+import _ from 'lodash';
 import rootStore from '@/store';
 
 const state = {
@@ -15,7 +16,46 @@ const state = {
 
 const getters = {
     service: state => state.service,
-    intervals: state => state.intervals,
+    intervals: state => {
+        const companyTimezone = rootStore.getters['user/companyData'].timezone;
+
+        for (const userId of Object.keys(state.intervals)) {
+            state.intervals[userId].map(interval => {
+                interval.durationByDay = {};
+
+                const startAt = moment.tz(interval.start_at, companyTimezone).tz(state.timezone);
+                const endAt = moment.tz(interval.end_at, companyTimezone).tz(state.timezone);
+
+                const startDate = startAt.format('YYYY-MM-DD');
+                const endDate = endAt.format('YYYY-MM-DD');
+                if (startDate === endDate) {
+                    if (interval.durationByDay[startDate]) {
+                        interval.durationByDay[startDate] += interval.duration;
+                    } else {
+                        interval.durationByDay[startDate] = interval.duration;
+                    }
+                } else {
+                    // If interval spans over midnight, divide it at midnight
+                    const startOfDay = endAt.clone().startOf('day');
+                    const startDateDuration = startOfDay.diff(startAt, 'seconds');
+                    if (interval.durationByDay[startDate]) {
+                        interval.durationByDay[startDate] += startDateDuration;
+                    } else {
+                        interval.durationByDay[startDate] = startDateDuration;
+                    }
+
+                    const endDateDuration = endAt.diff(startOfDay, 'seconds');
+                    if (interval.durationByDay[endDate]) {
+                        interval.durationByDay[endDate] += endDateDuration;
+                    } else {
+                        interval.durationByDay[endDate] = endDateDuration;
+                    }
+                }
+            });
+        }
+
+        return state.intervals;
+    },
     tasks: state => state.tasks,
     users: state => state.users,
     timePerProject: (state, getters) => {
@@ -32,9 +72,16 @@ const getters = {
                         name: event.project_name,
                         duration: event.duration,
                         tasks: {},
+                        durationByDay: event.durationByDay,
                     };
                 } else {
                     projects[event.project_id].duration += event.duration;
+                    projects[event.project_id].durationByDay = _.mergeWith(
+                        {},
+                        projects[event.project_id].durationByDay,
+                        event.durationByDay,
+                        _.add,
+                    );
                 }
 
                 if (!projects[event.project_id].tasks[event.task_id]) {
@@ -42,9 +89,16 @@ const getters = {
                         id: event.task_id,
                         name: event.task_name,
                         duration: event.duration,
+                        durationByDay: event.durationByDay,
                     };
                 } else {
                     projects[event.project_id].tasks[event.task_id].duration += event.duration;
+                    projects[event.project_id].tasks[event.task_id].durationByDay = _.mergeWith(
+                        {},
+                        projects[event.project_id].tasks[event.task_id].durationByDay,
+                        event.durationByDay,
+                        _.add,
+                    );
                 }
 
                 return projects;
@@ -63,6 +117,7 @@ const getters = {
                 return result;
             }
 
+            // TODO: optimize by using durationByDay property of interval(event)
             const companyTimezone = rootStore.getters['user/companyData'].timezone;
 
             const userTimePerDay = userEvents.reduce((result, event) => {

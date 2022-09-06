@@ -1,4 +1,6 @@
-import moment from 'moment';
+import Moment from 'moment';
+import { extendMoment } from 'moment-range';
+const moment = extendMoment(Moment);
 import i18n from '@/i18n';
 
 export function formatDate(date, format = 'YYYY-MM-DD h:mm:ss') {
@@ -49,6 +51,14 @@ export function getStartOfDayInTimezone(date, timezone) {
 
 export function getEndOfDayInTimezone(date, timezone) {
     return moment.tz(date, timezone).endOf('day').toISOString();
+}
+
+export function getMomentDate(date) {
+    return moment(date);
+}
+
+export function getMomentRange(start, end) {
+    return moment.range(start, end);
 }
 
 const zones = {

@@ -3,7 +3,12 @@
         <div class="row">
             <div class="col-5 col-xl-4 pr-1">
                 <div class="at-container sidebar">
-                    <TimelineSidebar :active-task="activeTask" :isDataLoading="isDataLoading" />
+                    <TimelineSidebar
+                        :active-task="activeTask"
+                        :isDataLoading="isDataLoading"
+                        :startDate="start"
+                        :endDate="end"
+                    />
                 </div>
             </div>
             <div class="col-19 col-xl-20">

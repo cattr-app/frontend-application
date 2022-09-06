@@ -3,7 +3,7 @@
         <div class="total-time">
             <h5>{{ $t('dashboard.total_time') }}:</h5>
             <h5>
-                <Skeleton :loading="isDataLoading" width="50px">{{ formatDuration(totalTime) }} </Skeleton>
+                <Skeleton :loading="isDataLoading" width="50px">{{ totalTime }} </Skeleton>
             </h5>
         </div>
 
@@ -17,7 +17,7 @@
                             </router-link>
                         </span>
                         <span class="project__duration">
-                            {{ formatDuration(project.duration) }}
+                            {{ formatDurationByDay(project.durationByDay) }}
                         </span>
                     </div>
                     <!-- /.project-title -->
@@ -44,10 +44,10 @@
                                 class="task__progressbar"
                                 status="success"
                                 :stroke-width="5"
-                                :percent="(100 * task.duration) / project.duration"
+                                :percent="getPercentForTaskInProject(task, project)"
                             ></at-progress>
 
-                            <span class="task__duration">{{ formatDuration(task.duration) }}</span>
+                            <span class="task__duration">{{ formatDurationByDay(task.durationByDay) }}</span>
                         </div>
                     </Skeleton>
                 </li>
@@ -73,7 +73,7 @@
 
 <script>
     import { mapGetters } from 'vuex';
-    import { formatDurationString } from '@/utils/time';
+    import { formatDurationString, getMomentRange, getMomentDate } from '@/utils/time';
     import { Skeleton } from 'vue-loading-skeleton';
 
     export default {
@@ -88,6 +88,12 @@
             isDataLoading: {
                 type: Boolean,
                 default: false,
+            },
+            startDate: {
+                type: String,
+            },
+            endDate: {
+                type: String,
             },
         },
         data() {
@@ -110,8 +116,11 @@
                 return Object.values(this.timePerProject[this.user.id]);
             },
             totalTime() {
-                const sum = (totalTime, time) => (totalTime += time.duration);
-                return this.userProjects.reduce(sum, 0);
+                const sum = (totalTime, project) => (totalTime += this.getTotalTime(project.durationByDay));
+                return formatDurationString(this.userProjects.reduce(sum, 0));
+            },
+            momentRange() {
+                return getMomentRange(this.startDate, this.endDate);
             },
         },
         methods: {
@@ -131,7 +140,19 @@
                 const tasks = this.getAllTasks(projectID);
                 return this.isExpanded(projectID) ? tasks : tasks.slice(0, 3);
             },
-            formatDuration: formatDurationString,
+            getTotalTime(durationByDay) {
+                let totalTime = 0;
+                for (const [date, duration] of Object.entries(durationByDay)) {
+                    getMomentDate(date).within(this.momentRange) ? (totalTime += duration) : null;
+                }
+                return totalTime;
+            },
+            getPercentForTaskInProject(task, project) {
+                return (100 * this.getTotalTime(task.durationByDay)) / this.getTotalTime(project.durationByDay);
+            },
+            formatDurationByDay(durationByDay) {
+                return formatDurationString(this.getTotalTime(durationByDay));
+            },
         },
     };
 </script>
