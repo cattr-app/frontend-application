@@ -20,8 +20,7 @@ export default class CompanyService extends SettingsService {
      * @returns {data}
      */
     async getAll() {
-        const { data } = await axios.get(this.getItemRequestUri(), { ignoreCancel: true });
-        return data;
+        return (await axios.get(this.getItemRequestUri(), { ignoreCancel: true })).data.data;
     }
 
     /**

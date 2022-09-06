@@ -82,7 +82,7 @@
                                                 :vid="field.key"
                                             >
                                                 <at-input-number
-                                                    v-model="values[field.key]"
+                                                    v-model="values.data[field.key]"
                                                     :min="field.minValue"
                                                     :max="field.maxValue"
                                                     size="large"
@@ -166,9 +166,9 @@
                                                     v-html="field.fieldOptions.checkedText"
                                                 />
                                                 <at-switch
-                                                    v-model="values[field.key]"
+                                                    v-model="values.data[field.key]"
                                                     size="large"
-                                                    @change="$set(values, field.key, $event)"
+                                                    @change="$set(values.data, field.key, $event)"
                                                 >
                                                     <template
                                                         v-if="field.fieldOptions.innerCheckedText"

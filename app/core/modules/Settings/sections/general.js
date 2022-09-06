@@ -35,13 +35,10 @@ export default {
                     label: 'settings.company_timezone',
                     key: 'timezone',
                     render: (h, props) => {
-                        if (typeof props.currentValue === 'object') {
-                            props.currentValue = '';
-                        }
-
+                        const value = props.values.timezone ?? 'UTC';
                         return h(TimezonePicker, {
                             props: {
-                                value: props.currentValue,
+                                value,
                             },
                             on: {
                                 onTimezoneChange(ev) {
@@ -53,7 +50,7 @@ export default {
                 },
                 {
                     label: 'field.work_time',
-                    key: 'work_time',
+                    key: 'heartbeat_period',
                     maxValue: 24,
                     minValue: 0,
                     fieldOptions: {
@@ -143,10 +140,7 @@ export default {
                     label: 'field.default_priority',
                     key: 'default_priority_id',
                     render: (h, props) => {
-                        let value = '';
-                        if (typeof props.currentValue === 'number' || typeof props.currentValue === 'string') {
-                            value = props.currentValue;
-                        }
+                        const value = props.values.default_priority_id ?? 0;
 
                         return h(PrioritySelect, {
                             props: {
@@ -165,13 +159,11 @@ export default {
                     label: 'settings.company_language',
                     key: 'language',
                     render: (h, props) => {
-                        if (typeof props.currentValue === 'object') {
-                            props.currentValue = 'en';
-                        }
+                        const lang = props.values.language ?? 'en';
 
                         return h(LanguageSelector, {
                             props: {
-                                value: props.currentValue,
+                                value: lang,
                             },
                             on: {
                                 setLanguage(lang) {
