@@ -50,6 +50,7 @@
                         <TeamDayGraph
                             v-if="type === 'day'"
                             :users="graphUsers"
+                            :start="start"
                             class="graph"
                             @selectedIntervals="onSelectedIntervals"
                         />
@@ -91,7 +92,13 @@
     import TimezonePicker from '@/components/TimezonePicker';
     import DashboardReportService from '_internal/Dashboard/services/dashboard.service';
     import ProjectService from '@/services/resource/project.service';
-    import { getDateToday, getEndOfDayInTimezone, getStartOfDayInTimezone } from '@/utils/time';
+    import {
+        getDateToday,
+        getEndOfDayInTimezone,
+        getMomentDate,
+        getMomentRange,
+        getStartOfDayInTimezone,
+    } from '@/utils/time';
     import ExportDropdown from '@/components/ExportDropdown';
     import TimeIntervalEdit from '../../components/TimeIntervalEdit';
     import cloneDeep from 'lodash/cloneDeep';
@@ -163,6 +170,9 @@
 
                         return this.sortDir === 'asc' ? order : -order;
                     });
+            },
+            momentRange() {
+                return getMomentRange(this.start, this.end);
             },
         },
         methods: {
@@ -298,9 +308,16 @@
                     this.$Message.error(this.$t('invite.message.valid') + validation.emails);
                 }
             },
+            getTotalTime(durationByDay) {
+                let totalTime = 0;
+                for (const [date, duration] of Object.entries(durationByDay)) {
+                    getMomentDate(date).within(this.momentRange) ? (totalTime += duration) : null;
+                }
+                return totalTime;
+            },
             getWorked(userId) {
                 return this.intervals.hasOwnProperty(userId)
-                    ? this.intervals[userId].reduce((acc, el) => acc + el.duration, 0)
+                    ? this.intervals[userId].reduce((acc, el) => acc + this.getTotalTime(el.durationByDay), 0)
                     : 0;
             },
         },
