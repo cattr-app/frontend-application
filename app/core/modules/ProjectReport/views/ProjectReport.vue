@@ -55,6 +55,7 @@
     import Preloader from '@/components/Preloader';
     import ExportDropdown from '@/components/ExportDropdown';
     import { mapGetters } from 'vuex';
+    import debounce from 'lodash.debounce';
 
     const reportService = new ProjectReportService();
 
@@ -105,7 +106,7 @@
                 this.datepickerDateEnd = getStartDate(end);
                 this.fetchData();
             },
-            async fetchData() {
+            fetchData: debounce(async function () {
                 this.isDataLoading = true;
                 try {
                     const { data } = await reportService.getReport(
@@ -123,7 +124,7 @@
                 }
 
                 this.isDataLoading = false;
-            },
+            }, 300),
             async onExport(format) {
                 try {
                     const { data } = await reportService.downloadReport(

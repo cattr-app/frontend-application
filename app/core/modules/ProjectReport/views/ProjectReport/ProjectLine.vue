@@ -237,14 +237,7 @@
                 return Math.floor((seconds * 100) / totalTime);
             },
             getHourRow(screenshots) {
-                let result = new Array(this.screenshotsPerRow).fill(null);
-
-                for (let key in screenshots) {
-                    if (screenshots.hasOwnProperty(key)) {
-                        result[key] = screenshots[key];
-                    }
-                }
-                return result;
+                return new Array(this.screenshotsPerRow).fill(null).map((el, i) => screenshots[i] || el);
             },
         },
     };
