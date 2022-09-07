@@ -5,6 +5,7 @@ stages:
   - build
   - test
   - release
+  - deploy
 
 sast:
   stage: test
