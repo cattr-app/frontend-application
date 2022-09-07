@@ -276,6 +276,7 @@
                 }
                 const { width: canvasWidth } = this.$refs.canvasWrapper.getBoundingClientRect();
                 const maxLeftOffset = canvasWidth - popupWidth + 2 * canvasPadding;
+                const minLeftOffset = canvasPadding / 2;
 
                 for (let i = 0; i < columns; ++i) {
                     const date = moment().startOf('day').add(i, 'hours');
@@ -332,7 +333,7 @@
                         .tz(event.start_at, this.companyData.timezone)
                         .tz(this.timezone)
                         .diff(
-                            moment.tz(event.start_at, this.companyData.timezone).tz(this.timezone).startOf('day'),
+                            moment.tz(this.start, this.companyData.timezone).tz(this.timezone).startOf('day'),
                             'hours',
                             true,
                         );
@@ -366,7 +367,7 @@
                         } else {
                             this.hoverPopup = {
                                 show: true,
-                                x: e.target.left,
+                                x: e.target.left < minLeftOffset ? minLeftOffset : e.target.left,
                                 y: e.target.top,
                                 borderX: defaultCornerOffset,
                                 event,
