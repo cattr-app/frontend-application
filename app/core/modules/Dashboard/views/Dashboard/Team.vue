@@ -91,7 +91,13 @@
     import TimezonePicker from '@/components/TimezonePicker';
     import DashboardReportService from '_internal/Dashboard/services/dashboard.service';
     import ProjectService from '@/services/resource/project.service';
-    import { getDateToday, getEndOfDayInTimezone, getStartOfDayInTimezone } from '@/utils/time';
+    import {
+        convertTimezones,
+        getDateToday,
+        getEndOfDayInTimezone,
+        getStartDay,
+        getStartOfDayInTimezone,
+    } from '@/utils/time';
     import ExportDropdown from '@/components/ExportDropdown';
     import TimeIntervalEdit from '../../components/TimeIntervalEdit';
     import cloneDeep from 'lodash/cloneDeep';
@@ -145,6 +151,7 @@
         },
         computed: {
             ...mapGetters('dashboard', ['intervals', 'timePerDay', 'users', 'timezone', 'service']),
+            ...mapGetters('user', ['companyData']),
             graphUsers() {
                 return this.users
                     .filter(user => this.userIDs.includes(user.id))
@@ -180,8 +187,8 @@
                     return;
                 }
 
-                const startAt = this.getStartOfDayInTimezone(this.start, this.timezone);
-                const endAt = this.getEndOfDayInTimezone(this.end, this.timezone);
+                const startAt = this.getStartOfDayInTimezone(this.start, this.companyData['timezone'], this.timezone);
+                const endAt = this.getEndOfDayInTimezone(this.end, this.companyData['timezone'], this.timezone);
 
                 await this.service.load(this.userIDs, this.projectIDs, startAt, endAt);
 
@@ -223,8 +230,8 @@
             },
             async onExport(format) {
                 const { data } = await this.reportService.downloadReport(
-                    this.getStartOfDayInTimezone(this.start, this.timezone),
-                    this.getEndOfDayInTimezone(this.end, this.timezone),
+                    this.getStartOfDayInTimezone(this.start, this.companyData['timezone'], this.timezone),
+                    this.getEndOfDayInTimezone(this.end, this.companyData['timezone'], this.timezone),
                     this.userIDs,
                     this.projectIDs,
                     format,

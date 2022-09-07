@@ -69,12 +69,20 @@ export function getEndDay(date) {
     return moment(date).endOf('day').toISOString();
 }
 
-export function getStartOfDayInTimezone(date, timezone) {
-    return moment.tz(date, timezone).toISOString();
+export function getStartOfDayInTimezone(date, timezone, base_timezone = null) {
+    return convertTimezones(
+        date + 'T00:00:00',
+        base_timezone ? base_timezone : moment().utcOffset(),
+        timezone,
+    ).toISOString();
 }
 
-export function getEndOfDayInTimezone(date, timezone) {
-    return moment.tz(date, timezone).toISOString();
+export function getEndOfDayInTimezone(date, timezone, base_timezone = null) {
+    return convertTimezones(
+        date + 'T23:59:59',
+        base_timezone ? base_timezone : moment().utcOffset(),
+        timezone,
+    ).toISOString();
 }
 
 const zones = {

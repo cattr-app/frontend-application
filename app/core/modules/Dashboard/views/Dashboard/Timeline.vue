@@ -144,7 +144,7 @@
         },
         computed: {
             ...mapGetters('dashboard', ['service', 'intervals', 'timePerDay', 'timePerProject', 'timezone']),
-            ...mapGetters('user', ['user']),
+            ...mapGetters('user', ['user', 'companyData']),
             userEvents() {
                 if (!this.user || !this.user.id || !this.intervals[this.user.id]) {
                     return [];
@@ -178,8 +178,8 @@
 
                 const userIDs = [this.user.id];
 
-                const startAt = this.getStartOfDayInTimezone(this.start, this.timezone);
-                const endAt = this.getEndOfDayInTimezone(this.end, this.timezone);
+                const startAt = this.getStartOfDayInTimezone(this.start, this.companyData['timezone'], this.timezone);
+                const endAt = this.getEndOfDayInTimezone(this.end, this.companyData['timezone'], this.timezone);
 
                 await this.service.load(userIDs, null, startAt, endAt);
 
