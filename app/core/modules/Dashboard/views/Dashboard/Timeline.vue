@@ -88,7 +88,7 @@
 
 <script>
     import moment from 'moment';
-    import throttle from 'lodash/throttle';
+    import debounce from 'lodash/debounce';
     import { mapGetters, mapMutations } from 'vuex';
     import Calendar from '@/components/Calendar';
     import TimelineSidebar from '../../components/TimelineSidebar';
@@ -172,7 +172,7 @@
             ...mapMutations({
                 setTimezone: 'dashboard/setTimezone',
             }),
-            loadData: throttle(async function (withLoadingIndicator = true) {
+            loadData: debounce(async function (withLoadingIndicator = true) {
                 this.isDataLoading = withLoadingIndicator;
 
                 if (!this.user || !this.user.id) {
@@ -189,7 +189,7 @@
                 await this.service.load(userIDs, null, startAt, endAt);
 
                 this.isDataLoading = false;
-            }, 1000),
+            }, 350),
             onCalendarChange({ type, start, end }) {
                 this.type = type;
                 this.start = start;
