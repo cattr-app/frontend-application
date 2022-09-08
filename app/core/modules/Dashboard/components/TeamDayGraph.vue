@@ -334,14 +334,18 @@
                     // Intervals
                     if (this.intervals.hasOwnProperty(user.id)) {
                         this.intervals[user.id].forEach(event => {
-                            const leftOffset = moment
-                                .tz(event.start_at, this.companyData.timezone)
-                                .tz(this.timezone)
-                                .diff(
-                                    moment.tz(this.start, this.companyData.timezone).tz(this.timezone).startOf('day'),
-                                    'hours',
-                                    true,
-                                );
+                            const leftOffset =
+                                moment
+                                    .tz(event.start_at, this.companyData.timezone)
+                                    .tz(this.timezone)
+                                    .diff(
+                                        moment
+                                            .tz(this.start, this.companyData.timezone)
+                                            .tz(this.timezone)
+                                            .startOf('day'),
+                                        'hours',
+                                        true,
+                                    ) % 24;
 
                             const width = ((Math.max(event.duration, 60) + 120) * columnWidth) / 60 / 60;
 

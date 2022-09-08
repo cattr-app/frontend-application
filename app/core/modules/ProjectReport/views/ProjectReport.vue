@@ -50,11 +50,19 @@
     import UserSelect from '@/components/UserSelect';
     import ProjectReportService from '_internal/ProjectReport/services/project-report.service';
     import ProjectLine from './ProjectReport/ProjectLine';
-    import { getDateToday, getStartDate, getEndDate, formatDurationString } from '@/utils/time';
+    import {
+        getDateToday,
+        getStartDate,
+        getEndDate,
+        formatDurationString,
+        getStartOfDayInTimezone,
+        getEndOfDayInTimezone,
+    } from '@/utils/time';
     import ProjectSelect from '@/components/ProjectSelect';
     import Preloader from '@/components/Preloader';
     import ExportDropdown from '@/components/ExportDropdown';
     import { mapGetters } from 'vuex';
+    import debounce from 'lodash.debounce';
 
     const reportService = new ProjectReportService();
 
@@ -105,12 +113,12 @@
                 this.datepickerDateEnd = getStartDate(end);
                 this.fetchData();
             },
-            async fetchData() {
+            fetchData: debounce(async function () {
                 this.isDataLoading = true;
                 try {
                     const { data } = await reportService.getReport(
-                        this.datepickerDateStart,
-                        this.datepickerDateEnd,
+                        getStartOfDayInTimezone(this.datepickerDateStart, this.companyData.timezone),
+                        getEndOfDayInTimezone(this.datepickerDateEnd, this.companyData.timezone),
                         this.userIds,
                         this.projectsList,
                     );
@@ -123,12 +131,12 @@
                 }
 
                 this.isDataLoading = false;
-            },
+            }, 300),
             async onExport(format) {
                 try {
                     const { data } = await reportService.downloadReport(
-                        this.datepickerDateStart,
-                        this.datepickerDateEnd,
+                        getStartOfDayInTimezone(this.datepickerDateStart, this.companyData.timezone),
+                        getEndOfDayInTimezone(this.datepickerDateEnd, this.companyData.timezone),
                         this.userIds,
                         this.projectsList,
                         format,

@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { getStartDay, getEndDay } from '@/utils/time';
 import ReportService from '@/services/report.service';
 
 export default class ProjectReportService extends ReportService {
@@ -12,8 +11,8 @@ export default class ProjectReportService extends ReportService {
      */
     getReport(startAt, endAt, users, projects) {
         return axios.post('report/project', {
-            start_at: getStartDay(startAt),
-            end_at: getEndDay(endAt),
+            start_at: startAt,
+            end_at: endAt,
             users,
             projects,
         });
@@ -29,8 +28,8 @@ export default class ProjectReportService extends ReportService {
      */
     downloadReport(startAt, endAt, users, projects, format) {
         const params = {
-            start_at: getStartDay(startAt),
-            end_at: getEndDay(endAt),
+            start_at: startAt,
+            end_at: endAt,
             users,
             projects,
         };
