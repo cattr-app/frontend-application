@@ -882,7 +882,14 @@
         border-radius: $border-radius-lger;
     }
 
-    .at-container {
+    .at-container ::v-deep {
         margin-bottom: $layout-01;
+
+        tr {
+            .at-table__cell:nth-child(2),
+            .at-table__cell:nth-child(3) {
+                overflow: visible;
+            }
+        }
     }
 </style>
