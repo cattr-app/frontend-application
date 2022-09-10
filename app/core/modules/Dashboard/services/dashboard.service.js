@@ -11,7 +11,7 @@ export default class DashboardService extends ReportService {
         this.userService = userService;
     }
 
-    downloadReport(startAt, endAt, users, projects, format, sortCol, sortDir) {
+    downloadReport(startAt, endAt, users, projects, userTimezone, format, sortCol, sortDir) {
         return axios.post(
             'report/dashboard/download',
             {
@@ -19,6 +19,7 @@ export default class DashboardService extends ReportService {
                 end_at: endAt,
                 users,
                 projects,
+                user_timezone: userTimezone,
                 sort_column: sortCol,
                 sort_direction: sortDir,
             },
@@ -28,16 +29,22 @@ export default class DashboardService extends ReportService {
         );
     }
 
-    getReport(startAt, endAt, users, projects) {
-        return axios.post('report/dashboard', { users, projects, start_at: startAt, end_at: endAt });
+    getReport(startAt, endAt, users, projects, userTimezone) {
+        return axios.post('report/dashboard', {
+            users,
+            projects,
+            start_at: startAt,
+            end_at: endAt,
+            user_timezone: userTimezone,
+        });
     }
 
     unloadIntervals() {
         this.context.commit('setIntervals', []);
     }
 
-    load(userIDs, projectIDs, startAt, endAt) {
-        this.getReport(startAt, endAt, userIDs, projectIDs)
+    load(userIDs, projectIDs, startAt, endAt, userTimezone) {
+        this.getReport(startAt, endAt, userIDs, projectIDs, userTimezone)
             .then(response => {
                 if (!response) {
                     return;

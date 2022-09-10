@@ -53,14 +53,6 @@ export function getEndOfDayInTimezone(date, timezone) {
     return moment.tz(date, timezone).endOf('day').toISOString();
 }
 
-export function getMomentDate(date) {
-    return moment(date);
-}
-
-export function getMomentRange(start, end) {
-    return moment.range(start, end);
-}
-
 const zones = {
     UTC: ['UTC'],
     AD: ['Europe/Andorra'],

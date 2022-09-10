@@ -4,7 +4,6 @@ import TasksService from '@/services/resource/task.service';
 import UserService from '@/services/resource/user.service';
 import DashboardService from '_internal/Dashboard/services/dashboard.service';
 import _ from 'lodash';
-import rootStore from '@/store';
 
 const state = {
     service: null,
@@ -16,46 +15,7 @@ const state = {
 
 const getters = {
     service: state => state.service,
-    intervals: state => {
-        const companyTimezone = rootStore.getters['user/companyData'].timezone;
-
-        for (const userId of Object.keys(state.intervals)) {
-            state.intervals[userId].map(interval => {
-                interval.durationByDay = {};
-
-                const startAt = moment.tz(interval.start_at, companyTimezone).tz(state.timezone);
-                const endAt = moment.tz(interval.end_at, companyTimezone).tz(state.timezone);
-
-                const startDate = startAt.format('YYYY-MM-DD');
-                const endDate = endAt.format('YYYY-MM-DD');
-                if (startDate === endDate) {
-                    if (interval.durationByDay[startDate]) {
-                        interval.durationByDay[startDate] += interval.duration;
-                    } else {
-                        interval.durationByDay[startDate] = interval.duration;
-                    }
-                } else {
-                    // If interval spans over midnight, divide it at midnight
-                    const startOfDay = endAt.clone().startOf('day');
-                    const startDateDuration = startOfDay.diff(startAt, 'seconds');
-                    if (interval.durationByDay[startDate]) {
-                        interval.durationByDay[startDate] += startDateDuration;
-                    } else {
-                        interval.durationByDay[startDate] = startDateDuration;
-                    }
-
-                    const endDateDuration = endAt.diff(startOfDay, 'seconds');
-                    if (interval.durationByDay[endDate]) {
-                        interval.durationByDay[endDate] += endDateDuration;
-                    } else {
-                        interval.durationByDay[endDate] = endDateDuration;
-                    }
-                }
-            });
-        }
-
-        return state.intervals;
-    },
+    intervals: state => state.intervals,
     tasks: state => state.tasks,
     users: state => state.users,
     timePerProject: (state, getters) => {
@@ -72,16 +32,11 @@ const getters = {
                         name: event.project_name,
                         duration: event.duration,
                         tasks: {},
-                        durationByDay: event.durationByDay,
+                        durationAtSelectedPeriod: event.durationAtSelectedPeriod,
                     };
                 } else {
                     projects[event.project_id].duration += event.duration;
-                    projects[event.project_id].durationByDay = _.mergeWith(
-                        {},
-                        projects[event.project_id].durationByDay,
-                        event.durationByDay,
-                        _.add,
-                    );
+                    projects[event.project_id].durationAtSelectedPeriod += event.durationAtSelectedPeriod;
                 }
 
                 if (!projects[event.project_id].tasks[event.task_id]) {
@@ -89,16 +44,12 @@ const getters = {
                         id: event.task_id,
                         name: event.task_name,
                         duration: event.duration,
-                        durationByDay: event.durationByDay,
+                        durationAtSelectedPeriod: event.durationAtSelectedPeriod,
                     };
                 } else {
                     projects[event.project_id].tasks[event.task_id].duration += event.duration;
-                    projects[event.project_id].tasks[event.task_id].durationByDay = _.mergeWith(
-                        {},
-                        projects[event.project_id].tasks[event.task_id].durationByDay,
-                        event.durationByDay,
-                        _.add,
-                    );
+                    projects[event.project_id].tasks[event.task_id].durationAtSelectedPeriod +=
+                        event.durationAtSelectedPeriod;
                 }
 
                 return projects;
@@ -117,40 +68,8 @@ const getters = {
                 return result;
             }
 
-            // TODO: optimize by using durationByDay property of interval(event)
-            const companyTimezone = rootStore.getters['user/companyData'].timezone;
-
             const userTimePerDay = userEvents.reduce((result, event) => {
-                const startAt = moment.tz(event.start_at, companyTimezone).tz(state.timezone);
-                const endAt = moment.tz(event.end_at, companyTimezone).tz(state.timezone);
-
-                const startDate = startAt.format('YYYY-MM-DD');
-                const endDate = endAt.format('YYYY-MM-DD');
-                if (startDate === endDate) {
-                    if (result[startDate]) {
-                        result[startDate] += event.duration;
-                    } else {
-                        result[startDate] = event.duration;
-                    }
-                } else {
-                    // If interval spans over midnight, divide it at midnight
-                    const startOfDay = endAt.clone().startOf('day');
-                    const startDateDuration = startOfDay.diff(startAt, 'seconds');
-                    if (result[startDate]) {
-                        result[startDate] += startDateDuration;
-                    } else {
-                        result[startDate] = startDateDuration;
-                    }
-
-                    const endDateDuration = endAt.diff(startOfDay, 'seconds');
-                    if (result[endDate]) {
-                        result[endDate] += endDateDuration;
-                    } else {
-                        result[endDate] = endDateDuration;
-                    }
-                }
-
-                return result;
+                return _.mergeWith({}, result, event.durationByDay, _.add);
             }, {});
 
             return {

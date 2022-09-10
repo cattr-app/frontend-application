@@ -186,7 +186,7 @@
                 const startAt = this.getStartOfDayInTimezone(this.start, this.timezone);
                 const endAt = this.getEndOfDayInTimezone(this.end, this.timezone);
 
-                await this.service.load(userIDs, null, startAt, endAt);
+                await this.service.load(userIDs, null, startAt, endAt, this.timezone);
 
                 this.isDataLoading = false;
             }, 350),
@@ -208,6 +208,7 @@
                     this.getEndOfDayInTimezone(this.end, this.timezone),
                     [this.user.id],
                     this.projectIDs,
+                    this.timezone,
                     format,
                 );
 

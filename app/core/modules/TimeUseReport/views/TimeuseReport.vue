@@ -8,6 +8,12 @@
             <div class="select controls-row__item">
                 <UserSelect @change="onUsersChange" />
             </div>
+
+            <div class="controls-row__item controls-row__item--left-auto">
+                <small v-if="companyData.timezone">
+                    {{ $t('project-report.report_timezone', [companyData.timezone]) }}
+                </small>
+            </div>
         </div>
         <div class="at-container">
             <div class="total-time-row">
@@ -29,11 +35,12 @@
     import List from './TimeUseReport/List';
     import UsersService from '@/services/resource/user.service';
     import TimeUseReportService from '_internal/TimeUseReport/service/time-use-report.service';
-    import { formatDurationString } from '@/utils/time';
-    import moment from 'moment';
+    import { formatDurationString, getStartOfDayInTimezone, getEndOfDayInTimezone } from '@/utils/time';
     import Preloader from '@/components/Preloader';
     import UserSelect from '@/components/UserSelect';
     import Calendar from '@/components/Calendar';
+    import { mapGetters } from 'vuex';
+    import debounce from 'lodash.debounce';
 
     const timeUseService = new TimeUseReportService();
     const usersService = new UsersService();
@@ -58,6 +65,7 @@
             };
         },
         computed: {
+            ...mapGetters('user', ['companyData']),
             totalTime() {
                 return this.userReportsList.reduce((total, current) => total + current.time, 0);
             },
@@ -75,7 +83,7 @@
                     }
                 }
             },
-            async getReport() {
+            getReport: debounce(async function () {
                 if (this.userIDs === 'undefined' || !this.datepickerDateStart) {
                     return;
                 }
@@ -83,8 +91,8 @@
                 this.isDataLoading = true;
                 try {
                     const { data } = await timeUseService.getReport(
-                        this.datepickerDateStart,
-                        this.datepickerDateEnd,
+                        getStartOfDayInTimezone(this.datepickerDateStart, this.companyData.timezone),
+                        getEndOfDayInTimezone(this.datepickerDateEnd, this.companyData.timezone),
                         this.userIDs,
                     );
                     this.userReportsList = data.data;
@@ -95,7 +103,7 @@
                 }
 
                 this.isDataLoading = false;
-            },
+            }, 350),
             onUsersChange(userIDs) {
                 this.userIDs = userIDs;
                 if (this._isMounted) {
@@ -113,6 +121,7 @@
             },
         },
         async mounted() {
+            // FIXME: on first run companyData.timezone is undefined
             await this.sendRequests();
         },
     };

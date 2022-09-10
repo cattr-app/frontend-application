@@ -92,13 +92,7 @@
     import TimezonePicker from '@/components/TimezonePicker';
     import DashboardReportService from '_internal/Dashboard/services/dashboard.service';
     import ProjectService from '@/services/resource/project.service';
-    import {
-        getDateToday,
-        getEndOfDayInTimezone,
-        getMomentDate,
-        getMomentRange,
-        getStartOfDayInTimezone,
-    } from '@/utils/time';
+    import { getDateToday, getEndOfDayInTimezone, getStartOfDayInTimezone } from '@/utils/time';
     import ExportDropdown from '@/components/ExportDropdown';
     import TimeIntervalEdit from '../../components/TimeIntervalEdit';
     import cloneDeep from 'lodash/cloneDeep';
@@ -171,9 +165,6 @@
                         return this.sortDir === 'asc' ? order : -order;
                     });
             },
-            momentRange() {
-                return getMomentRange(this.start, this.end);
-            },
         },
         methods: {
             getDateToday,
@@ -193,7 +184,7 @@
                 const startAt = this.getStartOfDayInTimezone(this.start, this.timezone);
                 const endAt = this.getEndOfDayInTimezone(this.end, this.timezone);
 
-                await this.service.load(this.userIDs, this.projectIDs, startAt, endAt);
+                await this.service.load(this.userIDs, this.projectIDs, startAt, endAt, this.timezone);
 
                 this.isDataLoading = false;
             }, 1000),
@@ -237,6 +228,7 @@
                     this.getEndOfDayInTimezone(this.end, this.timezone),
                     this.userIDs,
                     this.projectIDs,
+                    this.timezone,
                     format,
                     this.sort,
                     this.sortDir,
@@ -308,16 +300,9 @@
                     this.$Message.error(this.$t('invite.message.valid') + validation.emails);
                 }
             },
-            getTotalTime(durationByDay) {
-                let totalTime = 0;
-                for (const [date, duration] of Object.entries(durationByDay)) {
-                    getMomentDate(date).within(this.momentRange) ? (totalTime += duration) : null;
-                }
-                return totalTime;
-            },
             getWorked(userId) {
                 return this.intervals.hasOwnProperty(userId)
-                    ? this.intervals[userId].reduce((acc, el) => acc + this.getTotalTime(el.durationByDay), 0)
+                    ? this.intervals[userId].reduce((acc, el) => acc + el.durationAtSelectedPeriod, 0)
                     : 0;
             },
         },
