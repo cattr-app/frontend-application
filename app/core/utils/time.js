@@ -1,6 +1,4 @@
-import Moment from 'moment';
-import { extendMoment } from 'moment-range';
-const moment = extendMoment(Moment);
+import moment from 'moment';
 import i18n from '@/i18n';
 
 export function formatDate(date, format = 'YYYY-MM-DD h:mm:ss') {
