@@ -72,6 +72,7 @@
     import AppImage from './AppImage';
     import ScreenshotModal from './ScreenshotModal';
     import { mapGetters } from 'vuex';
+    import { convertTimezones } from '@/utils/time';
 
     export function thumbnailPathProvider(interval) {
         return `time-intervals/${interval.id}/thumb`;
@@ -130,14 +131,13 @@
         computed: {
             ...mapGetters('user', ['companyData']),
             screenshotTime() {
-                const timezone = this.timezone || this.companyData['timezone'];
+                let timezone = this.timezone || moment().utcOffset();
 
                 if (!timezone || !this.interval.start_at) {
                     return;
-                } else if (timezone === this.companyData['timezone']) {
-                    return moment.tz(this.interval.start_at, 'gmt').format('HH:mm');
                 }
-                return moment.tz(this.interval.start_at, this.companyData['timezone']).tz(timezone).format('HH:mm');
+
+                return convertTimezones(this.interval.start_at, this.companyData['timezone'], timezone).format('HH:mm');
             },
         },
         methods: {

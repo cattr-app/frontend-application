@@ -180,7 +180,7 @@
                     show: true,
                     project: { id: this.clickPopup.event.project_id, name: this.clickPopup.event.project_name },
                     user: this.clickPopup.event,
-                    task: { id: this.clickPopup.event.task_id, name: this.clickPopup.event.task_name },
+                    task: { id: this.clickPopup.event.task_id, task_name: this.clickPopup.event.task_name },
                     interval: this.clickPopup.event,
                 };
             },

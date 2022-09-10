@@ -29,8 +29,8 @@ export default class ProjectService extends ResourceService {
     /**
      * @returns {Promise<AxiosResponse<T>>}
      */
-    getAll(options = {}) {
-        return axios.get('projects/list?' + serialize(this.params), options);
+    async getAll(options = {}) {
+        return (await axios.get('projects/list?' + serialize(this.params), options)).data.data;
     }
 
     /**

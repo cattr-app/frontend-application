@@ -173,8 +173,7 @@
 
             this.isLoading = true;
             try {
-                const { data } = await this.usersService.getAll({ headers: { 'X-Paginate': false } });
-                this.users = data.data;
+                this.users = await this.usersService.getAll({ headers: { 'X-Paginate': false } });
             } catch ({ response }) {
                 if (process.env.NODE_ENV === 'development') {
                     console.warn(response ? response : 'request to users is canceled');

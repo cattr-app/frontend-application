@@ -21,6 +21,32 @@ export function formatDurationString(time) {
     return `${hours}${i18n.t('time.h')} ${minutes}${i18n.t('time.m')}`;
 }
 
+export function getTimezoneOffset(offset) {
+    let tz_s = offset < 0 ? '-' : '+';
+    let tz_offset = Math.abs(offset);
+    return tz_s + (tz_offset > 9 ? tz_offset : '0' + tz_offset) + ':00';
+}
+
+export function convertTimezones(time, base_tz, new_tz) {
+    if (time[time.length - 1] === 'Z') {
+        time = time.slice(0, time.length - 2);
+    }
+
+    let tz_offset = base_tz;
+    if (!Number.isInteger(tz_offset)) {
+        tz_offset = moment.tz(tz_offset).utcOffset();
+    }
+
+    let tz_offset2 = new_tz;
+    if (!Number.isInteger(tz_offset2)) {
+        tz_offset2 = moment.tz(tz_offset2).utcOffset();
+    }
+
+    tz_offset = (tz_offset - tz_offset2) / 60;
+
+    return moment.tz(time + getTimezoneOffset(tz_offset), 'gmt');
+}
+
 export function fromNow(date) {
     return moment(date).fromNow();
 }
@@ -45,12 +71,20 @@ export function getEndDay(date) {
     return moment(date).endOf('day').toISOString();
 }
 
-export function getStartOfDayInTimezone(date, timezone) {
-    return moment.tz(date, timezone).startOf('day').toISOString();
+export function getStartOfDayInTimezone(date, timezone, base_timezone = null) {
+    return convertTimezones(
+        date + 'T00:00:00',
+        base_timezone ? base_timezone : moment().utcOffset(),
+        timezone,
+    ).toISOString();
 }
 
-export function getEndOfDayInTimezone(date, timezone) {
-    return moment.tz(date, timezone).endOf('day').toISOString();
+export function getEndOfDayInTimezone(date, timezone, base_timezone = null) {
+    return convertTimezones(
+        date + 'T23:59:59',
+        base_timezone ? base_timezone : moment().utcOffset(),
+        timezone,
+    ).toISOString();
 }
 
 export function getMomentDate(date) {

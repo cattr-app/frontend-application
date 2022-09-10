@@ -67,7 +67,7 @@
     import UserSelect from '@/components/UserSelect';
     import ProjectService from '@/services/resource/project.service';
     import TimeIntervalService from '@/services/resource/time-interval.service';
-    import { getStartOfDayInTimezone, getEndOfDayInTimezone } from '@/utils/time';
+    import { getStartOfDayInTimezone, getEndOfDayInTimezone, convertTimezones } from '@/utils/time';
     import Preloader from '@/components/Preloader';
     import ProjectSelect from '@/components/ProjectSelect';
     import moment from 'moment';
@@ -198,8 +198,11 @@
                             start_at: [
                                 'between',
                                 [
-                                    this.getStartOfDayInTimezone(this.datepickerDateStart, 'gmt'),
-                                    this.getEndOfDayInTimezone(this.datepickerDateEnd, 'gmt'),
+                                    this.getStartOfDayInTimezone(
+                                        this.datepickerDateStart,
+                                        this.companyData['timezone'],
+                                    ),
+                                    this.getEndOfDayInTimezone(this.datepickerDateEnd, this.companyData['timezone']),
                                 ],
                             ],
                         },
