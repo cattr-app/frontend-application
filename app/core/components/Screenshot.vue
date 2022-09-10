@@ -134,9 +134,8 @@
 
                 if (!timezone || !this.interval.start_at) {
                     return;
-                } else if (timezone === this.companyData['timezone']) {
-                    return moment(this.interval.start_at).format('HH:mm');
                 }
+
                 return moment.tz(this.interval.start_at, this.companyData['timezone']).tz(timezone).format('HH:mm');
             },
         },
