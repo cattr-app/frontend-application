@@ -100,7 +100,6 @@
     import moment from 'moment';
     import AppImage from './AppImage';
     import { mapGetters } from 'vuex';
-    import { convertTimezones } from '@/utils/time';
 
     export function screenshotPathProvider(interval) {
         return `time-intervals/${interval.id}/screenshot`;
@@ -144,9 +143,10 @@
         },
         methods: {
             formatDate(value) {
-                return convertTimezones(value, this.companyData.timezone, moment().utcOffset())
+                return moment(value)
+                    .tz(this.companyData.timezone)
                     .locale(this.$i18n.locale)
-                    .format('MMMM D, YYYY — HH:mm:ss');
+                    .format('MMMM D, YYYY — HH:mm:ss (Z)');
             },
             onClose() {
                 this.$emit('close');
