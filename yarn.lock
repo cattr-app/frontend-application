@@ -1346,7 +1346,6 @@ __metadata:
     mapbox-gl: ^2.8.2
     mini-css-extract-plugin: ^1.6.2
     moment: ^2.29.3
-    moment-range: ^4.0.2
     moment-timezone: ^0.5.34
     pinst: ^3.0.0
     postcss: ^7.0.39
