@@ -121,6 +121,9 @@
             companyData() {
                 this.getScreenshots();
             },
+            timezone() {
+                this.getScreenshots();
+            },
         },
         async created() {
             window.addEventListener('keydown', this.onKeyDown);
