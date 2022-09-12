@@ -51,6 +51,15 @@ export function getEndOfDayInTimezone(date, timezone) {
     return moment.tz(date, timezone).endOf('day').toISOString();
 }
 
+export function getDateWithTimezoneDifference(date, baseTimezone, userTimezone, startOfDay = true) {
+    const timeDiff = moment.tz(date, baseTimezone).diff(moment.tz(date, userTimezone));
+    if (startOfDay) {
+        return moment.tz(date, baseTimezone).startOf('day').add(timeDiff, 'milliseconds').toISOString();
+    } else {
+        return moment.tz(date, baseTimezone).endOf('day').add(timeDiff, 'milliseconds').toISOString();
+    }
+}
+
 const zones = {
     UTC: ['UTC'],
     AD: ['Europe/Andorra'],

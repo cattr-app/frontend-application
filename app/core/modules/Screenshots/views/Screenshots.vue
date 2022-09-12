@@ -11,6 +11,10 @@
             <div class="controls-row__item">
                 <ProjectSelect @change="onProjectsChange" />
             </div>
+
+            <div class="controls-row__item">
+                <TimezonePicker :value="timezone" @onTimezoneChange="onTimezoneChange" />
+            </div>
         </div>
         <div class="at-container">
             <div class="at-container__inner">
@@ -23,6 +27,7 @@
                                 :interval="interval"
                                 :task="interval.task"
                                 :user="modal.user"
+                                :timezone="timezone"
                                 @click="showImage(interval)"
                             />
                         </div>
@@ -60,16 +65,17 @@
 </template>
 
 <script>
-    import { mapGetters } from 'vuex';
+    import { mapGetters, mapMutations } from 'vuex';
     import Calendar from '@/components/Calendar';
     import Screenshot from '@/components/Screenshot';
     import ScreenshotModal from '@/components/ScreenshotModal';
     import UserSelect from '@/components/UserSelect';
     import ProjectService from '@/services/resource/project.service';
     import TimeIntervalService from '@/services/resource/time-interval.service';
-    import { getStartOfDayInTimezone, getEndOfDayInTimezone } from '@/utils/time';
+    import { getStartOfDayInTimezone, getEndOfDayInTimezone, getDateWithTimezoneDifference } from '@/utils/time';
     import Preloader from '@/components/Preloader';
     import ProjectSelect from '@/components/ProjectSelect';
+    import TimezonePicker from '@/components/TimezonePicker';
 
     export default {
         name: 'Screenshots',
@@ -80,6 +86,7 @@
             UserSelect,
             Preloader,
             ProjectSelect,
+            TimezonePicker,
         },
         data() {
             const limit = 15;
@@ -106,6 +113,7 @@
             };
         },
         computed: {
+            ...mapGetters('dashboard', ['timezone']),
             ...mapGetters('timeline', ['service', 'users']),
             ...mapGetters('user', ['user', 'companyData']),
         },
@@ -130,6 +138,12 @@
         methods: {
             getStartOfDayInTimezone,
             getEndOfDayInTimezone,
+            ...mapMutations({
+                setTimezone: 'dashboard/setTimezone',
+            }),
+            onTimezoneChange(timezone) {
+                this.setTimezone(timezone);
+            },
             onHide() {
                 this.modal.show = false;
             },
@@ -189,18 +203,24 @@
 
                 this.isDataLoading = true;
 
+                const startAt = getDateWithTimezoneDifference(
+                    this.datepickerDateStart,
+                    this.companyData.timezone,
+                    this.timezone,
+                );
+                const endAt = getDateWithTimezoneDifference(
+                    this.datepickerDateEnd,
+                    this.companyData.timezone,
+                    this.timezone,
+                    false,
+                );
+
                 try {
                     const { data } = await this.intervalService.getAll({
                         where: {
                             user_id: ['in', this.userIDs],
                             'task.project_id': ['in', this.projectsList],
-                            start_at: [
-                                'between',
-                                [
-                                    this.getStartOfDayInTimezone(this.datepickerDateStart, this.companyData.timezone),
-                                    this.getEndOfDayInTimezone(this.datepickerDateEnd, this.companyData.timezone),
-                                ],
-                            ],
+                            start_at: ['between', [startAt, endAt]],
                         },
                         page: this.page,
                         with: ['task', 'task.project', 'user'],

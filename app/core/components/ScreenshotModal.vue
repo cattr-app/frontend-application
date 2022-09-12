@@ -143,8 +143,9 @@
         },
         methods: {
             formatDate(value) {
-                return moment(value)
-                    .tz(this.companyData.timezone)
+                return moment
+                    .utc(value)
+                    .tz(this.companyData.timezone, true)
                     .locale(this.$i18n.locale)
                     .format('MMMM D, YYYY — HH:mm:ss (Z)');
             },
