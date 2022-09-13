@@ -52,11 +52,10 @@ export function getEndOfDayInTimezone(date, timezone) {
 }
 
 export function getDateWithTimezoneDifference(date, baseTimezone, userTimezone, startOfDay = true) {
-    const timeDiff = moment.tz(date, baseTimezone).diff(moment.tz(date, userTimezone));
     if (startOfDay) {
-        return moment.tz(date, baseTimezone).startOf('day').add(timeDiff, 'milliseconds').toISOString();
+        return moment.utc(getStartOfDayInTimezone(date, userTimezone)).tz(baseTimezone).format('YYYY-MM-DD H:mm:ss');
     } else {
-        return moment.tz(date, baseTimezone).endOf('day').add(timeDiff, 'milliseconds').toISOString();
+        return moment.utc(getEndOfDayInTimezone(date, userTimezone)).tz(baseTimezone).format('YYYY-MM-DD H:mm:ss');
     }
 }
 

@@ -200,7 +200,13 @@
                 this.getScreenshots();
             },
             async getScreenshots() {
-                if (this.userIDs === 'undefined' || !this.datepickerDateStart || !this.datepickerDateEnd) {
+                if (
+                    this.userIDs === 'undefined' ||
+                    !this.datepickerDateStart ||
+                    !this.datepickerDateEnd ||
+                    !this.timezone ||
+                    !this.companyData.timezone
+                ) {
                     return;
                 }
 
