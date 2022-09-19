@@ -3,6 +3,8 @@ import UsersService from '@/services/resource/user.service';
 import TasksService from '@/services/resource/task.service';
 import LazySelect from './components/LazySelect';
 import DatetimeInput from './components/DatetimeInput';
+import TimezonePicker from '@/components/TimezonePicker';
+import rootStore from '@/store';
 import moment from 'moment';
 
 export const ModuleConfig = {
@@ -41,18 +43,44 @@ export function init(context, router) {
             required: true,
         },
         {
+            label: 'field.timezone',
+            key: 'timezone',
+            render: (h, props) => {
+                const timezone =
+                    typeof props.currentValue === 'string'
+                        ? props.currentValue
+                        : rootStore.getters['dashboard/timezone'] || moment.tz.guess();
+
+                props.setValue('timezone', timezone);
+
+                return h(TimezonePicker, {
+                    props: {
+                        value: timezone,
+                    },
+                    on: {
+                        onTimezoneChange: value => {
+                            props.setValue('timezone', value);
+                            rootStore.commit('dashboard/setTimezone', value);
+                        },
+                    },
+                });
+            },
+            required: true,
+        },
+        {
             label: 'field.start_at',
             key: 'start_at',
             render: (h, props) => {
                 const value =
                     typeof props.currentValue === 'string'
-                        ? props.currentValue
-                        : moment().startOf('hour').toISOString();
+                        ? moment(props.currentValue).tz(props.values.timezone, true).toISOString()
+                        : moment().startOf('day').tz(props.values.timezone, true).toISOString();
 
                 return h(DatetimeInput, {
                     props: {
                         inputHandler: props.inputHandler,
                         value,
+                        timezone: props.values.timezone,
                     },
                     on: {
                         change: value => {
@@ -72,12 +100,15 @@ export function init(context, router) {
             key: 'end_at',
             render: (h, props) => {
                 const value =
-                    typeof props.currentValue === 'string' ? props.currentValue : moment().startOf('day').toISOString();
+                    typeof props.currentValue === 'string'
+                        ? moment(props.currentValue).tz(props.values.timezone, true).toISOString()
+                        : moment().startOf('day').tz(props.values.timezone, true).add(10, 'minutes').toISOString();
 
                 return h(DatetimeInput, {
                     props: {
                         inputHandler: props.inputHandler,
                         value,
+                        timezone: props.values.timezone,
                     },
                 });
             },
