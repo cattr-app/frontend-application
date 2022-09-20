@@ -24,11 +24,7 @@
             </at-option>
         </at-select>
         <span v-if="showCount" class="at-select__placeholder">
-            {{
-                $tc(placeholder, selectionAmount, {
-                    count: selectionAmount,
-                })
-            }}
+            {{ placeholderText }}
         </span>
         <i v-if="model.length > 0" class="icon icon-x at-select__clear" @click.stop="clearSelect"></i>
     </div>
@@ -181,6 +177,15 @@
         computed: {
             selectionAmount() {
                 return this.model.length;
+            },
+            allOptionsSelected() {
+                return this.options.length === this.selectionAmount;
+            },
+            placeholderText() {
+                const i18nKey = this.placeholder + (this.allOptionsSelected ? '_all' : '');
+                return this.$tc(i18nKey, this.selectionAmount, {
+                    count: this.selectionAmount,
+                });
             },
         },
     };
