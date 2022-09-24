@@ -1,7 +1,7 @@
 <template>
     <div class="team_sidebar">
         <div class="row team_sidebar__heading">
-            <div class="col-16">
+            <div class="col-12">
                 <span
                     :class="{ 'team_sidebar__heading-active': this.sort === 'user' }"
                     class="team_sidebar__heading-toggle"
@@ -13,7 +13,7 @@
                     </template>
                 </span>
             </div>
-            <div>
+            <div class="col-12 flex-end">
                 <span
                     :class="{ 'team_sidebar__heading-active': this.sort === 'worked' }"
                     class="team_sidebar__heading-toggle"
@@ -46,7 +46,7 @@
                     </div>
                 </div>
             </div>
-            <div class="team_sidebar__user_worked">
+            <div class="col-8 flex-end team_sidebar__user_worked">
                 {{ formatDurationString(user.worked) }}
             </div>
         </div>
@@ -97,14 +97,23 @@
         &__heading {
             font-weight: 600;
             color: #b1b1be;
+            padding-right: 9px;
 
             &-active {
                 color: #59566e;
+                padding-right: 14px;
             }
             &-toggle {
                 cursor: pointer;
                 display: inline-block;
-                padding-bottom: 20px;
+                margin-bottom: 20px;
+                position: relative;
+                .icon {
+                    position: absolute;
+                    top: 50%;
+                    right: -3px;
+                    transform: translateY(-46%);
+                }
             }
         }
 
@@ -123,6 +132,7 @@
                 color: #59566e;
                 font-weight: 600;
                 margin-top: 15px;
+                padding-right: 15px;
             }
 
             &_task {
