@@ -74,16 +74,21 @@
                 type: String,
                 required: true,
             },
+            timezone: {
+                type: String,
+                required: true,
+            },
         },
         data() {
             return {
                 showPopup: false,
                 datePickerLang: {},
+                userTimezone: moment.tz.guess(true),
             };
         },
         computed: {
             datePickerValue() {
-                return moment(this.value).toDate();
+                return moment(this.value).add(this.tzDiff).toDate();
             },
             inputValue() {
                 return moment(this.value).format(DATETIME_FORMAT);
@@ -110,11 +115,18 @@
             minute() {
                 return moment(this.value).minutes();
             },
+            tzDiff() {
+                return moment().tz(this.timezone, true).diff(moment().tz(this.userTimezone, true)) * -1;
+            },
         },
         mounted() {
             window.addEventListener('click', this.hidePopup);
 
-            const dateTimeStr = moment().startOf('day').toISOString();
+            moment.tz.setDefault(this.timezone);
+
+            const dateTimeStr = this.value
+                ? moment(this.value).tz(this.timezone).toISOString()
+                : moment().startOf('day').toISOString();
             this.inputHandler(dateTimeStr);
             this.$emit('change', dateTimeStr);
             this.$nextTick(async () => {
@@ -139,6 +151,7 @@
         },
         beforeDestroy() {
             window.removeEventListener('click', this.hidePopup);
+            moment.tz.setDefault();
         },
         methods: {
             togglePopup() {
@@ -150,7 +163,13 @@
                 }
             },
             onDateChange(value) {
-                const dateTime = moment(value).hour(this.hour).minute(this.minute);
+                // value = js Date object in user timezone
+                const dateTime = moment
+                    .utc(value)
+                    .tz(this.userTimezone)
+                    .hour(this.hour)
+                    .minute(this.minute)
+                    .tz(this.timezone, true);
                 const dateTimeStr = dateTime.toISOString();
 
                 this.inputHandler(dateTimeStr);
@@ -171,7 +190,33 @@
                 this.$emit('change', dateTimeStr);
             },
             disabledDate(date) {
-                return moment(date).isAfter(moment(), 'day');
+                // date = js Date object in user timezone
+                return moment.utc(date).tz(this.userTimezone).tz(this.timezone, true).isAfter(moment(), 'day');
+            },
+        },
+        watch: {
+            timezone(newTimezone) {
+                let dateTimeStr = this.value
+                    ? moment.tz(this.value, newTimezone).toISOString()
+                    : moment().startOf('day').toISOString();
+
+                // Subtract one day if selected day is in the future in newTimezone,
+                // (relative to user timezone coz calendar show dates in user timezone)
+                if (
+                    moment
+                        .utc(moment.tz(this.value, newTimezone).toISOString())
+                        .tz(newTimezone)
+                        .tz(this.userTimezone, true)
+                        .isAfter(moment().tz(newTimezone), 'day')
+                ) {
+                    dateTimeStr = this.value
+                        ? moment.tz(this.value, newTimezone).subtract(1, 'day').toISOString()
+                        : moment().startOf('day').toISOString();
+                }
+
+                moment.tz.setDefault(this.timezone);
+                this.inputHandler(dateTimeStr);
+                this.$emit('change', dateTimeStr);
             },
         },
     };
