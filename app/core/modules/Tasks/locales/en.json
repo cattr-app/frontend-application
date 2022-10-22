@@ -15,7 +15,7 @@
     },
     "projects": "Projects",
     "users": "Users",
-    "worked": "Worked",
+    "spent_by_user": "Spent time by user",
     "status": "Status",
     "statuses": {
       "any": "Any",

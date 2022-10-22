@@ -224,7 +224,7 @@ export function init(context, router) {
         },
         {
             key: 'workers',
-            label: 'tasks.worked',
+            label: 'tasks.spent_by_user',
             render: (h, props) => {
                 const data = [];
                 Object.keys(props.currentValue).forEach(k => {
