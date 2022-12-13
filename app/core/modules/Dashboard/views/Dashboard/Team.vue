@@ -80,7 +80,6 @@
 
 <script>
     import moment from 'moment';
-    import 'moment-timezone';
     import throttle from 'lodash/throttle';
     import { mapMutations, mapGetters } from 'vuex';
     import Calendar from '@/components/Calendar';

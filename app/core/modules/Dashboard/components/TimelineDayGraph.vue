@@ -76,7 +76,7 @@
 <script>
     import { fabric } from 'fabric';
     import throttle from 'lodash/throttle';
-    import moment from 'moment';
+    import moment from 'moment-timezone';
     import { formatDurationString } from '@/utils/time';
     import Screenshot from '@/components/Screenshot';
     import ScreenshotModal from '@/components/ScreenshotModal';
