@@ -1,7 +1,6 @@
 {
   "name": "@cattr/frontend",
   "description": "Frontend application for Cattr",
-  "version": "0.0.0",
   "homepage": "https://cattr.app",
   "license": "SEE LICENSE IN LICENSE",
   "scripts": {

@@ -13,7 +13,6 @@ ENV SENTRY_DSN $SENTRY_DSN
 ENV IMAGE_VERSION=4.0.2
 
 RUN yarn && \
-    yarn version $APP_VERSION && \
     yarn compile && \
     yarn build
 
