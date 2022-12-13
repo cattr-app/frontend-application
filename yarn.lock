@@ -1313,12 +1313,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cattr/demo-module@workspace:app/vendor_modules/AmazingCat/Demo":
-  version: 0.0.0-use.local
-  resolution: "@cattr/demo-module@workspace:app/vendor_modules/AmazingCat/Demo"
-  languageName: unknown
-  linkType: soft
-
 "@cattr/frontend@workspace:.":
   version: 0.0.0-use.local
   resolution: "@cattr/frontend@workspace:."
@@ -1354,8 +1348,8 @@ __metadata:
     lodash: ^4.17.21
     mapbox-gl: ^2.11.1
     mini-css-extract-plugin: ^1.6.2
-    moment: ^2.29.4
-    moment-timezone: ^0.5.40
+    moment: ^2.29.3
+    moment-timezone: ^0.5.34
     pinst: ^3.0.0
     postcss: ^7.0.39
     prettier: 2.8.1
@@ -1387,17 +1381,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cattr/gitlab-integration@*, @cattr/gitlab-integration@workspace:app/vendor_modules/AmazingCat/GitlabIntegration":
-  version: 0.0.0-use.local
-  resolution: "@cattr/gitlab-integration@workspace:app/vendor_modules/AmazingCat/GitlabIntegration"
-  languageName: unknown
-  linkType: soft
+"@cattr/gitlab-integration@npm:*":
+  version: 2.0.3
+  resolution: "@cattr/gitlab-integration@npm:2.0.3::__archiveUrl=https%3A%2F%2Fgit.amazingcat.net%2Fapi%2Fv4%2Fprojects%2F274%2Fpackages%2Fnpm%2F%40cattr%2Fgitlab-integration%2F-%2F%40cattr%2Fgitlab-integration-2.0.3.tgz"
+  checksum: b0841e6ad3578fb2566eaee4959fb0542b66558de1a9e0b704bb0a0451db21d6421b9581330482af400f46483566264183adbeb2a8bcc623a66e25ece884d26d
+  languageName: node
+  linkType: hard
 
-"@cattr/redmine-integration@*, @cattr/redmine-integration@workspace:app/vendor_modules/AmazingCat/RedmineIntegration":
-  version: 0.0.0-use.local
-  resolution: "@cattr/redmine-integration@workspace:app/vendor_modules/AmazingCat/RedmineIntegration"
-  languageName: unknown
-  linkType: soft
+"@cattr/redmine-integration@npm:*":
+  version: 4.0.3
+  resolution: "@cattr/redmine-integration@npm:4.0.3::__archiveUrl=https%3A%2F%2Fgit.amazingcat.net%2Fapi%2Fv4%2Fprojects%2F272%2Fpackages%2Fnpm%2F%40cattr%2Fredmine-integration%2F-%2F%40cattr%2Fredmine-integration-4.0.3.tgz"
+  checksum: 68515f6c5861cb4fbd69eacf6f6bc2b56c3d3452dcd98b7a94275aed95d23aeeecd950ae94e68b50f57defa4390eeff2114a70cddd013d01063ed3289638706b
+  languageName: node
+  linkType: hard
 
 "@cattr/ui-kit@npm:^1.3.6":
   version: 1.3.6
@@ -9530,7 +9526,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"moment-timezone@npm:^0.5.40":
+"moment-timezone@npm:^0.5.34":
   version: 0.5.40
   resolution: "moment-timezone@npm:0.5.40"
   dependencies:
@@ -9546,7 +9542,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"moment@npm:^2.29.4":
+"moment@npm:^2.29.3":
   version: 2.29.4
   resolution: "moment@npm:2.29.4"
   checksum: 0ec3f9c2bcba38dc2451b1daed5daded747f17610b92427bebe1d08d48d8b7bdd8d9197500b072d14e326dd0ccf3e326b9e3d07c5895d3d49e39b6803b76e80e

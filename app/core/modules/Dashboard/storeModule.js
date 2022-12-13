@@ -1,5 +1,4 @@
-import moment from 'moment';
-import 'moment-timezone';
+import moment from 'moment-timezone';
 import TasksService from '@/services/resource/task.service';
 import UserService from '@/services/resource/user.service';
 import DashboardService from '_internal/Dashboard/services/dashboard.service';

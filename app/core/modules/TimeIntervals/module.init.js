@@ -5,7 +5,7 @@ import LazySelect from './components/LazySelect';
 import DatetimeInput from './components/DatetimeInput';
 import TimezonePicker from '@/components/TimezonePicker';
 import rootStore from '@/store';
-import moment from 'moment';
+import moment from 'moment-timezone';
 
 export const ModuleConfig = {
     routerPrefix: 'time-intervals',

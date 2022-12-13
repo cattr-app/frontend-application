@@ -76,8 +76,7 @@
 <script>
     import { fabric } from 'fabric';
     import throttle from 'lodash/throttle';
-    import moment from 'moment';
-    import 'moment-timezone';
+    import moment from 'moment-timezone';
     import { mapGetters } from 'vuex';
     import Screenshot from '@/components/Screenshot';
     import ScreenshotModal from '@/components/ScreenshotModal';

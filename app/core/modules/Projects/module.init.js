@@ -1,5 +1,4 @@
-import moment from 'moment';
-import 'moment-timezone';
+import moment from 'moment-timezone';
 import ProjectService from '@/services/resource/project.service';
 import i18n from '@/i18n';
 import { formatDurationString } from '@/utils/time';
