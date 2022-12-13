@@ -1313,12 +1313,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cattr/demo-module@workspace:app/vendor_modules/AmazingCat/Demo":
-  version: 0.0.0-use.local
-  resolution: "@cattr/demo-module@workspace:app/vendor_modules/AmazingCat/Demo"
-  languageName: unknown
-  linkType: soft
-
 "@cattr/frontend@workspace:.":
   version: 0.0.0-use.local
   resolution: "@cattr/frontend@workspace:."
@@ -1387,17 +1381,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@cattr/gitlab-integration@*, @cattr/gitlab-integration@workspace:app/vendor_modules/AmazingCat/GitlabIntegration":
-  version: 0.0.0-use.local
-  resolution: "@cattr/gitlab-integration@workspace:app/vendor_modules/AmazingCat/GitlabIntegration"
-  languageName: unknown
-  linkType: soft
+"@cattr/gitlab-integration@npm:*":
+  version: 2.0.3
+  resolution: "@cattr/gitlab-integration@npm:2.0.3::__archiveUrl=https%3A%2F%2Fgit.amazingcat.net%2Fapi%2Fv4%2Fprojects%2F274%2Fpackages%2Fnpm%2F%40cattr%2Fgitlab-integration%2F-%2F%40cattr%2Fgitlab-integration-2.0.3.tgz"
+  checksum: b0841e6ad3578fb2566eaee4959fb0542b66558de1a9e0b704bb0a0451db21d6421b9581330482af400f46483566264183adbeb2a8bcc623a66e25ece884d26d
+  languageName: node
+  linkType: hard
 
-"@cattr/redmine-integration@*, @cattr/redmine-integration@workspace:app/vendor_modules/AmazingCat/RedmineIntegration":
-  version: 0.0.0-use.local
-  resolution: "@cattr/redmine-integration@workspace:app/vendor_modules/AmazingCat/RedmineIntegration"
-  languageName: unknown
-  linkType: soft
+"@cattr/redmine-integration@npm:*":
+  version: 4.0.3
+  resolution: "@cattr/redmine-integration@npm:4.0.3::__archiveUrl=https%3A%2F%2Fgit.amazingcat.net%2Fapi%2Fv4%2Fprojects%2F272%2Fpackages%2Fnpm%2F%40cattr%2Fredmine-integration%2F-%2F%40cattr%2Fredmine-integration-4.0.3.tgz"
+  checksum: 68515f6c5861cb4fbd69eacf6f6bc2b56c3d3452dcd98b7a94275aed95d23aeeecd950ae94e68b50f57defa4390eeff2114a70cddd013d01063ed3289638706b
+  languageName: node
+  linkType: hard
 
 "@cattr/ui-kit@npm:^1.3.6":
   version: 1.3.6
@@ -13061,15 +13057,15 @@ __metadata:
   linkType: hard
 
 "terser@npm:^4.1.2":
-  version: 4.8.0
-  resolution: "terser@npm:4.8.0"
+  version: 4.8.1
+  resolution: "terser@npm:4.8.1"
   dependencies:
     commander: ^2.20.0
     source-map: ~0.6.1
     source-map-support: ~0.5.12
   bin:
     terser: bin/terser
-  checksum: f980789097d4f856c1ef4b9a7ada37beb0bb022fb8aa3057968862b5864ad7c244253b3e269c9eb0ab7d0caf97b9521273f2d1cf1e0e942ff0016e0583859c71
+  checksum: b342819bf7e82283059aaa3f22bb74deb1862d07573ba5a8947882190ad525fd9b44a15074986be083fd379c58b9a879457a330b66dcdb77b485c44267f9a55a
   languageName: node
   linkType: hard
 
