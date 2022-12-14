@@ -41,6 +41,8 @@ build:
 
 mark_release:
   image: ${CI_DEPENDENCY_PROXY_DIRECT_GROUP_IMAGE_PREFIX}/docker:20
+  tags:
+    - privileged
   stage: release
   only:
     - tags
