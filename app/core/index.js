@@ -56,6 +56,11 @@ if (
         integrations: [
             new BrowserTracing({
                 routingInstrumentation: Sentry.vueRouterInstrumentation(router),
+                tracePropagationTargets: [
+                    process.env.VUE_APP_API_URL !== 'null'
+                        ? process.env.VUE_APP_API_URL
+                        : `${window.location.origin}/api`,
+                ],
             }),
         ],
         tracesSampleRate: 0.2,
