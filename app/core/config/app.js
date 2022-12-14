@@ -9,7 +9,7 @@ axios.defaults.baseURL =
     (process.env.VUE_APP_API_URL !== 'null' ? process.env.VUE_APP_API_URL : `${window.location.origin}/api`) + '/';
 axios.defaults.headers.common['X-REQUESTED-WITH'] = 'XMLHttpRequest';
 axios.defaults.headers.common['X-CATTR-CLIENT'] = window.location.host;
-axios.defaults.headers.common['X_CATTR_CLIENT_VERSION'] = process.env.VUE_APP_VERSION;
+axios.defaults.headers.common['X-CATTR-VERSION'] = process.env.VUE_APP_VERSION;
 
 httpInterceptor.setup();
 
