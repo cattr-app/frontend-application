@@ -68,7 +68,7 @@
 </template>
 
 <script>
-    import moment from 'moment';
+    import moment from 'moment-timezone';
     import AppImage from './AppImage';
     import ScreenshotModal from './ScreenshotModal';
     import { mapGetters } from 'vuex';
