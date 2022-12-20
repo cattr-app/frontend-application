@@ -37,7 +37,7 @@
                     <div v-if="task" class="modal-field">
                         <span class="modal-label">{{ $t('field.task') }}:</span>
                         <span class="modal-value">
-                            <router-link :to="`/tasks/view/${task.id}`">{{ task.name }}</router-link>
+                            <router-link :to="`/tasks/view/${task.id}`">{{ task.task_name }}</router-link>
                         </span>
                     </div>
 
