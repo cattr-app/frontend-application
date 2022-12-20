@@ -50,7 +50,7 @@ export default {
                 },
                 {
                     label: 'field.work_time',
-                    key: 'heartbeat_period',
+                    key: 'work_time',
                     maxValue: 24,
                     minValue: 0,
                     fieldOptions: {
