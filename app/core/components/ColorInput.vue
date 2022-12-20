@@ -46,11 +46,11 @@
             display: flex;
             flex-flow: row nowrap;
 
-            & >>> .at-modal {
+            &::v-deep .at-modal {
                 width: 225px !important;
             }
 
-            & >>> .at-modal__body {
+            &::v-deep .at-modal__body {
                 padding: 0;
             }
         }

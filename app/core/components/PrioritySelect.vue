@@ -102,15 +102,15 @@
     .priority-select {
         border-radius: 5px;
 
-        & >>> .at-select__selection {
+        &::v-deep .at-select__selection {
             background: transparent;
         }
 
-        & >>> .at-select__dropdown .at-select__option {
+        &::v-deep .at-select__dropdown .at-select__option {
             padding: 0;
         }
 
-        & >>> .at-select {
+        &::v-deep .at-select {
             color: inherit;
         }
     }
