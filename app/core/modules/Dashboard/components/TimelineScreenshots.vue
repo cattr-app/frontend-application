@@ -61,6 +61,7 @@
                     project: null,
                     task: null,
                     show: false,
+                    user: null,
                 },
                 firstSelectedCheckboxIndex: null,
             };
