@@ -61,6 +61,7 @@
                     project: null,
                     task: null,
                     show: false,
+                    user: null,
                 },
                 firstSelectedCheckboxIndex: null,
             };
@@ -120,7 +121,7 @@
                     show: true,
                     project: { id: interval.project_id, name: interval.project_name },
                     user: interval,
-                    task: { id: interval.task_id, name: interval.task_name },
+                    task: { id: interval.task_id, task_name: interval.task_name },
                     interval,
                 };
             },

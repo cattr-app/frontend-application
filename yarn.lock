@@ -1321,7 +1321,7 @@ __metadata:
   dependencies:
     "@cattr/gitlab-integration": "*"
     "@cattr/redmine-integration": "*"
-    "@cattr/ui-kit": ^1.3.6
+    "@cattr/ui-kit": ^1.3.7
     "@cattr/vue-cli-plugin-compiler": "workspace:*"
     "@commitlint/cli": ^17.3.0
     "@commitlint/config-conventional": ^17.3.0
@@ -1397,16 +1397,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cattr/ui-kit@npm:^1.3.6":
-  version: 1.3.6
-  resolution: "@cattr/ui-kit@npm:1.3.6::__archiveUrl=https%3A%2F%2Fgit.amazingcat.net%2Fapi%2Fv4%2Fprojects%2F406%2Fpackages%2Fnpm%2F%40cattr%2Fui-kit%2F-%2F%40cattr%2Fui-kit-1.3.6.tgz"
+"@cattr/ui-kit@npm:^1.3.7":
+  version: 1.3.7
+  resolution: "@cattr/ui-kit@npm:1.3.7::__archiveUrl=https%3A%2F%2Fgit.amazingcat.net%2Fapi%2Fv4%2Fprojects%2F406%2Fpackages%2Fnpm%2F%40cattr%2Fui-kit%2F-%2F%40cattr%2Fui-kit-1.3.7.tgz"
   dependencies:
     deepmerge: ^2.0.1
     vue: ^2.5.13
     vue-i18n: ^7.4.1
     vue-router: ^2.8.1
     vue-template-compiler: ^2.5.13
-  checksum: b4fe68106b9fef51f555f636458bdb5bc00d0142d855324a3e2dca08b9bad323dc6b19ae5150c0a9d0be10a251112715a0a80e174737d8b7f1aca755bfa85046
+  checksum: 02e466b42cd30c62155c0dc1415d3c6f66067a5cc1647e697b2a7d44edfcc7eb83204f339621c1e25bf346f5fa3845a5d05bf533a46cf6a808cb2501fc580109
   languageName: node
   linkType: hard
 

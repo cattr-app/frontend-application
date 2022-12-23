@@ -137,13 +137,10 @@ export function fieldsToFillProvider() {
             label: 'field.timezone',
             key: 'timezone',
             render: (h, props) => {
-                if (typeof props.currentValue === 'object') {
-                    props.companyData.timezone
-                        ? props.inputHandler(props.companyData.timezone)
-                        : (props.currentValue = '');
-                }
-
-                if (!props.currentValue) {
+                if (typeof props.currentValue === 'object' && props.companyData.timezone) {
+                    props.currentValue = props.companyData.timezone;
+                    props.inputHandler(props.companyData.timezone);
+                } else if (typeof props.currentValue === 'object' || !props.currentValue) {
                     props.currentValue = '';
                 }
 
