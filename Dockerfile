@@ -24,3 +24,5 @@ COPY cattr_server.conf /opt/bitnami/nginx/conf/server_blocks/
 WORKDIR /app
 
 VOLUME /ssl
+
+EXPOSE 8080
