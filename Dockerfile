@@ -16,13 +16,11 @@ RUN yarn && \
     yarn compile && \
     yarn build
 
-FROM bitnami/nginx:latest AS nginx
+FROM nginx:alpine AS nginx
 
 COPY --from=frontend /app/output /app
-COPY cattr_server.conf /opt/bitnami/nginx/conf/server_blocks/
+COPY cattr_server.conf /etc/nginx/conf.d/default.conf
 
 WORKDIR /app
 
 VOLUME /ssl
-
-EXPOSE 8080
