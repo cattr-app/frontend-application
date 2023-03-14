@@ -3,14 +3,14 @@
 Here is an official development repository: https://git.amazingcat.net/AmazingTime/core/cattr-frontend
 
 ## About Cattr
-Cattr is an open-source time tracking solution, designed to be flawlessly integrated with your infrastructure. 
-Superpowered with features like built-in screenshot capture and activity detection, it's a great instrument to boost 
+Cattr is an open-source time tracking solution, designed to be flawlessly integrated with your infrastructure.
+Superpowered with features like built-in screenshot capture and activity detection, it's a great instrument to boost
 your team's performance straight to the top.
 
 ### Screenshots
-Dashboard             |  Project report
-:-------------------------:|:-------------------------:
-![](https://git.amazingcat.net/AmazingTime/core/cattr-frontend/uploads/69a5912d9db48237c29cd58aa54728b1/2.png)  |  ![](https://git.amazingcat.net/AmazingTime/core/cattr-frontend/uploads/bd595fdde959e6aff922ce2253a8acc8/1.png)
+|                                                Dashboard                                                 |                                              Project report                                              |
+|:--------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------:|
+| ![](https://git.amazingcat.net/Cattr/core/cattr-frontend/uploads/69a5912d9db48237c29cd58aa54728b1/2.png) | ![](https://git.amazingcat.net/Cattr/core/cattr-frontend/uploads/bd595fdde959e6aff922ce2253a8acc8/1.png) |
 
 ### Demo
 The demo app is available here: [demo.cattr.app](https://demo.cattr.app)
@@ -19,16 +19,16 @@ The demo app is available here: [demo.cattr.app](https://demo.cattr.app)
 [Installation manual](https://docs.cattr.app/#/en/getting-started/) on the documentation website
 ```
 # Install dependencies
-npm install
+yarn install
 
 # Adjust parameters in env.local.js (API_URL at least)
 nano app/etc/env.local.js
 
 # Compile modules
-npm run compile
+yarn run compile
 
 # Run production build
-npm run build
+yarn run build
 ```
 
 Note: if you want to work with the compiler or core use `npm link`
@@ -56,7 +56,7 @@ By default, will be loaded config from /app/etc/modules.*.json.
 `modules.local.json` if it exists
 
 ## Links
-https://github.com/cattr-app/desktop-application – Cattr Desktop Application. You can also download the built app for 
+https://github.com/cattr-app/desktop-application – Cattr Desktop Application. You can also download the built app for
 any OS from the [official site](https://cattr.app/desktop/).
 
 https://github.com/cattr-app/frontend-application – Cattr Frontend Application.
@@ -69,4 +69,4 @@ You can find the Cattr documentation [on the website](https://docs.cattr.app)
 Checkout the [Getting Started](https://docs.cattr.app/#/en/getting-started/) page for a quick overview.
 
 ## Questions
-For questions and support please use the [official forum](https://community.cattr.app). 
+For questions and support please use the [official forum](https://community.cattr.app).
