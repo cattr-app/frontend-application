@@ -17,6 +17,8 @@
     "users": "Users",
     "spent_by_user": "Spent time by user",
     "status": "Status",
+    "save_comment":"Save comment",
+    "cancel":"Cancel",
     "statuses": {
       "any": "Any",
       "open": "Open",

@@ -37,8 +37,8 @@ export default class TaskCommentService extends ResourceService {
     }
 
     /**
-     * @returns {Promise<AxiosResponse<T>>}
      * @param id
+     * @returns {Promise<AxiosResponse<T>>}
      */
     deleteItem(id) {
         return axios.post('task-comment/remove', { id });
@@ -51,5 +51,13 @@ export default class TaskCommentService extends ResourceService {
      */
     save(data) {
         return axios.post('task-comment/create', data);
+    }
+    /**
+     * @returns {Promise<AxiosResponse<T>>}
+     * @param data
+     * @param isNew
+     */
+    edit(data) {
+        return axios.post('task-comment/edit', data);
     }
 }

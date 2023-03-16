@@ -28,13 +28,28 @@
             <div class="comment-header">
                 <span class="comment-author">
                     <team-avatars class="comment-avatar" :users="[comment.user]" />
-                    {{ comment.user.full_name }}
+                    {{ comment.user.full_name }}·
+                    <span class="comment-date">{{ formatDate(comment.created_at) }}</span>
                 </span>
-
-                <span class="comment-date">{{ formatDate(comment.created_at) }}</span>
+                <div class="commment-functions">
+                    <div class="comment-buttons">
+                        <i class="icon icon-edit-2" @click="changeComment(comment)"></i>
+                        <i class="icon icon-x" @click="deleteComment(comment)"></i>
+                    </div>
+                </div>
             </div>
-
-            <div class="comment-content">
+            <div v-if="comment.id == idComment" ref="commentChangeForm" class="comment-content">
+                <at-textarea v-model="changeMessageText" class="comment-message" />
+                <div class="comment-buttons">
+                    <at-button class="comment-submit" @click.prevent="editComment(comment)">
+                        {{ $t('tasks.save_comment') }}
+                    </at-button>
+                    <at-button class="comment-submit" @click.prevent="cancelChangeComment">
+                        {{ $t('tasks.cancel') }}
+                    </at-button>
+                </div>
+            </div>
+            <div v-else class="comment-content">
                 <template v-for="(content, index) in getCommentContent(comment)">
                     <span v-if="content.type === 'text'" :key="index">{{ content.text }}</span>
                     <span v-else-if="content.type === 'username'" :key="index" class="username">{{
@@ -78,6 +93,8 @@
                 usersLeft: 0,
                 scrollTop: 0,
                 commentMessageScrollTop: 0,
+                idComment: false,
+                changeMessageText: null,
             };
         },
         computed: {
@@ -160,6 +177,25 @@
                     };
                 });
             },
+            changeComment(comment) {
+                this.idComment = comment.id;
+                this.changeMessageText = comment.content;
+            },
+            cancelChangeComment() {
+                this.idComment = false;
+            },
+            async editComment(comment) {
+                comment.content = this.changeMessageText;
+                const commentNew = await this.taskCommentService.edit(comment);
+                this.changeMessageText = '';
+                this.idComment = false;
+            },
+            async deleteComment(comment) {
+                const result = await this.taskCommentService.deleteItem(comment.id);
+                if (this.reload) {
+                    this.reload();
+                }
+            },
         },
         async created() {
             this.users = (await this.userService.getAll()).data;
@@ -203,6 +239,7 @@
 
     .comment-submit {
         margin-top: 8px;
+        margin-right: 8px;
     }
 
     .comment {
