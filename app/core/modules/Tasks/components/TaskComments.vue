@@ -28,7 +28,7 @@
             <div class="comment-header">
                 <span class="comment-author">
                     <team-avatars class="comment-avatar" :users="[comment.user]" />
-                    {{ comment.user.full_name }}·
+                    {{ comment.user.full_name }} ·
                     <span class="comment-date">{{ formatDate(comment.created_at) }}</span>
                 </span>
                 <div class="commment-functions">
@@ -57,6 +57,9 @@
                     }}</span>
                 </template>
             </div>
+            <span v-if="comment.updated_at !== comment.created_at" class="comment-date">
+                {{ $t('tasks.edited') }} {{ formatDate(comment.updated_at) }}
+            </span>
         </div>
     </div>
 </template>
@@ -66,7 +69,8 @@
     import TeamAvatars from '@/components/TeamAvatars';
     import TaskCommentService from '@/services/resource/task-comment.service';
     import UsersService from '@/services/resource/user.service';
-    import { formatDate } from '@/utils/time';
+    import { getLangCookie } from '@/i18n';
+    import { DateTime } from 'luxon';
 
     export default {
         components: {
@@ -105,7 +109,9 @@
             },
         },
         methods: {
-            formatDate,
+            formatDate(dateString) {
+                return DateTime.fromISO(dateString).setLocale(getLangCookie()).toRelative();
+            },
             async createComment(id) {
                 const comment = await this.taskCommentService.save({
                     task_id: id,
@@ -185,10 +191,15 @@
                 this.idComment = false;
             },
             async editComment(comment) {
+                const newCommnet = { ...comment, content: this.changeMessageText };
+                const result = await this.taskCommentService.edit(newCommnet);
                 comment.content = this.changeMessageText;
-                const commentNew = await this.taskCommentService.edit(comment);
+                comment.updated_at = result.data.data.updated_at;
                 this.changeMessageText = '';
                 this.idComment = false;
+                if (this.reload) {
+                    this.reload();
+                }
             },
             async deleteComment(comment) {
                 const result = await this.taskCommentService.deleteItem(comment.id);
@@ -255,7 +266,9 @@
         &-avatar {
             display: inline-block;
         }
-
+        &-date {
+            opacity: 0.5;
+        }
         .username {
             background: #ecf2fc;
             border-radius: 4px;

@@ -19,6 +19,7 @@
     "status": "Status",
     "save_comment":"Save comment",
     "cancel":"Cancel",
+    "edited":"Edited",
     "statuses": {
       "any": "Any",
       "open": "Open",

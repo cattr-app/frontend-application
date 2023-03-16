@@ -41,6 +41,7 @@
     "fabric": "^3.6.6",
     "js-md5": "^0.7.3",
     "lodash": "^4.17.21",
+    "luxon": "^3.3.0",
     "mapbox-gl": "^2.11.1",
     "mini-css-extract-plugin": "^1.6.2",
     "moment": "^2.29.4",
