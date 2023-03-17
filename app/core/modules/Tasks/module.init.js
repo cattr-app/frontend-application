@@ -10,7 +10,6 @@ import i18n from '@/i18n';
 import { getTextColor } from '@/utils/color';
 import { formatDate, formatDurationString } from '@/utils/time';
 import { VueEditor } from 'vue2-editor';
-import TaskComments from './components/TaskComments';
 import TaskHistory from './components/TaskHistory';
 
 export const ModuleConfig = {
@@ -270,15 +269,6 @@ export function init(context, router) {
             label: 'field.history',
             render: (h, props) => {
                 return h(TaskHistory, { props: { task: props.values } });
-            },
-        },
-        {
-            key: 'comments',
-            label: 'field.comments',
-            render: (h, props) => {
-                return h(TaskComments, {
-                    props: { task: props.values },
-                });
             },
         },
     ];

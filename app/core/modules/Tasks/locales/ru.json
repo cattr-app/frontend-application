@@ -20,6 +20,12 @@
     "save_comment":"Сохранить коментарий",
     "cancel":"Отменить",
     "edited":"Отредактирован",
+    "sort_or_filter":"Сортировка и фильтрация",
+    "newest_first":"Сначала новые",
+    "oldest_first":"Сначала старые",
+    "show_all_activity":"Показать все активности",
+    "show_comments_only":"Показать только коментарий",
+    "show_history_only":"Показать только изменения",
     "statuses": {
       "any": "Все",
       "open": "Открыта",
