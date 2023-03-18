@@ -193,7 +193,7 @@
             };
         },
         async created() {
-            this.users = (await this.userService.getAll()).data;
+            this.users = await this.userService.getAll();
             this.activity = (await this.getActivity()).data;
         },
         async mounted() {
