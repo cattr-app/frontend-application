@@ -58,7 +58,7 @@
                         {{
                             $t('projects.task_change_users', {
                                 user: item.user.full_name,
-                                date: formatDate(item.created_at),
+                                date: fromNow(item.created_at),
                                 value:
                                     item.new_value && item.new_value.length
                                         ? JSON.parse(item.new_value)
@@ -75,7 +75,7 @@
                                 user: item.user.full_name,
                                 field: $t(`field.${item.field}`).toLocaleLowerCase(),
                                 value: getStatusName(item.new_value),
-                                date: formatDate(item.created_at),
+                                date: fromNow(item.created_at),
                             })
                         }}
                     </template>
@@ -86,7 +86,7 @@
                                 user: item.user.full_name,
                                 field: $t(`field.${item.field}`).toLocaleLowerCase(),
                                 value: getPriorityName(item.new_value),
-                                date: formatDate(item.created_at),
+                                date: fromNow(item.created_at),
                             })
                         }}
                     </template>
@@ -96,7 +96,7 @@
                             $t('projects.task_change', {
                                 user: item.user.full_name,
                                 field: $t(`field.${item.field}`).toLocaleLowerCase(),
-                                date: formatDate(item.created_at),
+                                date: fromNow(item.created_at),
                             })
                         }}
                     </template>
@@ -106,9 +106,9 @@
                         <span class="comment-author">
                             <team-avatars class="comment-avatar" :users="[item.user]" />
                             {{ item.user.full_name }} ·
-                            <span class="comment-date">{{ formatDate(item.created_at) }}</span>
+                            <span class="comment-date">{{ fromNow(item.created_at) }}</span>
                         </span>
-                        <div class="commment-functions">
+                        <div v-if="item.can_change" class="commment-functions">
                             <div class="comment-buttons">
                                 <i class="icon icon-edit-2" @click="changeComment(item)"></i>
                                 <i class="icon icon-x" @click="deleteComment(item)"></i>
@@ -135,7 +135,7 @@
                         </template>
                     </div>
                     <span v-if="item.updated_at !== item.created_at" class="comment-date">
-                        {{ $t('tasks.edited') }} {{ formatDate(item.updated_at) }}
+                        {{ $t('tasks.edited') }} {{ fromNow(item.updated_at) }}
                     </span>
                 </div>
             </div>
@@ -152,7 +152,7 @@
     import taskActivityService from '@/services/resource/task-activity.service';
     import UsersService from '@/services/resource/user.service';
     import { getLangCookie } from '@/i18n';
-    import { DateTime } from 'luxon';
+    import { fromNow } from '@/utils/time';
 
     export default {
         components: {
@@ -220,6 +220,7 @@
             },
         },
         methods: {
+            fromNow,
             async resetHistory() {
                 this.page = 1;
                 this.canLoad = true;
@@ -250,9 +251,6 @@
                 }
 
                 return '';
-            },
-            formatDate(dateString) {
-                return DateTime.fromISO(dateString).setLocale(getLangCookie()).toRelative();
             },
             async createComment(id) {
                 const comment = await this.taskCommentService.save({
