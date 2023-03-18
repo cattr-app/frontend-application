@@ -151,7 +151,6 @@
     import TaskCommentService from '@/services/resource/task-comment.service';
     import taskActivityService from '@/services/resource/task-activity.service';
     import UsersService from '@/services/resource/user.service';
-    import { getLangCookie } from '@/i18n';
     import { fromNow } from '@/utils/time';
 
     export default {
