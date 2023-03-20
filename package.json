@@ -47,7 +47,7 @@
     "moment-timezone": "^0.5.40",
     "postcss": "^7.0.39",
     "semver": "^7.3.8",
-    "validator": "^12.2.0",
+    "validator": "^13.7.0",
     "vee-validate": "^3.4.14",
     "vue": "^2.7.14",
     "vue-avatar": "^2.3.3",
