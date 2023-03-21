@@ -18,7 +18,7 @@
                 </div>
             </div>
             <div class="buttons">
-                <at-button class="comment-submit" @click.prevent="createComment(task.id)">
+                <at-button class="comment-button" @click.prevent="createComment(task.id)">
                     {{ $t('projects.add_comment') }}
                 </at-button>
                 <at-dropdown>
@@ -118,10 +118,10 @@
                     <div v-if="item.id == idComment" ref="commentChangeForm" class="comment-content">
                         <at-textarea v-model="changeMessageText" class="comment-message" />
                         <div class="comment-buttons">
-                            <at-button class="comment-submit" @click.prevent="editComment(item)">
+                            <at-button class="comment-button" @click.prevent="editComment(item)">
                                 {{ $t('tasks.save_comment') }}
                             </at-button>
-                            <at-button class="comment-submit" @click.prevent="cancelChangeComment">
+                            <at-button class="comment-button" @click.prevent="cancelChangeComment">
                                 {{ $t('tasks.cancel') }}
                             </at-button>
                         </div>
@@ -148,7 +148,6 @@
     import StatusService from '@/services/resource/status.service';
     import PriorityService from '@/services/resource/priority.service';
     import { offset } from 'caret-pos';
-    import TaskCommentService from '@/services/resource/task-comment.service';
     import taskActivityService from '@/services/resource/task-activity.service';
     import UsersService from '@/services/resource/user.service';
     import { fromNow } from '@/utils/time';
@@ -171,7 +170,6 @@
                 taskActivityService: new taskActivityService(),
                 statuses: [],
                 priorities: [],
-                taskCommentService: new TaskCommentService(),
                 userService: new UsersService(),
                 commentMessage: '',
                 users: [],
@@ -226,14 +224,15 @@
                 this.activity = (await this.getActivity()).data;
             },
             async getActivity(dataOptions = {}) {
-                let data = {
-                    task_id: this.task.id,
-                    sort: this.sort,
-                    page: this.page,
-                    type: this.typeActivity,
-                    ...dataOptions,
-                };
-                return (await this.taskActivityService.get(data)).data;
+                return (
+                    await this.taskActivityService.getActivity({
+                        task_id: this.task.id,
+                        sort: this.sort,
+                        page: this.page,
+                        type: this.typeActivity,
+                        ...dataOptions,
+                    })
+                ).data;
             },
             getStatusName(id) {
                 const status = this.statuses.find(status => +status.id === +id);
@@ -252,7 +251,7 @@
                 return '';
             },
             async createComment(id) {
-                const comment = await this.taskCommentService.save({
+                const comment = await this.taskActivityService.saveComment({
                     task_id: id,
                     content: this.commentMessage,
                 });
@@ -346,14 +345,14 @@
             },
             async editComment(item) {
                 const newCommnet = { ...item, content: this.changeMessageText };
-                const result = await this.taskCommentService.edit(newCommnet);
+                const result = await this.taskActivityService.editComment(newCommnet);
                 item.content = this.changeMessageText;
                 item.updated_at = result.data.data.updated_at;
                 this.changeMessageText = '';
                 this.idComment = false;
             },
             async deleteComment(item) {
-                const result = await this.taskCommentService.deleteItem(item.id);
+                const result = await this.taskActivityService.deleteComment(item.id);
                 this.activity.splice(this.activity.indexOf(item), 1);
             },
         },
@@ -397,7 +396,7 @@
         display: inline-block;
     }
 
-    .comment-submit {
+    .comment-button {
         margin-top: 8px;
         margin-right: 8px;
     }
