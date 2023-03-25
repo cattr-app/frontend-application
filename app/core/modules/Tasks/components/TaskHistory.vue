@@ -50,7 +50,7 @@
             </div>
         </div>
         <div class="history">
-            <div v-for="item in activity" :key="item.id" class="comment">
+            <div v-for="item in activity" :key="item.id + (item.content ? 'c' : 'h')" class="comment">
                 <div v-if="!item.content" class="content">
                     <TeamAvatars class="history-change-avatar" :users="[item.user]" />
 
@@ -108,7 +108,7 @@
                             {{ item.user.full_name }} ·
                             <span class="comment-date">{{ fromNow(item.created_at) }}</span>
                         </span>
-                        <div v-if="item.can_change" class="commment-functions">
+                        <div v-if="item.user.id === user.id" class="commment-functions">
                             <div class="comment-buttons">
                                 <i class="icon icon-edit-2" @click="changeComment(item)"></i>
                                 <i class="icon icon-x" @click="deleteComment(item)"></i>
@@ -181,7 +181,8 @@
                 usersLeft: 0,
                 scrollTop: 0,
                 commentMessageScrollTop: 0,
-                idComment: false,
+                user: null,
+                idComment: null,
                 changeMessageText: null,
                 sort: 'desc',
                 typeActivity: 'all',
@@ -193,6 +194,7 @@
         async created() {
             this.users = await this.userService.getAll();
             this.activity = (await this.getActivity()).data;
+            this.user = this.$store.state.user.user.data;
         },
         async mounted() {
             window.addEventListener('scroll', this.onScroll);
@@ -226,9 +228,11 @@
             async getActivity(dataOptions = {}) {
                 return (
                     await this.taskActivityService.getActivity({
-                        task_id: this.task.id,
-                        sort: this.sort,
                         page: this.page,
+                        orderBy: ['created_at', this.sort],
+                        where: { task_id: ['=', [this.task.id]] },
+                        task_id: this.task.id,
+                        with: ['user'],
                         type: this.typeActivity,
                         ...dataOptions,
                     })
@@ -341,7 +345,7 @@
                 this.changeMessageText = item.content;
             },
             cancelChangeComment() {
-                this.idComment = false;
+                this.idComment = null;
             },
             async editComment(item) {
                 const newCommnet = { ...item, content: this.changeMessageText };
@@ -349,7 +353,7 @@
                 item.content = this.changeMessageText;
                 item.updated_at = result.data.data.updated_at;
                 this.changeMessageText = '';
-                this.idComment = false;
+                this.idComment = null;
             },
             async deleteComment(item) {
                 const result = await this.taskActivityService.deleteComment(item.id);

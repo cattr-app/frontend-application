@@ -1,6 +1,5 @@
 import ResourceService from '@/services/resource.service';
 import axios from 'axios';
-import { serialize } from '@/utils/url';
 
 export default class TaskActivityService extends ResourceService {
     /**
